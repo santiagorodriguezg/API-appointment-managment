@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  postgres_server:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PWD}
+    ports:
+      - 5432:5432
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+
+  web:
+    build: .
+    command: bash -c "
+      while !</dev/tcp/postgres_server/5432; do sleep 1; done;
+      python manage.py migrate --noinput
+      && python manage.py collectstatic --noinput
+      && python manage.py runserver 0.0.0.0:8000
+      && gunicorn roch.wsgi:application --bind 0.0.0.0:8000
+      "
+    expose:
+      - 8000
+    volumes:
+      - .:/code
+      - static:/code/static
+      - media:/code/media
+    depends_on:
+      - postgres_server
+
+  nginx:
+    build: ./nginx
+    ports:
+      - 8080:80
+    volumes:
+      - static:/code/static
+      - media:/code/media
+    depends_on:
+      - web
+
+volumes:
+  local_postgres_data:
+  local_postgres_data_backups:
+  static:
+  media:
