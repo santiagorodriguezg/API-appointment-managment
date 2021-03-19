@@ -1,3 +1,7 @@
+https://blog.logrocket.com/django-rest-framework-build-an-api-in-15-minutes/
+
+http://www.cdrf.co/
+
 # Gestión de citas para la Fundación de la Mujer en Boyacá
 
 API REST con Python y Django.

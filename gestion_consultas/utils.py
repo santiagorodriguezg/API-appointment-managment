@@ -8,5 +8,5 @@ class UserType(models.TextChoices):
     """Contact types"""
 
     ADMIN = 'ADMIN', _('Administrador')
-    WORKER = 'WKR', _('Trabajador')
-    CUSTOMER = 'CUST', _('Cliente')
+    DOCTOR = 'DOC', _('Doctor')
+    USER = 'USR', _('Usuario')

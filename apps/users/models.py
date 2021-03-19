@@ -11,40 +11,40 @@ class UserManager(BaseUserManager):
     """Custom User Manager"""
 
     def _create_user(
-            self, contact_type, first_name, email, phones, password, is_staff, is_superuser, **extra_fields
+            self, user_type, first_name, email, phone, password, is_staff, is_superuser, **extra_fields
     ):
         """
         Create a user. This function is called from the console.
         :param extra_fields: Extra fields that are defined in the REQUIRED_FIELDS constant.
         :return: User
         """
-        contact = self.model(
-            contact_type=contact_type,
+        user = self.model(
+            user_type=user_type,
             first_name=first_name,
             email=self.normalize_email(email),
-            phones=phones,
+            phone=phone,
             password=password,
             is_staff=is_staff,
             is_superuser=is_superuser,
             **extra_fields
         )
-        contact.set_password(password)
-        contact.save(using=self.db)
-        return contact
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
 
-    def create_user(self, contact_type, first_name, email, phones, password, **extra_fields):
+    def create_user(self, user_type, first_name, email, phone, password, **extra_fields):
         """
         Create a user
         :return: User
         """
-        return self._create_user(contact_type, first_name, email, phones, password, False, False, **extra_fields)
+        return self._create_user(user_type, first_name, email, phone, password, False, False, **extra_fields)
 
-    def create_superuser(self, first_name, email, phones, password, **extra_fields):
+    def create_superuser(self, first_name, email, phone, password, **extra_fields):
         """
         Create user with administrator permissions
         :return: User
         """
-        return self._create_user('ADMIN', first_name, email, phones, password, True, True, **extra_fields)
+        return self._create_user('ADMIN', first_name, email, phone, password, True, True, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -89,7 +89,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True,
         validators=[
-            MinLengthValidator(limit_value=7, message=_('Su identificación debe tener al menos 7 caracteres.')),
+            MinLengthValidator(limit_value=6, message=_('Su identificación debe tener al menos 6 caracteres.')),
         ]
     )
     email = models.EmailField(
@@ -123,7 +123,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
 
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phones']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone']
 
     class Meta:
         db_table = 'user'
@@ -139,3 +139,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         full_name = f'{self.first_name} {self.last_name}'
         return full_name.strip()
+
+    get_full_name.short_description = _('Nombre completo')
