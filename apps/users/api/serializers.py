@@ -1,8 +1,7 @@
 """Users serializers"""
-from datetime import datetime
-
 from django.contrib.auth import authenticate
 from django.contrib.sessions.models import Session
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
@@ -52,12 +51,14 @@ class UserLoginSerializer(serializers.Serializer):
         token, created = Token.objects.get_or_create(user=self.context['user'])
         if not created:
             # Delete users sessions
-            all_sessions = Session.objects.filter(expire_date__gte=datetime.now())
+            all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
             if all_sessions.exists():
                 for session in all_sessions:
                     session_data = session.get_decoded()
-                    if self.context['user'].id == int(session_data.get('_auth_user_id')):
-                        session.delete()
+                    session_user = session_data.get('_auth_user_id')
+                    if session_user:
+                        if self.context['user'].id == int(session_user):
+                            session.delete()
             # Update token
             token.delete()
             token = Token.objects.create(user=self.context['user'])

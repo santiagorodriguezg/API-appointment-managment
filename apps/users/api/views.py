@@ -1,7 +1,11 @@
 """Users views"""
+from django.contrib.sessions.models import Session
+from django.utils import timezone
 from rest_framework import status, viewsets
+from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.users.api.serializers import UserLoginSerializer, UserListSerializer, UserSerializer
 from apps.users.models import User
@@ -21,6 +25,34 @@ class LoginAPI(ObtainAuthToken):
             'user': UserListSerializer(user).data,
         }
         return Response(data, status=status.HTTP_201_CREATED)
+
+
+class LogoutAPI(APIView):
+    """User logout API view."""
+
+    def post(self, request, *args, **kwargs):
+        token = request.POST.get('token')
+        if token:
+            token = Token.objects.filter(key=token).first()
+            if token:
+                user = token.user
+                # Delete users sessions
+                all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
+                if all_sessions.exists():
+                    for session in all_sessions:
+                        session_data = session.get_decoded()
+                        session_user = session_data.get('_auth_user_id')
+                        if session_user:
+                            if user.id == int(session_user):
+                                session.delete()
+                token.delete()
+                return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
+            return Response(
+                {'error': 'No se ha encontrado un usuario con estas credenciales'}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(
+            {'error': 'No se ha encontrado un token en la petición'}, status=status.HTTP_409_CONFLICT
+        )
 
 
 class UserViewSet(viewsets.ModelViewSet):
