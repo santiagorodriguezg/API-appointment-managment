@@ -39,13 +39,12 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{host}}/users/",
+							"raw": "{{host}}/users",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"users",
-								""
+								"users"
 							]
 						}
 					},
@@ -84,6 +83,105 @@
 						"description": "Un usuario ADMIN puede crear usuarios de cualquier tipo"
 					},
 					"response": []
+				},
+				{
+					"name": "Me",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token_doctor}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/users/me/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"me",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User change password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password_old\": \"lg123456\",\r\n    \"password\":\"lg654321\",\r\n    \"password2\":\"lg654321\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/users/change-password/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"change-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"Guillermo\",\r\n    \"last_name\": \"Galeano\",\r\n    \"identification_type\": \"CE\",\r\n    \"identification_number\": \"785236525\",\r\n    \"username\": \"guillermo\",\r\n    \"email\": \"guillermo@gmail.com\",\r\n    \"phone\": \"3457824633\",\r\n    \"city\": null,\r\n    \"address\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/users/profile/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -100,7 +198,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "santiago",
+									"value": "luisgomez",
 									"type": "text"
 								},
 								{
