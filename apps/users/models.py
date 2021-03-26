@@ -1,11 +1,14 @@
+from django.contrib.auth import password_validation
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.sessions.models import Session
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator, FileExtensionValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
 from gestion_consultas.utils import REGEX_LETTERS_ONLY, UserType
 
@@ -109,7 +112,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=10,
         unique=True,
         error_messages={
-            'unique': _('Ya existe un contacto con este número de identificación.')
+            'unique': _('Ya existe un usuario con este número de identificación.')
         },
         validators=[
             MinLengthValidator(limit_value=6, message=_('Su identificación debe tener al menos 6 caracteres.')),
@@ -186,6 +189,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 def delete_user_sessions(user, token):
     """Delete the authentication token and user sessions."""
+
     all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
     if all_sessions.exists():
         for session in all_sessions:
@@ -195,3 +199,21 @@ def delete_user_sessions(user, token):
                 if user.id == int(session_user):
                     session.delete()
     token.delete()
+
+
+def clean_password2(instance, data):
+    """Verify passwords match"""
+
+    password1 = data.get("password")
+    password2 = data.get("password2")
+    if password1 and password2 and password1 != password2:
+        raise serializers.ValidationError(
+            {'password2': 'Las contraseñas ingresadas no coinciden'}, code='password_mismatch',
+        )
+
+    try:
+        password_validation.validate_password(password2, instance)
+    except ValidationError as error:
+        raise serializers.ValidationError({'password2': error.messages}, code='password2')
+
+    return data

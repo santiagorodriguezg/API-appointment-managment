@@ -1,29 +1,34 @@
 """Users views"""
+
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.users.api.serializers import UserLoginSerializer, UserListSerializer, UserSerializer
+from apps.users.api.serializers import (
+    UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserSignUpSerializer, UserLoginSerializer,
+)
 from apps.users.models import User, delete_user_sessions
+from gestion_consultas.exceptions import BadRequest
 from gestion_consultas.permissions import IsAdminOrDoctorUser
 from gestion_consultas.utils import UserType
 
-""""
-REVISAR EL FORMATO DE SALIDA DE LOS ERRORES
 
-EXAMPLE: 
-{
-    "error": "No se ha encontrado un usuario con estas credenciales"
-}
+class SignUpAPI(APIView):
+    """User sign up API view."""
 
-OR
-
-"errors": [
-        "Correo electrónico o contraseña incorrectos"
-    ]
-"""
+    def post(self, request, *args, **kwargs):
+        serializer = UserSignUpSerializer(data=request.data)
+        if serializer.is_valid():
+            user, token = serializer.save()
+            data = {
+                'access_token': token,
+                'user': UserListSerializer(user).data,
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginAPI(ObtainAuthToken):
@@ -38,7 +43,7 @@ class LoginAPI(ObtainAuthToken):
                 'user': UserListSerializer(user).data,
             }
             return Response(data, status=status.HTTP_201_CREATED)
-        return Response({'errors': ['Correo electrónico o contraseña incorrectos']}, status=status.HTTP_400_BAD_REQUEST)
+        raise BadRequest('Usuario o contraseña incorrectos')
 
 
 class LogoutAPI(APIView):
@@ -53,12 +58,8 @@ class LogoutAPI(APIView):
                 # Delete users sessions
                 delete_user_sessions(user, token)
                 return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
-            return Response(
-                {'error': 'No se ha encontrado un usuario con estas credenciales'}, status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(
-            {'error': 'No se ha encontrado un token en la petición'}, status=status.HTTP_409_CONFLICT
-        )
+            raise BadRequest('No se ha encontrado un usuario con estas credenciales')
+        raise BadRequest('No se ha encontrado un token en la petición')
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -68,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
     Only ADMIN and DOCTOR users can interact with the URLS in this view.
     """
 
-    serializer_class = UserSerializer
+    serializer_class = UserListAdminSerializer
     queryset = User.objects.all()
 
     permission_classes = (IsAdminOrDoctorUser,)
@@ -82,7 +83,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return User.objects.filter(is_active=True, pk=pk).defer(*UserListSerializer.Meta.exclude).first()
 
     def retrieve(self, request, pk=None, *args, **kwargs):
-        if request.user.is_authenticated:
+        if request.user.user_type == UserType.ADMIN:
             user_serializer = self.get_serializer(self.get_queryset(pk))
         else:
             user_serializer = UserListSerializer(self.get_queryset(pk))
@@ -93,3 +94,13 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.user.user_type == UserType.DOCTOR:
             user_serializer = UserListSerializer(self.get_queryset(), many=True)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        """Handle user create"""
+        if request.user.user_type == UserType.ADMIN:
+            serializer = UserCreateSerializer(data=request.data)
+            if serializer.is_valid():
+                user = serializer.save()
+                return Response(UserListAdminSerializer(user).data, status=status.HTTP_201_CREATED)
+            return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        raise PermissionDenied()

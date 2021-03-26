@@ -9,7 +9,7 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "{{host}}/users/",
+					"name": "users_list",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -50,6 +50,40 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "User create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{token_doctor}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_type\": \"DOC\",\r\n    \"first_name\": \"Julian\",\r\n    \"last_name\": \"Franco\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12348975\",\r\n    \"username\": \"julianfranco\",\r\n    \"email\": \"julian@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/users/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						},
+						"description": "Un usuario ADMIN puede crear usuarios de cualquier tipo"
+					},
+					"response": []
 				}
 			]
 		},
@@ -57,7 +91,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "{{host}}/login",
+					"name": "login",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -66,7 +100,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "luisgomez",
+									"value": "santiago",
 									"type": "text"
 								},
 								{
@@ -96,7 +130,7 @@
 					"response": []
 				},
 				{
-					"name": "{{host}}/logout/",
+					"name": "logout",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -105,7 +139,7 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": "0cf2994af550f7379c51168a02743b0f388903a1",
+									"value": "1874cd852a1d35945f9b84ef7381887a99488218",
 									"type": "text"
 								}
 							]
@@ -117,6 +151,33 @@
 							],
 							"path": [
 								"logout",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"Santiago\",\r\n    \"last_name\": \"Rpdriguez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"98732256\",\r\n    \"username\": \"santiago\",\r\n    \"email\": \"santiago@gmail.com\",\r\n    \"phone\": \"3152366674\",\r\n    \"city\": null,\r\n    \"address\": null,\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/signup/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"signup",
 								""
 							]
 						}
