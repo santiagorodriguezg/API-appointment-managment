@@ -1,6 +1,4 @@
 """Users views"""
-from django.contrib.sessions.models import Session
-from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -8,9 +6,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.users.api.serializers import UserLoginSerializer, UserListSerializer, UserSerializer
-from apps.users.models import User
+from apps.users.models import User, delete_user_sessions
 from gestion_consultas.permissions import IsAdminOrDoctorUser
 from gestion_consultas.utils import UserType
+
+""""
+REVISAR EL FORMATO DE SALIDA DE LOS ERRORES
+
+EXAMPLE: 
+{
+    "error": "No se ha encontrado un usuario con estas credenciales"
+}
+
+OR
+
+"errors": [
+        "Correo electrónico o contraseña incorrectos"
+    ]
+"""
 
 
 class LoginAPI(ObtainAuthToken):
@@ -18,13 +31,14 @@ class LoginAPI(ObtainAuthToken):
 
     def post(self, request, *args, **kwargs):
         serializer = UserLoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user, token = serializer.save()
-        data = {
-            'access_token': token,
-            'user': UserListSerializer(user).data,
-        }
-        return Response(data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            user, token = serializer.save()
+            data = {
+                'access_token': token,
+                'user': UserListSerializer(user).data,
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response({'errors': ['Correo electrónico o contraseña incorrectos']}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutAPI(APIView):
@@ -37,15 +51,7 @@ class LogoutAPI(APIView):
             if token:
                 user = token.user
                 # Delete users sessions
-                all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-                if all_sessions.exists():
-                    for session in all_sessions:
-                        session_data = session.get_decoded()
-                        session_user = session_data.get('_auth_user_id')
-                        if session_user:
-                            if user.id == int(session_user):
-                                session.delete()
-                token.delete()
+                delete_user_sessions(user, token)
                 return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
             return Response(
                 {'error': 'No se ha encontrado un usuario con estas credenciales'}, status=status.HTTP_400_BAD_REQUEST

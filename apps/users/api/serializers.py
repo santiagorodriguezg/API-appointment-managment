@@ -1,11 +1,10 @@
 """Users serializers"""
-from django.contrib.auth import authenticate
-from django.contrib.sessions.models import Session
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
-from apps.users.models import User
+from apps.users.models import User, delete_user_sessions
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,45 +21,20 @@ class UserListSerializer(serializers.ModelSerializer):
         exclude = ('password', 'is_superuser', 'is_active', 'is_staff', 'groups', 'user_permissions')
 
 
-class UserLoginSerializer(serializers.Serializer):
+class UserLoginSerializer(AuthTokenSerializer):
     """
-    User login serializer.
-    Handle the login request data.
+    User login serializer. Handle the login request data.
     """
 
-    email = serializers.EmailField()
-    password = serializers.CharField(min_length=8, max_length=64)
-
-    def validate(self, data):
-        """Check credentials"""
-
-        user = authenticate(username=data['email'], password=data['password'])
-        if not user:
-            raise serializers.ValidationError({
-                'errors': 'Correo electrónico o contraseña incorrectos'
-            }, code='authorization')
-
-        # if not user.is_verified:
-        #     raise serializers.ValidationError('Account is not active yet :(')
-
-        self.context['user'] = user
-        return data
-
-    def create(self, data):
-        """Generate or retrieve new token."""
-        token, created = Token.objects.get_or_create(user=self.context['user'])
+    def create(self, attrs):
+        """Create token to identify the user and update the last login date"""
+        user = attrs['user']
+        token, created = Token.objects.get_or_create(user=user)
         if not created:
-            # Delete users sessions
-            all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-            if all_sessions.exists():
-                for session in all_sessions:
-                    session_data = session.get_decoded()
-                    session_user = session_data.get('_auth_user_id')
-                    if session_user:
-                        if self.context['user'].id == int(session_user):
-                            session.delete()
-            # Update token
-            token.delete()
-            token = Token.objects.create(user=self.context['user'])
-
-        return self.context['user'], token.key
+            # Delete users sessions and generate new token
+            delete_user_sessions(user, token)
+            token = Token.objects.create(user=user)
+        # Update the last login date
+        user.last_login = timezone.now()
+        user.save(update_fields=['last_login'])
+        return user, token.key
