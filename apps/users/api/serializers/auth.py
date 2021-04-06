@@ -6,7 +6,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 from apps.users.models import User, delete_user_sessions, clean_password2
-from gestion_consultas.utils import UserType
 
 
 class UserSignUpSerializer(serializers.ModelSerializer):
@@ -19,19 +18,22 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('user_type', 'is_active', 'is_superuser', 'is_staff', 'last_login', 'created_at', 'updated_at')
+        exclude = (
+            'role', 'is_active', 'is_superuser', 'is_staff', 'last_login', 'created_at', 'updated_at', 'groups',
+            'user_permissions'
+        )
 
     def validate(self, data):
         """Verify passwords match"""
         return clean_password2(self.instance, data)
 
     def create(self, validated_data):
-        """Handle user and token creation"""
+        """Handle user with user role and token creation"""
 
         validated_data.pop('password2')
         user = User(**validated_data)
         user.set_password(validated_data['password'])
-        user.user_type = UserType.USER
+        user.role = User.Type.USER
         user.last_login = timezone.now()
         user.save()
         # Create token

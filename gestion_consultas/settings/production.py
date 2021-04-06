@@ -1,11 +1,9 @@
-from .base import *
+"""Production settings."""
+
+from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
-FILE_UPLOAD_PERMISSIONS = 0o644
-STATIC_ROOT = Path(BASE_DIR, 'static')
+STATIC_ROOT = Path(BASE_DIR, 'static')  # NOQA
 
 # Django REST Framework
 REST_FRAMEWORK = {

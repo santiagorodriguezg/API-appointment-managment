@@ -6,13 +6,12 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.users.api.permissions import IsAdminOrDoctorUser
 from apps.users.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
     UserProfileUpdateSerializer
 )
 from apps.users.models import User
-from gestion_consultas.permissions import IsAdminOrDoctorUser
-from gestion_consultas.utils import UserType
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -27,7 +26,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrDoctorUser,)
 
     def get_queryset(self, pk=None):
-        if self.request.user.user_type == UserType.ADMIN:
+        if self.request.user.role == User.Type.ADMIN:
             return User.objects.all() if pk is None else User.objects.filter(pk=pk).first()
         # DOCTOR User
         if pk is None:
@@ -40,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if qs is None:
             raise NotFound(detail='Usuario no encontrado.')
 
-        if request.user.user_type == UserType.ADMIN:
+        if request.user.role == User.Type.ADMIN:
             user_serializer = self.get_serializer(qs)
         else:
             user_serializer = UserListSerializer(qs)
@@ -49,13 +48,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         """User list"""
         user_serializer = self.get_serializer(self.get_queryset(), many=True)
-        if request.user.user_type == UserType.DOCTOR:
+        if request.user.role == User.Type.DOCTOR:
             user_serializer = UserListSerializer(self.get_queryset(), many=True)
         return Response(user_serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         """Handle user create"""
-        if request.user.user_type == UserType.ADMIN:
+        if request.user.role == User.Type.ADMIN:
             serializer = UserCreateSerializer(data=request.data)
             if serializer.is_valid():
                 user = serializer.save()
@@ -67,7 +66,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         """Logged user profile"""
         user = request.user
-        if user.user_type == UserType.ADMIN:
+        if user.role == User.Type.ADMIN:
             user_serializer = self.get_serializer(self.get_queryset(user.id))
         else:
             user_serializer = UserListSerializer(self.get_queryset(user.id))

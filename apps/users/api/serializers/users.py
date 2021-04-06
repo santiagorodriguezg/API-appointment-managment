@@ -3,7 +3,6 @@
 from rest_framework import serializers
 
 from apps.users.models import User, clean_password2
-from gestion_consultas.utils import UserType
 
 
 class UserListAdminSerializer(serializers.ModelSerializer):
@@ -50,7 +49,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = User(**validated_data)
         user.set_password(validated_data['password'])
-        if validated_data['user_type'] == UserType.ADMIN:
+        if validated_data['role'] == User.Type.ADMIN:
             user.is_superuser = True
             user.is_staff = True
         user.save()

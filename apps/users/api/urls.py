@@ -11,7 +11,7 @@ router.register(r'users', UserViewSet, basename='users')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('signup/', SignUpAPI.as_view(), name='signup'),
     path('login/', LoginAPI.as_view(), name='login'),
     path('logout/', LogoutAPI.as_view(), name='logout'),
-    path('signup/', SignUpAPI.as_view(), name='signup'),
 ]

@@ -8,7 +8,7 @@ from decouple import config, Csv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -76,7 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'gestion_consultas.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -90,7 +90,7 @@ DATABASES = {
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -107,8 +107,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'es-co'
 
@@ -119,6 +124,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+STATIC_URL = '/static/'
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 # MEDIA
 MEDIA_URL = '/media/'
@@ -131,8 +142,8 @@ AUTH_USER_MODEL = 'users.User'
 CSRF_COOKIE_HTTPONLY = True
 
 # Email settings
-EMAIL_PORT = 587
 EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # env
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # env
@@ -140,9 +151,7 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # env
 
 # django-cors-headers
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8080",
     "http://localhost:8000",
-    "http://127.0.0.1:3000",
 ]
 
 CORS_URLS_REGEX = r'^/api.*$'

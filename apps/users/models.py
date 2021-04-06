@@ -10,15 +10,15 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from gestion_consultas.utils import REGEX_LETTERS_ONLY, UserType
+from gestion_consultas.utils import REGEX_LETTERS_ONLY
 
 
 class UserManager(BaseUserManager):
     """Custom User Manager"""
 
     def _create_user(
-            self, user_type, first_name, last_name, identification_type, identification_number, username, phone,
-            password, email, **extra_fields
+            self, role, first_name, last_name, identification_type, identification_number, username, phone, password,
+            email, **extra_fields
     ):
         """
         Create a user. This function is called from the console.
@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
         :return: User
         """
         user = self.model(
-            user_type=user_type,
+            role=role,
             first_name=first_name,
             last_name=last_name,
             identification_type=identification_type,
@@ -41,8 +41,8 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(
-            self, user_type, first_name, last_name, identification_type, identification_number, username,
-            phone, password, email=None, **extra_fields
+            self, role, first_name, last_name, identification_type, identification_number, username, phone, password,
+            email=None, **extra_fields
     ):
         """
         Create a user
@@ -51,8 +51,8 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(
-            user_type, first_name, last_name, identification_type, identification_number, username, phone,
-            password, email, **extra_fields
+            role, first_name, last_name, identification_type, identification_number, username, phone, password, email,
+            **extra_fields
         )
 
     def create_superuser(
@@ -80,11 +80,18 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     """User model"""
 
+    class Type(models.TextChoices):
+        """User types"""
+
+        ADMIN = 'ADMIN', _('Administrador')
+        DOCTOR = 'DOC', _('Doctor')
+        USER = 'USR', _('Usuario')
+
     class IdentificationType(models.TextChoices):
         CC = 'CC', _('Cédula de Ciudadanía')
         CE = 'CE', _('Cédula de Extranjería')
 
-    user_type = models.CharField(_('tipo de usuario'), max_length=8, choices=UserType.choices)
+    role = models.CharField(_('tipo de usuario'), max_length=8, choices=Type.choices)
     first_name = models.CharField(_('nombre'), max_length=60, validators=[
         MinLengthValidator(limit_value=2, message=_('El nombre debe tener al menos 2 caracteres.')),
         RegexValidator(

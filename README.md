@@ -38,7 +38,7 @@ cd venv/Scripts/activate
 6. Instalar requerimientos:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements/local.txt
 ```
 
 7. Ejecutar el servidor local:
