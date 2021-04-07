@@ -45,7 +45,7 @@ class LogoutAPI(APIView):
     """User logout API view."""
 
     def post(self, request, *args, **kwargs):
-        token = request.POST.get('token')
+        token = request.data.get('token')
         if token:
             token = Token.objects.filter(key=token).first()
             if token:
