@@ -37,7 +37,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('is_superuser', 'is_staff', 'last_login', 'created_at', 'updated_at')
+        exclude = ('is_superuser', 'is_staff', 'last_login', 'created_at', 'updated_at', 'groups', 'user_permissions')
 
     def validate(self, data):
         """Verify passwords match"""
@@ -58,7 +58,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     """
-    User create serializer.
+    User update serializer.
     An ADMIN user can update users of any type.
     """
 

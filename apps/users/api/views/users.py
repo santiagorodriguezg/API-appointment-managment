@@ -62,7 +62,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         raise PermissionDenied()
 
-    @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated])
+    @action(methods=['get'], detail=False, permission_classes=[IsAuthenticated])
     def me(self, request):
         """Logged user profile"""
         user = request.user
