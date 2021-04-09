@@ -11,6 +11,8 @@ class Appointment(models.Model):
     doctor = models.ForeignKey(
         User, verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True, blank=True
     )
+    children = models.JSONField(verbose_name=_('hijos'), null=True, blank=True)
+    aggressor = models.CharField(_('datos del posible agresor'), max_length=500, null=True, blank=True)
     start_time = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
     end_time = models.DateTimeField(_('fecha de finalización'), null=True, blank=True)
     description = models.TextField(_('descripción'), null=True, blank=True)
