@@ -18,5 +18,8 @@ USER_DATA = {
     'email': fake.free_email(),
     'phone': fake.bothify(text='3#########'),
     'city': fake.city(),
-    'address': fake.address(),
+    'neighborhood': fake.street_name(),
+    'address': fake.street_address(),
+    'password': TEST_PASSWORD,
+    'password2': TEST_PASSWORD,
 }

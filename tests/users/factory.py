@@ -16,13 +16,14 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     role = User.Type.USER
-    identification_type = "CC"
+    identification_type = User.IdentificationType.CC
     identification_number = factory.Faker('bothify', text='########')
     username = factory.LazyAttribute(lambda a: f"{a.first_name}{a.last_name}".lower())
     email = factory.LazyAttribute(lambda a: f'{a.first_name}.{a.last_name}@gmail.com'.lower())
     phone = factory.Faker('bothify', text='3#########')
-    city = None
-    address = None
+    city = factory.Faker('city')
+    neighborhood = factory.Faker('street_name')
+    address = factory.Faker('street_address')
     password = factory.PostGenerationMethodCall('set_password', TEST_PASSWORD)
 
 

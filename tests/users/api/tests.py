@@ -14,9 +14,6 @@ class AccountsAPITestCase(APITestCase):
 
     def test_signup(self) -> None:
         """Register user with role USER"""
-
-        USER_DATA.setdefault('password', TEST_PASSWORD)
-        USER_DATA.setdefault('password2', TEST_PASSWORD)
         response = self.client.post(reverse('signup'), USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
@@ -26,7 +23,7 @@ class AccountsAPITestCase(APITestCase):
         """Verify user is logged in"""
         user = UserFactory()
         data = {
-            'username': user.username,
+            'email': user.email,
             'password': TEST_PASSWORD,
         }
         response = self.client.post(reverse('login'), data)
@@ -66,25 +63,34 @@ class UsersAdminAPITestCase(APITestCase):
         UserDoctorFactory.create_batch(3)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.count(), 4)
 
-        for i, user in enumerate(User.objects.prefetch_related('groups', 'user_permissions').all()):
-            self.assertEqual(response.data[i].get('first_name'), user.first_name)
-            self.assertEqual(response.data[i].get('role'), user.role)
-            self.assertEqual(response.data[i].get('is_superuser'), user.is_superuser)
-            self.assertEqual(response.data[i].get('is_active'), user.is_active)
-            self.assertEqual(response.data[i].get('is_staff'), user.is_staff)
-            self.assertEqual(response.data[i].get('groups'), list(user.groups.all()))
-            self.assertEqual(response.data[i].get('user_permissions'), list(user.user_permissions.all()))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), 4)
+
+        res = response.data.get('results')
+        for i, user in enumerate(User.objects.prefetch_related('groups', 'user_permissions').all()[:2]):
+            self.assertEqual(res[i].get('first_name'), user.first_name)
+            self.assertEqual(res[i].get('role'), user.role)
+            self.assertEqual(res[i].get('is_superuser'), user.is_superuser)
+            self.assertEqual(res[i].get('is_active'), user.is_active)
+            self.assertEqual(res[i].get('is_staff'), user.is_staff)
+            self.assertEqual(res[i].get('groups'), list(user.groups.all()))
+            self.assertEqual(res[i].get('user_permissions'), list(user.user_permissions.all()))
 
     def test_user_admin_retrieve_user(self) -> None:
         """An ADMIN user can retrieve one user"""
-        # Create users
         users = UserDoctorFactory.create_batch(3)
         response = self.client.get(f'{self.url}{users[1].id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(users[1].first_name, response.data.get('first_name'))
+
+    def test_user_admin_update_user(self) -> None:
+        """Update users for given Id"""
+        users = UserDoctorFactory.create_batch(3)
+        response = self.client.put(f'{self.url}{users[1].id}/', USER_DATA)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.count(), 4)
+        self.assertEqual(response.data.get('first_name'), USER_DATA.get('first_name'))
 
 
 class UsersDoctorAPITestCase(APITestCase):
@@ -109,27 +115,35 @@ class UsersDoctorAPITestCase(APITestCase):
         self.assertEqual(User.objects.count(), 1)
 
         # Create users
-        UserAdminFactory.create_batch(3)
+        UserFactory.create_batch(4)
 
-        response = self.client.get(self.url)
+        response = self.client.get(f'{self.url}?limit=3')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(User.objects.count(), 4)
-        for i, user in enumerate(User.objects.prefetch_related('groups', 'user_permissions').all()):
-            self.assertEqual(response.data[i].get('first_name'), user.first_name)
-            self.assertEqual(response.data[i].get('role'), user.role)
-            self.assertIsNone(response.data[i].get('is_superuser'))
-            self.assertIsNone(response.data[i].get('is_active'))
-            self.assertIsNone(response.data[i].get('is_staff'))
-            self.assertIsNone(response.data[i].get('groups'))
-            self.assertIsNone(response.data[i].get('user_permissions'))
+        self.assertEqual(response.data.get('count'), 5)
+
+        res = response.data.get('results')
+        for i, user in enumerate(User.objects.all()[:3]):
+            self.assertEqual(res[i].get('first_name'), user.first_name)
+            self.assertEqual(res[i].get('role'), user.role)
+            self.assertIsNone(res[i].get('is_superuser'))
+            self.assertIsNone(res[i].get('is_active'))
+            self.assertIsNone(res[i].get('is_staff'))
+            self.assertIsNone(res[i].get('groups'))
+            self.assertIsNone(res[i].get('user_permissions'))
 
     def test_user_doctor_retrieve_user(self) -> None:
         """Verify that DOCTOR users only see basic user fields for one user."""
-        # Create users
         users = UserFactory.create_batch(3)
         response = self.client.get(f'{self.url}{users[1].id}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(users[1].username, response.data.get('username'))
+
+    def test_user_doctor_update_user(self) -> None:
+        """Verify that a DOCTOR user cannot update users for given Id"""
+        users = UserDoctorFactory.create_batch(3)
+        response = self.client.put(f'{self.url}{users[1].id}/', USER_DATA)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(User.objects.count(), 4)
 
 
 class UsersPatientAPITestCase(APITestCase):
@@ -143,24 +157,29 @@ class UsersPatientAPITestCase(APITestCase):
         self.url = '/users/'
 
     def test_user_patient_create_users(self):
-        """Verify that an PATIENT user can not create users"""
+        """Verify that an patient user can not create users"""
         response = self.client.post(self.url, USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 1)
 
     def test_user_patient_list_users(self) -> None:
         """Verify that a patient user cannot list users"""
-        # Users in DB must be 1
         self.assertEqual(User.objects.count(), 1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_patient_retrieve_user(self) -> None:
         """Verify that patient users can not retrieve users"""
-        # Create users
         users = UserFactory.create_batch(3)
         response = self.client.get(f'{self.url}{users[1].id}/')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_patient_update_user(self) -> None:
+        """Verify that a patient user cannot update users for given Id"""
+        users = UserDoctorFactory.create_batch(3)
+        response = self.client.put(f'{self.url}{users[1].id}/', USER_DATA)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(User.objects.count(), 4)
 
 
 class UsersAPITestCase(APITestCase):
@@ -181,10 +200,7 @@ class UsersAPITestCase(APITestCase):
 
     def test_update_profile(self) -> None:
         """Verify that the user can update his profile"""
-        data = {
-
-        }
-        response = self.client.post(f'{self.url}profile/', USER_DATA)
+        response = self.client.put(f'{self.url}me/', USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data.get('first_name'), USER_DATA.get('first_name'))
 
@@ -196,13 +212,13 @@ class UsersAPITestCase(APITestCase):
             "password": pwd,
             "password2": pwd
         }
-        response = self.client.post(f'{self.url}change-password/', data)
+        response = self.client.put(f'{self.url}change-password/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
 
         # Verify user login
         data = {
-            'username': self.user.username,
+            'email': self.user.email,
             'password': pwd,
         }
         response = self.client.post(reverse('login'), data)

@@ -5,9 +5,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.users.api.serializers.auth import UserSignUpSerializer, UserLoginSerializer
+from apps.users.api.serializers.auth import UserSignUpSerializer, UserLoginSerializer, FindUserAccountSerializer
 from apps.users.api.serializers.users import UserListSerializer
-from apps.users.models import delete_user_sessions
+from apps.users.utils import delete_user_sessions
 from gestion_consultas.exceptions import BadRequest
 
 
@@ -31,14 +31,13 @@ class LoginAPI(APIView):
 
     def post(self, request, *args, **kwargs):
         serializer = UserLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user, token = serializer.save()
-            data = {
-                'access_token': token,
-                'user': UserListSerializer(user).data,
-            }
-            return Response(data, status=status.HTTP_201_CREATED)
-        raise BadRequest('Usuario o contraseña incorrectos')
+        serializer.is_valid(raise_exception=True)
+        user, token = serializer.save()
+        data = {
+            'access_token': token,
+            'user': UserListSerializer(user).data,
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class LogoutAPI(APIView):
@@ -55,3 +54,18 @@ class LogoutAPI(APIView):
                 return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
             raise BadRequest('No se ha encontrado un usuario con estas credenciales')
         raise BadRequest('No se ha encontrado un token en la petición')
+
+
+class BeginPasswordReset(APIView):
+    """Verify that the user account exists."""
+
+    def get(self, request, *args, **kwargs):
+        serializer = FindUserAccountSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.context['user']
+        data = {
+            'success': True,
+            'username': user.username,
+            'email': user.email,
+        }
+        return Response(data, status=status.HTTP_201_CREATED)

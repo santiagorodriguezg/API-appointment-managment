@@ -2,7 +2,8 @@
 
 from rest_framework import serializers
 
-from apps.users.models import User, clean_password2
+from apps.users.models import User
+from apps.users.utils import clean_password2
 
 
 class UserListAdminSerializer(serializers.ModelSerializer):
@@ -37,7 +38,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('is_superuser', 'is_staff', 'last_login', 'created_at', 'updated_at', 'groups', 'user_permissions')
+        exclude = (
+            'username', 'is_superuser', 'is_staff', 'last_login', 'created_at', 'updated_at', 'groups',
+            'user_permissions'
+        )
 
     def validate(self, data):
         """Verify passwords match"""
@@ -64,7 +68,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ('password', 'last_login', 'created_at', 'updated_at')
+        exclude = ('password', 'last_login', 'created_at', 'updated_at', 'groups', 'user_permissions')
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
@@ -77,7 +81,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'first_name', 'last_name', 'identification_type', 'identification_number', 'phone', 'email', 'city',
-            'address', 'username',
+            'neighborhood', 'address', 'username'
         )
 
 

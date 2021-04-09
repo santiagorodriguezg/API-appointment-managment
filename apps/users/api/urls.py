@@ -3,7 +3,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from apps.users.api.views.auth import SignUpAPI, LoginAPI, LogoutAPI
+from apps.users.api.views.auth import SignUpAPI, LoginAPI, LogoutAPI, BeginPasswordReset
 from apps.users.api.views.users import UserViewSet
 
 router = DefaultRouter()
@@ -14,4 +14,5 @@ urlpatterns = [
     path('signup', SignUpAPI.as_view(), name='signup'),
     path('login', LoginAPI.as_view(), name='login'),
     path('logout', LogoutAPI.as_view(), name='logout'),
+    path('begin-reset-password', BeginPasswordReset.as_view(), name='begin_reset_password'),
 ]
