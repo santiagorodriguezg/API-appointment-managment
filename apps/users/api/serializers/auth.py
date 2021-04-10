@@ -1,12 +1,15 @@
 """Users serializers"""
 
+from django.conf import settings
 from django.contrib.auth import authenticate
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from apps.users.models import User
-from apps.users.utils import clean_password2, delete_user_sessions
+from apps.users.utils import clean_password2, delete_user_sessions, generate_token, verify_token
 
 
 class UserSignUpSerializer(serializers.ModelSerializer):
@@ -48,27 +51,27 @@ class UserLoginSerializer(serializers.Serializer):
     Handle the login request data.
     """
 
-    email = serializers.EmailField()
+    username = serializers.CharField()
     password = serializers.CharField(min_length=8, max_length=64)
 
     def validate(self, data):
         """Check credentials"""
 
-        user = authenticate(username=data['email'], password=data['password'])
+        user = authenticate(username=data['username'], password=data['password'])
         if not user:
             raise serializers.ValidationError({
-                'errors': 'Correo electrónico o contraseña incorrectos'
+                'errors': 'Usuario o contraseña incorrectos'
             }, code='authorization')
 
         # if not user.is_verified:
         #     raise serializers.ValidationError('Account is not active yet :(')
-        self.context['user'] = user
+
+        data['user'] = user
         return data
 
     def create(self, data):
         """Create token to identify the user and update the last login date"""
-
-        user = self.context['user']
+        user = data['user']
         token, created = Token.objects.get_or_create(user=user)
         if not created:
             # Delete users sessions and generate new token
@@ -80,22 +83,75 @@ class UserLoginSerializer(serializers.Serializer):
         return user, token.key
 
 
-# begin_password_reset
-class FindUserAccountSerializer(serializers.Serializer):
+class VerifyTokenSerializer(serializers.Serializer):
+    """Verify token serializer"""
+    token = serializers.CharField()
+
+    def validate_token(self, data):
+        """Verify token is valid."""
+        self.context['payload'] = verify_token(data)
+        return data
+
+
+class PasswordResetSerializer(serializers.Serializer):
     """
     Find user account serializer.
-    Finds the user account given a user name.
+    Finds the user account given a user name and send email reset password.
     """
 
-    username = serializers.CharField(min_length=8)
+    username = serializers.CharField()
 
-    def validate(self, data):
+    def validate_username(self, data):
         """Verify that the user account exists"""
-
-        user = User.objects.filter(username=data.get('username'), is_active=True).first()
+        user = User.objects.filter(username=data, is_active=True).first()
         if user is None:
             raise serializers.ValidationError(
-                {'errors': 'No se encontró su cuenta. Vuelva a intentarlo con otro usuario.'}, code='account_not_found'
+                {'errors': 'El usuario no está asignado a ninguna cuenta.'}, code='account_not_found'
             )
-        self.context['user'] = user
+        self.instance = user
         return data
+
+    def save(self, **kwargs):
+        """Send password reset email"""
+        if self.instance.email is None:
+            self.context['send_email'] = False
+        else:
+            self.send_password_reset_email(self.instance)
+        return self.instance
+
+    def send_password_reset_email(self, user):
+        """Send reset password link to given user."""
+        token = generate_token(user, 'password_reset')
+        url = f'{settings.DEFAULT_DOMAIN}password/reset/key/{token}'
+        template_prefix = 'users/email/password_reset_key'
+        context = {'user': user, 'password_reset_url': url}
+        subject = render_to_string(f'{template_prefix}_subject.txt', context)
+        subject = " ".join(subject.splitlines()).strip()  # Remove superfluous line breaks
+        content = render_to_string(f'{template_prefix}_message.html', context)
+        msg = EmailMultiAlternatives(subject, content, settings.DEFAULT_FROM_EMAIL, [user.email])
+        msg.attach_alternative(content, "text/html")
+        self.context['send_email'] = msg.send() == 1
+
+
+class PasswordResetFromKeySerializer(serializers.Serializer):
+    """Password reset password from key serializer"""
+
+    token = serializers.CharField()
+    password = serializers.CharField(min_length=8)
+    password2 = serializers.CharField(min_length=8)
+
+    def validate_token(self, data):
+        """Verify token is valid."""
+        self.context['payload'] = verify_token(data)
+        return data
+
+    def validate(self, data):
+        """Verify passwords match"""
+        return clean_password2(self.instance, data)
+
+    def save(self, **kwargs):
+        """Update user´s password"""
+        payload = self.context['payload']
+        user = User.objects.get(username=payload['user'], is_active=True)
+        user.set_password(self.validated_data['password2'])
+        user.save(update_fields=['password', 'updated_at'])

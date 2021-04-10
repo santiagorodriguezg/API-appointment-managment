@@ -1,9 +1,9 @@
 """Users serializers"""
-
+from django.conf import settings
 from rest_framework import serializers
 
 from apps.users.models import User
-from apps.users.utils import clean_password2
+from apps.users.utils import clean_password2, generate_token
 
 
 class UserListAdminSerializer(serializers.ModelSerializer):
@@ -108,3 +108,27 @@ class UserPasswordChangeSerializer(serializers.Serializer):
         self.instance.set_password(validated_data['password2'])
         self.instance.save(update_fields=['password', 'updated_at'])
         return self.instance
+
+
+class UserPasswordResetSerializer(serializers.Serializer):
+    """
+    User password serializer.
+    An ADMIN user can send a password reset link
+    """
+
+    username = serializers.CharField()
+
+    def validate_username(self, data):
+        """Verify that the user account exists"""
+        user = User.objects.filter(username=data, is_active=True).first()
+        if user is None:
+            raise serializers.ValidationError(
+                {'errors': 'El usuario no está asignado a ninguna cuenta.'}, code='account_not_found'
+            )
+        self.instance = user
+        return data
+
+    def save(self, **kwargs):
+        """Generate password reset link to given user."""
+        token = generate_token(self.instance, 'password_reset')
+        self.context['password_reset_url'] = f'{settings.DEFAULT_DOMAIN}password/reset/key/{token}'

@@ -4,11 +4,9 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.sessions.models import Session
 from django.core.validators import MinLengthValidator, RegexValidator, FileExtensionValidator
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-from gestion_consultas.utils import REGEX_LETTERS_ONLY, generate_random_field
+from gestion_consultas.utils import REGEX_LETTERS_ONLY
 
 
 class UserManager(BaseUserManager):
@@ -130,9 +128,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         _('correo electrónico'),
         max_length=60,
-        unique=True,
         blank=True,
-        default='fundacionmujer@gmail.com',
+        null=True,
         error_messages={
             'unique': _('Ya existe un contacto con este correo electrónico.')
         }
@@ -170,10 +167,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated_at = models.DateTimeField(_('fecha de modificación de la cuenta'), auto_now=True)
 
     objects = UserManager()
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     EMAIL_FIELD = 'email'
 
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'identification_number', 'username', 'phone']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'identification_number', 'email', 'phone']
 
     class Meta:
         db_table = 'user'
@@ -190,10 +187,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f'{self.first_name} {self.last_name}'.strip()
 
     get_full_name.short_description = _('Nombre completo')
-
-
-@receiver(pre_save, sender=User)
-def username_save(sender, instance, **kwargs):
-    """Generate user username"""
-    if not instance.username:
-        instance.username = generate_random_field(instance, 'username', instance.get_full_name())

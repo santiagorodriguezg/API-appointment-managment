@@ -4,7 +4,7 @@ API REST con Python y Django.
 
 ## Requerimientos
 
-**Python 3.8, 3.9**
+**Python 3.9**
 
 **PostgreSQL 12, 13**
 
@@ -46,6 +46,14 @@ pip install -r requirements/local.txt
 ```bash
 python manage.py runserver
 ```
+
+## Configuración de correos electrónicos
+
+1. Habilitar la opción `Acceso de aplicaciones poco seguras`.
+
+2. Deshabilitar CAPTCHA para Gmail:
+
+   [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha)
 
 ## Colaboradores
 

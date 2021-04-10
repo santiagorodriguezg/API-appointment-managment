@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from apps.users.api.permissions import IsAdminOrDoctorUser
 from apps.users.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
-    UserProfileUpdateSerializer, UserUpdateSerializer
+    UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer
 )
 from apps.users.models import User
 from gestion_consultas.utils import UnaccentedSearchFilter
@@ -31,19 +31,20 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ['~first_name', '~last_name', '~city', '~neighborhood', '~address']
     ordering_fields = ['first_name', 'last_name', 'created_at', 'updated_at']
     ordering = ('id',)
+    lookup_field = 'username'
 
-    def get_queryset(self, pk=None):
+    def get_queryset(self, username=None):
         queryset = User.objects.all()
         if self.request.user.role == User.Type.ADMIN:
-            return queryset if pk is None else queryset.filter(pk=pk).first()
+            return queryset if username is None else queryset.filter(username=username).first()
         # DOCTOR User
-        if pk is None:
+        if username is None:
             return queryset.filter(is_active=True).defer(*UserListSerializer.Meta.exclude)
-        return queryset.filter(is_active=True, pk=pk).defer(*UserListSerializer.Meta.exclude).first()
+        return queryset.filter(is_active=True, username=username).defer(*UserListSerializer.Meta.exclude).first()
 
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        """User by pk"""
-        qs = self.get_queryset(pk)
+    def retrieve(self, request, username=None, *args, **kwargs):
+        """User by username"""
+        qs = self.get_queryset(username)
         if qs is None:
             raise NotFound(detail='Usuario no encontrado.')
 
@@ -72,10 +73,10 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         raise PermissionDenied()
 
-    def update(self, request, pk=None, *args, **kwargs):
+    def update(self, request, username=None, *args, **kwargs):
         """Update users for given Id"""
         if request.user.role == User.Type.ADMIN:
-            qs = self.get_queryset(pk)
+            qs = self.get_queryset(username)
             if qs is None:
                 raise NotFound(detail='Usuario no encontrado.')
             serializer = UserUpdateSerializer(qs, data=request.data)
@@ -91,9 +92,9 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         if request.method == 'GET':
             if user.role == User.Type.ADMIN:
-                user_serializer = self.get_serializer(self.get_queryset(user.id))
+                user_serializer = self.get_serializer(self.get_queryset(user.username))
             else:
-                user_serializer = UserListSerializer(self.get_queryset(user.id))
+                user_serializer = UserListSerializer(self.get_queryset(user.username))
             return Response(user_serializer.data, status=status.HTTP_200_OK)
         else:
             partial = request.method == 'PATCH'
@@ -103,8 +104,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['put'], detail=False, url_path='change-password', url_name='change_password',
-            permission_classes=[IsAuthenticated])
+    @action(methods=['put'], detail=False, url_path='change-password', permission_classes=[IsAuthenticated])
     def change_password(self, request):
         """User change password"""
         serializer = UserPasswordChangeSerializer(request.user, data=request.data)
@@ -115,3 +115,17 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_201_CREATED
             )
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=True, url_path='password-reset')
+    def password_reset(self, request, username=None):
+        """User password reset link for given username"""
+        if request.user.role == User.Type.ADMIN:
+            serializer = UserPasswordResetSerializer(data={'username': username})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = {
+                'success': True,
+                'password_reset_url': serializer.context['password_reset_url'],
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        raise PermissionDenied()

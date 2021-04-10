@@ -9,35 +9,6 @@ from tests.users.factory import UserFactory, UserAdminFactory, TokenFactory, Use
 from tests.utils import TEST_PASSWORD, USER_DATA
 
 
-class AccountsAPITestCase(APITestCase):
-    """Accounts API test case"""
-
-    def test_signup(self) -> None:
-        """Register user with role USER"""
-        response = self.client.post(reverse('signup'), USER_DATA)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(User.objects.get().first_name, USER_DATA.get('first_name'))
-
-    def test_login(self) -> None:
-        """Verify user is logged in"""
-        user = UserFactory()
-        data = {
-            'email': user.email,
-            'password': TEST_PASSWORD,
-        }
-        response = self.client.post(reverse('login'), data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertContains(response, user.role, status_code=status.HTTP_201_CREATED)
-
-    def test_logout(self) -> None:
-        """Verify that the user is logged out"""
-        url = reverse('logout')
-        response = self.client.post(url, {'token': TokenFactory().key})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data.get('success'))
-
-
 class UsersAdminAPITestCase(APITestCase):
     """Users with ADMIN role API test case"""
 
@@ -61,9 +32,7 @@ class UsersAdminAPITestCase(APITestCase):
         self.assertEqual(User.objects.count(), 1)
         # Create users
         UserDoctorFactory.create_batch(3)
-
         response = self.client.get(self.url)
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 4)
 
@@ -80,17 +49,26 @@ class UsersAdminAPITestCase(APITestCase):
     def test_user_admin_retrieve_user(self) -> None:
         """An ADMIN user can retrieve one user"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.get(f'{self.url}{users[1].id}/')
+        response = self.client.get(f'{self.url}{users[1].username}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(users[1].first_name, response.data.get('first_name'))
 
     def test_user_admin_update_user(self) -> None:
-        """Update users for given Id"""
+        """Update users for given username"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.put(f'{self.url}{users[1].id}/', USER_DATA)
+        response = self.client.put(f'{self.url}{users[1].username}/', USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(User.objects.count(), 4)
         self.assertEqual(response.data.get('first_name'), USER_DATA.get('first_name'))
+
+    def test_user_admin_password_reset(self) -> None:
+        """Verify that ADMIN user can send a password reset link"""
+        user = UserFactory(email=None)
+        url = f'{self.url}{user.username}/password-reset/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data.get('success'))
+        self.assertContains(response, 'password_reset_url')
 
 
 class UsersDoctorAPITestCase(APITestCase):
@@ -134,16 +112,23 @@ class UsersDoctorAPITestCase(APITestCase):
     def test_user_doctor_retrieve_user(self) -> None:
         """Verify that DOCTOR users only see basic user fields for one user."""
         users = UserFactory.create_batch(3)
-        response = self.client.get(f'{self.url}{users[1].id}/')
+        response = self.client.get(f'{self.url}{users[1].username}/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(users[1].username, response.data.get('username'))
+        self.assertEqual(users[1].last_name, response.data.get('last_name'))
 
     def test_user_doctor_update_user(self) -> None:
-        """Verify that a DOCTOR user cannot update users for given Id"""
+        """Verify that a DOCTOR user cannot update users for given username"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.put(f'{self.url}{users[1].id}/', USER_DATA)
+        response = self.client.put(f'{self.url}{users[1].username}/', USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 4)
+
+    def test_user_doctor_password_reset(self) -> None:
+        """Verify that DOCTOR user can not send a password reset link"""
+        user = UserFactory(email=None)
+        url = f'{self.url}{user.username}/password-reset/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class UsersPatientAPITestCase(APITestCase):
@@ -175,11 +160,18 @@ class UsersPatientAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_patient_update_user(self) -> None:
-        """Verify that a patient user cannot update users for given Id"""
+        """Verify that a patient user cannot update users for given username"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.put(f'{self.url}{users[1].id}/', USER_DATA)
+        response = self.client.put(f'{self.url}{users[1].username}/', USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 4)
+
+    def test_user_patient_password_reset(self) -> None:
+        """Verify that patient user can not send a password reset link"""
+        user = UserFactory(email=None)
+        url = f'{self.url}{user.username}/password-reset/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class UsersAPITestCase(APITestCase):
@@ -218,7 +210,7 @@ class UsersAPITestCase(APITestCase):
 
         # Verify user login
         data = {
-            'email': self.user.email,
+            'username': self.user.username,
             'password': pwd,
         }
         response = self.client.post(reverse('login'), data)
