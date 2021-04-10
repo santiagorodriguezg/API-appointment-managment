@@ -1,4 +1,4 @@
-"""Auth tests"""
+"""Accounts tests"""
 
 from django.urls import reverse
 from rest_framework import status
@@ -15,7 +15,7 @@ class AccountsAPITestCase(APITestCase):
 
     def test_signup(self) -> None:
         """Register user with role USER"""
-        response = self.client.post(reverse('signup'), USER_DATA)
+        response = self.client.post(reverse('accounts-signup'), USER_DATA)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(User.objects.get().first_name, USER_DATA.get('first_name'))
@@ -27,13 +27,13 @@ class AccountsAPITestCase(APITestCase):
             'username': user.username,
             'password': TEST_PASSWORD,
         }
-        response = self.client.post(reverse('login'), data)
+        response = self.client.post(reverse('accounts-login'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertContains(response, user.role, status_code=status.HTTP_201_CREATED)
 
     def test_logout(self) -> None:
         """Verify that the user is logged out"""
-        url = reverse('logout')
+        url = reverse('accounts-logout')
         response = self.client.post(url, {'token': TokenFactory().key})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data.get('success'))
@@ -46,7 +46,7 @@ class AccountsAPITestCase(APITestCase):
             'username': user.username,
             'email': user.email
         }
-        response = self.client.post(reverse('password_reset'), {'username': user.username})
+        response = self.client.post(reverse('accounts-password-reset'), {'username': user.username})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.data, expected)
 
@@ -58,7 +58,7 @@ class AccountsAPITestCase(APITestCase):
             'username': user.username,
             'email': user.email
         }
-        response = self.client.post(reverse('password_reset'), {'username': user.username})
+        response = self.client.post(reverse('accounts-password-reset'), {'username': user.username})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.data, expected)
 
@@ -67,7 +67,7 @@ class AccountsAPITestCase(APITestCase):
         user = UserFactory()
         token_type = 'password_reset'
         token = generate_token(user, token_type)
-        response = self.client.post(reverse('verify_token'), {'token': token})
+        response = self.client.post(reverse('accounts-verify-token'), {'token': token})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, user.username)
         self.assertContains(response, token_type)

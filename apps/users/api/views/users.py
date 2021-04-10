@@ -24,7 +24,6 @@ class UserViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = UserListAdminSerializer
-    queryset = User.objects.all()
     permission_classes = (IsAdminOrDoctorUser,)
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
     filterset_fields = ('identification_type', 'identification_number', 'role', 'is_active', 'is_superuser')

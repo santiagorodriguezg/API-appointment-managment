@@ -213,6 +213,6 @@ class UsersAPITestCase(APITestCase):
             'username': self.user.username,
             'password': pwd,
         }
-        response = self.client.post(reverse('login'), data)
+        response = self.client.post(reverse('accounts-login'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertContains(response, self.user.role, status_code=status.HTTP_201_CREATED)

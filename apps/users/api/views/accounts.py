@@ -1,10 +1,12 @@
-"""Auth views"""
+"""Accounts views"""
+
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
-from apps.users.api.serializers.auth import (
+from apps.users.api.serializers.accounts import (
     UserSignUpSerializer, UserLoginSerializer, PasswordResetSerializer, PasswordResetFromKeySerializer,
     VerifyTokenSerializer
 )
@@ -13,10 +15,11 @@ from apps.users.utils import delete_user_sessions
 from gestion_consultas.exceptions import BadRequest
 
 
-class SignUpAPIView(APIView):
-    """User sign up API view."""
+class AccountsViewSet(GenericViewSet):
+    """Accounts API view."""
 
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False)
+    def signup(self, request):
         serializer = UserSignUpSerializer(data=request.data)
         if serializer.is_valid():
             user, token = serializer.save()
@@ -27,11 +30,8 @@ class SignUpAPIView(APIView):
             return Response(data, status=status.HTTP_201_CREATED)
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class LoginAPIView(APIView):
-    """User login API view."""
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False)
+    def login(self, request):
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
@@ -41,11 +41,8 @@ class LoginAPIView(APIView):
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
-
-class LogoutAPIView(APIView):
-    """User logout API view."""
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False)
+    def logout(self, request):
         token = request.data.get('token')
         if token:
             token = Token.objects.filter(key=token).first()
@@ -57,11 +54,8 @@ class LogoutAPIView(APIView):
             raise BadRequest('No se ha encontrado un usuario con estas credenciales')
         raise BadRequest('No se ha encontrado un token en la petición')
 
-
-class VerifyTokenAPIView(APIView):
-    """Verify token API view."""
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False, url_path='verify-token')
+    def verify_token(self, request):
         serializer = VerifyTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = {
@@ -70,11 +64,8 @@ class VerifyTokenAPIView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
-class PasswordResetAPIView(APIView):
-    """Password reset API View"""
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False, url_path='password-reset')
+    def password_reset(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -85,11 +76,8 @@ class PasswordResetAPIView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
-class PasswordResetFromKeyAPIView(APIView):
-    """Password reset from key API view."""
-
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False, url_path='password-reset-from-key')
+    def password_reset_from_key(self, request):
         serializer = PasswordResetFromKeySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
