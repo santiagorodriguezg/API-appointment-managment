@@ -8,8 +8,8 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from apps.users.models import User
-from apps.users.utils import clean_password2, delete_user_sessions, generate_token, verify_token
+from apps.accounts.models import User
+from apps.accounts.utils import clean_password2, delete_user_sessions, generate_token, verify_token
 
 
 class UserSignUpSerializer(serializers.ModelSerializer):

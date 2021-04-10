@@ -3,8 +3,8 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from apps.users.models import User
-from apps.users.utils import clean_password2, generate_token
+from apps.accounts.models import User
+from apps.accounts.utils import clean_password2, generate_token
 
 
 class UserListAdminSerializer(serializers.ModelSerializer):

@@ -7,12 +7,12 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.users.api.permissions import IsAdminOrDoctorUser
-from apps.users.api.serializers.users import (
+from apps.accounts.api.permissions import IsAdminOrDoctorUser
+from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
     UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer
 )
-from apps.users.models import User
+from apps.accounts.models import User
 from gestion_consultas.utils import UnaccentedSearchFilter
 
 

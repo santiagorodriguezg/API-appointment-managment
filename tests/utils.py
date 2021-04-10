@@ -2,7 +2,7 @@
 
 from faker import Faker
 
-from apps.users.models import User
+from apps.accounts.models import User
 
 fake = Faker(['es_ES'])
 

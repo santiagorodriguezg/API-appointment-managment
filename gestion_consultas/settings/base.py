@@ -38,7 +38,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'apps.users',
+    'apps.accounts',
     'apps.appointments',
     'apps.chats',
     'django_cleanup.apps.CleanupConfig',
@@ -146,7 +146,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(BASE_DIR, 'media')
 
 # User model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 # Security
 CSRF_COOKIE_HTTPONLY = True

@@ -2,7 +2,7 @@
 
 from rest_framework.permissions import BasePermission
 
-from apps.users.models import User
+from apps.accounts.models import User
 
 
 class IsAdminOrDoctorUser(BasePermission):

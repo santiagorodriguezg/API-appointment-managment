@@ -6,12 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from apps.users.api.serializers.accounts import (
+from apps.accounts.api.serializers.accounts import (
     UserSignUpSerializer, UserLoginSerializer, PasswordResetSerializer, PasswordResetFromKeySerializer,
     VerifyTokenSerializer
 )
-from apps.users.api.serializers.users import UserListSerializer
-from apps.users.utils import delete_user_sessions
+from apps.accounts.api.serializers.users import UserListSerializer
+from apps.accounts.utils import delete_user_sessions
 from gestion_consultas.exceptions import BadRequest
 
 

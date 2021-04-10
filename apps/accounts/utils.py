@@ -1,4 +1,4 @@
-"""Users utilities"""
+"""Accounts utilities"""
 
 from datetime import timedelta
 

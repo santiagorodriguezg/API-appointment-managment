@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from apps.users.models import User
+from apps.accounts.models import User
 from tests.users.factory import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
 from tests.utils import TEST_PASSWORD, USER_DATA
 

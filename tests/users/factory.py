@@ -3,7 +3,7 @@
 import factory
 from rest_framework.authtoken.models import Token
 
-from apps.users.models import User
+from apps.accounts.models import User
 from tests.utils import TEST_PASSWORD
 
 
