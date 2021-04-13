@@ -17,12 +17,29 @@ from apps.appointments.models import Appointment
 from gestion_consultas.utils import UnaccentedSearchFilter
 
 
+class AppointmentListAPIView(ListAPIView):
+    """
+    Appointment List API View
+    List all appointments of all users by ADMIN users only.
+    """
+
+    serializer_class = AppointmentListSerializer
+    queryset = Appointment.objects.all()
+    permission_classes = (IsAdminUser,)
+    filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
+    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at', 'user__username')
+    search_fields = ['~user__city', '~user__neighborhood', '~user__address']
+    ordering_fields = ['created_at', 'updated_at']
+    ordering = ('id',)
+
+
 class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Appointment model view set"""
 
-    filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filterset_fields = ('start_time', 'end_time', 'created_at', 'updated_at')
+    filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
+    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at')
+    search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     ordering_fields = ['created_at', 'updated_at']
     ordering = ('id',)
 
@@ -115,19 +132,3 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class AppointmentAPIView(ListAPIView):
-    """
-    Appointment API View
-    List all appointments of all users by ADMIN users only.
-    """
-
-    serializer_class = AppointmentSerializer
-    queryset = Appointment.objects.all()
-    permission_classes = (IsAdminUser,)
-    filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = ('start_time', 'end_time', 'created_at', 'updated_at', 'user__username')
-    search_fields = ['~user__city', '~user__neighborhood', '~user__address']
-    ordering_fields = ['created_at', 'updated_at']
-    ordering = ('id',)

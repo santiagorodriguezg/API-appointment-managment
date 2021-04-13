@@ -20,8 +20,8 @@ class Appointment(models.Model):
     audio = models.FileField(_('audio'), upload_to='appointments/audio', null=True, blank=True, validators=[
         FileExtensionValidator(allowed_extensions=['mp3', 'mp4'])
     ])
-    start_time = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
-    end_time = models.DateTimeField(_('fecha de finalización'), null=True, blank=True)
+    start_date = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
+    end_date = models.DateTimeField(_('fecha de finalización'), null=True, blank=True)
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
     updated_at = models.DateTimeField(_('fecha de modificación de la cuenta'), auto_now=True)
 

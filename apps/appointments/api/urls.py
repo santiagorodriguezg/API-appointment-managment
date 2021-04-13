@@ -3,7 +3,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from apps.appointments.api.views.appointments import AppointmentViewSet, AppointmentAPIView
+from apps.appointments.api.views.appointments import AppointmentViewSet, AppointmentListAPIView
 
 router = DefaultRouter()
 router.register(
@@ -14,5 +14,5 @@ router.register(
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('appointments/', AppointmentAPIView.as_view(), name='appointments'),
+    path('appointments/', AppointmentListAPIView.as_view(), name='appointments'),
 ]

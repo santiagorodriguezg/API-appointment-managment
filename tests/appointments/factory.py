@@ -27,8 +27,8 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
     ])
     aggressor = factory.Faker('name')
     description = factory.Faker('text')
-    start_time = factory.LazyFunction(timezone.now)
-    end_time = factory.LazyAttribute(lambda o: o.start_time + timedelta(days=2))
+    start_date = factory.LazyFunction(timezone.now)
+    end_date = factory.LazyAttribute(lambda o: o.start_date + timedelta(days=2))
     user = factory.SubFactory(UserFactory)
 
 
