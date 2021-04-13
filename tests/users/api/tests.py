@@ -5,8 +5,11 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.accounts.models import User
-from tests.users.factory import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
-from tests.utils import TEST_PASSWORD, USER_DATA
+from tests.users.factory import (
+    UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory, USER_FACTORY_DICT, USER_ADMIN_FACTORY_DICT,
+    USER_DOCTOR_FACTORY_DICT
+)
+from tests.utils import TEST_PASSWORD
 
 
 class UsersAdminAPITestCase(APITestCase):
@@ -21,10 +24,10 @@ class UsersAdminAPITestCase(APITestCase):
 
     def test_user_admin_create_users(self) -> None:
         """Verify that an ADMIN user can create users"""
-        response = self.client.post(self.url, USER_DATA)
+        response = self.client.post(self.url, USER_ADMIN_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 2)
-        self.assertEqual(response.data.get('first_name'), USER_DATA.get('first_name'))
+        self.assertEqual(response.data.get('first_name'), USER_ADMIN_FACTORY_DICT.get('first_name'))
 
     def test_user_admin_list_users(self) -> None:
         """An ADMIN user can list users with all fields"""
@@ -56,10 +59,10 @@ class UsersAdminAPITestCase(APITestCase):
     def test_user_admin_update_user(self) -> None:
         """Update users for given username"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.put(f'{self.url}{users[1].username}/', USER_DATA)
+        response = self.client.put(f'{self.url}{users[1].username}/', USER_ADMIN_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(User.objects.count(), 4)
-        self.assertEqual(response.data.get('first_name'), USER_DATA.get('first_name'))
+        self.assertEqual(response.data.get('first_name'), USER_ADMIN_FACTORY_DICT.get('first_name'))
 
     def test_user_admin_password_reset(self) -> None:
         """Verify that ADMIN user can send a password reset link"""
@@ -83,7 +86,7 @@ class UsersDoctorAPITestCase(APITestCase):
 
     def test_user_doctor_create_users(self) -> None:
         """Verify that an DOCTOR user can not create users"""
-        response = self.client.post(self.url, USER_DATA)
+        response = self.client.post(self.url, USER_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 1)
 
@@ -119,7 +122,7 @@ class UsersDoctorAPITestCase(APITestCase):
     def test_user_doctor_update_user(self) -> None:
         """Verify that a DOCTOR user cannot update users for given username"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.put(f'{self.url}{users[1].username}/', USER_DATA)
+        response = self.client.put(f'{self.url}{users[1].username}/', USER_ADMIN_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 4)
 
@@ -143,7 +146,7 @@ class UsersPatientAPITestCase(APITestCase):
 
     def test_user_patient_create_users(self):
         """Verify that an patient user can not create users"""
-        response = self.client.post(self.url, USER_DATA)
+        response = self.client.post(self.url, USER_ADMIN_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 1)
 
@@ -162,7 +165,7 @@ class UsersPatientAPITestCase(APITestCase):
     def test_user_patient_update_user(self) -> None:
         """Verify that a patient user cannot update users for given username"""
         users = UserDoctorFactory.create_batch(3)
-        response = self.client.put(f'{self.url}{users[1].username}/', USER_DATA)
+        response = self.client.put(f'{self.url}{users[1].username}/', USER_DOCTOR_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(User.objects.count(), 4)
 
@@ -192,9 +195,9 @@ class UsersAPITestCase(APITestCase):
 
     def test_update_profile(self) -> None:
         """Verify that the user can update his profile"""
-        response = self.client.put(f'{self.url}me/', USER_DATA)
+        response = self.client.put(f'{self.url}me/', USER_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data.get('first_name'), USER_DATA.get('first_name'))
+        self.assertEqual(response.data.get('first_name'), USER_FACTORY_DICT.get('first_name'))
 
     def test_change_password(self) -> None:
         """Verify that the user can change his password"""

@@ -1,3 +1,6 @@
+"""Appointments models"""
+
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,15 +10,18 @@ from apps.accounts.models import User
 class Appointment(models.Model):
     """Appointment model. Represents a chat room"""
 
-    patient = models.ForeignKey(User, verbose_name=_('paciente'), related_name='patient', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name=_('user'), related_name='patient', on_delete=models.CASCADE)
     doctor = models.ForeignKey(
         User, verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True, blank=True
     )
     children = models.JSONField(verbose_name=_('hijos'), null=True, blank=True)
     aggressor = models.CharField(_('datos del posible agresor'), max_length=500, null=True, blank=True)
+    description = models.TextField(_('descripción'), null=True, blank=True)
+    audio = models.FileField(_('audio'), upload_to='appointments/audio', null=True, blank=True, validators=[
+        FileExtensionValidator(allowed_extensions=['mp3', 'mp4'])
+    ])
     start_time = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
     end_time = models.DateTimeField(_('fecha de finalización'), null=True, blank=True)
-    description = models.TextField(_('descripción'), null=True, blank=True)
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
     updated_at = models.DateTimeField(_('fecha de modificación de la cuenta'), auto_now=True)
 

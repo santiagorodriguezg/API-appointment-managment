@@ -18,13 +18,21 @@ class UserFactory(factory.django.DjangoModelFactory):
     role = User.Type.USER
     identification_type = User.IdentificationType.CC
     identification_number = factory.Faker('bothify', text='########')
-    username = factory.LazyAttribute(lambda a: f"{a.first_name}{a.last_name}".lower())
-    email = factory.LazyAttribute(lambda a: f'{a.first_name}.{a.last_name}@gmail.com'.lower())
+    username = factory.LazyAttribute(lambda o: f"{o.first_name}{o.last_name}".lower())
+    email = factory.Faker('free_email')
     phone = factory.Faker('bothify', text='3#########')
     city = factory.Faker('city')
     neighborhood = factory.Faker('street_name')
     address = factory.Faker('street_address')
-    password = factory.PostGenerationMethodCall('set_password', TEST_PASSWORD)
+    password = TEST_PASSWORD
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        password = kwargs.pop("password", None)
+        obj = model_class(*args, **kwargs)
+        obj.set_password(password)
+        obj.save()
+        return obj
 
 
 class UserDoctorFactory(UserFactory):
@@ -52,3 +60,12 @@ class TokenFactory(factory.django.DjangoModelFactory):
         model = Token
 
     user = factory.SubFactory(UserFactory)
+
+
+USER_FACTORY_DICT = factory.build(dict, FACTORY_CLASS=UserFactory)
+USER_DOCTOR_FACTORY_DICT = factory.build(dict, FACTORY_CLASS=UserDoctorFactory)
+USER_ADMIN_FACTORY_DICT = factory.build(dict, FACTORY_CLASS=UserAdminFactory)
+
+USER_FACTORY_DICT.setdefault('password2', TEST_PASSWORD)
+USER_DOCTOR_FACTORY_DICT.setdefault('password2', TEST_PASSWORD)
+USER_ADMIN_FACTORY_DICT.setdefault('password2', TEST_PASSWORD)

@@ -1,4 +1,5 @@
 """Users views"""
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -16,7 +17,7 @@ from apps.accounts.models import User
 from gestion_consultas.utils import UnaccentedSearchFilter
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserModelViewSet(viewsets.ModelViewSet):
     """
     User view set.
 
@@ -26,13 +27,16 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserListAdminSerializer
     permission_classes = (IsAdminOrDoctorUser,)
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = ('identification_type', 'identification_number', 'role', 'is_active', 'is_superuser')
+    filterset_fields = (
+        'identification_type', 'identification_number', 'role', 'is_active', 'is_superuser', 'created_at', 'updated_at'
+    )
     search_fields = ['~first_name', '~last_name', '~city', '~neighborhood', '~address']
     ordering_fields = ['first_name', 'last_name', 'created_at', 'updated_at']
     ordering = ('id',)
     lookup_field = 'username'
 
     def get_queryset(self, username=None):
+        """Get the list of items for this view."""
         queryset = User.objects.all()
         if self.request.user.role == User.Type.ADMIN:
             return queryset if username is None else queryset.filter(username=username).first()
@@ -48,10 +52,10 @@ class UserViewSet(viewsets.ModelViewSet):
             raise NotFound(detail='Usuario no encontrado.')
 
         if request.user.role == User.Type.ADMIN:
-            user_serializer = self.get_serializer(qs)
+            serializer = self.get_serializer(qs)
         else:
-            user_serializer = UserListSerializer(qs)
-        return Response(user_serializer.data, status=status.HTTP_200_OK)
+            serializer = UserListSerializer(qs)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         """User list"""
@@ -91,10 +95,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         if request.method == 'GET':
             if user.role == User.Type.ADMIN:
-                user_serializer = self.get_serializer(self.get_queryset(user.username))
+                serializer = self.get_serializer(self.get_queryset(user.username))
             else:
-                user_serializer = UserListSerializer(self.get_queryset(user.username))
-            return Response(user_serializer.data, status=status.HTTP_200_OK)
+                serializer = UserListSerializer(self.get_queryset(user.username))
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             partial = request.method == 'PATCH'
             serializer = UserProfileUpdateSerializer(user, data=request.data, partial=partial)
@@ -128,3 +132,24 @@ class UserViewSet(viewsets.ModelViewSet):
             }
             return Response(data, status=status.HTTP_200_OK)
         raise PermissionDenied()
+
+    # @action(methods=['get'], detail=True, permission_classes=[IsAccountOwnerOrAdminUser])
+    # def appointments(self, request, username=None):
+    #     """
+    #     User's appointments for a given username.
+    #     ADMIN users can access any user's appointments.
+    #     """
+    #     super(UserModelViewSet, self).retrieve(request)
+    #     response = self.retrieve(request, username)
+    #     user = User.objects.get(username=username)
+    #     queryset = Appointment.objects.order_by('id').filter(user=user)
+    #     if user.role == User.Type.DOCTOR:
+    #         queryset = Appointment.objects.order_by('id').filter(doctor=user)
+    #
+    #     serializer = AppointmentModelViewSet().get_serializer_class()
+    #     data = {
+    #         'user': response.data,
+    #         'appointments': serializer(queryset, many=True).data
+    #     }
+    #     response.data = data
+    #     return response

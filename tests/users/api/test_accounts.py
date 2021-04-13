@@ -6,8 +6,8 @@ from rest_framework.test import APITestCase
 
 from apps.accounts.models import User
 from apps.accounts.utils import generate_token
-from tests.users.factory import UserFactory, TokenFactory
-from tests.utils import TEST_PASSWORD, USER_DATA
+from tests.users.factory import UserFactory, TokenFactory, USER_FACTORY_DICT
+from tests.utils import TEST_PASSWORD
 
 
 class AccountsAPITestCase(APITestCase):
@@ -15,10 +15,10 @@ class AccountsAPITestCase(APITestCase):
 
     def test_signup(self) -> None:
         """Register user with role USER"""
-        response = self.client.post(reverse('accounts-signup'), USER_DATA)
+        response = self.client.post(reverse('accounts-signup'), USER_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(User.objects.get().first_name, USER_DATA.get('first_name'))
+        self.assertEqual(User.objects.get().first_name, USER_FACTORY_DICT.get('first_name'))
 
     def test_login(self) -> None:
         """Verify user is logged in"""
