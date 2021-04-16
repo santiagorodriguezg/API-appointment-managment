@@ -2,17 +2,18 @@
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from apps.accounts.api.permissions import IsAccountOwnerOrAdminUser
 from apps.accounts.api.views.users import UserModelViewSet
 from apps.accounts.models import User
-from apps.appointments.api.serializers.appointments import AppointmentSerializer, AppointmentUserSerializer, \
-    AppointmentListSerializer
+from apps.accounts.utils import check_permissions
+from apps.appointments.api.serializers.appointments import (
+    AppointmentSerializer, AppointmentUserSerializer, AppointmentListSerializer
+)
 from apps.appointments.models import Appointment
 from gestion_consultas.utils import UnaccentedSearchFilter
 
@@ -37,6 +38,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
                          mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """Appointment model view set"""
 
+    permission_classes = [IsAuthenticated]
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
     filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at')
     search_fields = ['~user__city', '~user__neighborhood', '~user__address']
@@ -50,14 +52,6 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         else:
             serializer = AppointmentListSerializer
         return serializer
-
-    def get_permissions(self):
-        """Assign permissions based on action."""
-        if self.action in ['create', 'update', 'partial_update', 'list', 'retrieve']:
-            permission = [IsAccountOwnerOrAdminUser]
-        else:
-            permission = [IsAuthenticated]
-        return [p() for p in permission]
 
     def get_queryset(self, user=None, pk=None):
         """Get the list of items for this view."""
@@ -80,9 +74,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
 
     def create(self, request, username=None, *args, **kwargs):
         """Users with ADMIN and USER roles can create appointments."""
-        if self.request.user.role == User.Type.DOCTOR:
-            raise PermissionDenied()
-
+        check_permissions(request.user, username, 'appointments.add_appointment')
         serializer = AppointmentUserSerializer(data=request.data, context={'request': request})
         if request.user.role == User.Type.ADMIN:
             user = User.objects.get(username=username)
@@ -94,6 +86,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
 
     def list(self, request, username=None, *args, **kwargs):
         """User appointments"""
+        check_permissions(request.user, username, 'appointments.view_appointment')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
         user = user_model_view_set.retrieve(request, username, *args, **kwargs)
         queryset = self.filter_queryset(self.get_queryset(user.data))
@@ -106,6 +99,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
 
     def retrieve(self, request, username=None, pk=None, *args, **kwargs):
         """User appointments given Id"""
+        check_permissions(request.user, username, 'appointments.view_appointment')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
         user = user_model_view_set.retrieve(request, username, *args, **kwargs)
         queryset = self.get_queryset(user.data, pk)
@@ -117,9 +111,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
 
     def update(self, request, username=None, pk=None, *args, **kwargs):
         """Users with ADMIN and USER roles can update appointments."""
-        if self.request.user.role == User.Type.DOCTOR:
-            raise PermissionDenied()
-
+        check_permissions(request.user, username, 'appointments.change_appointment')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
         user = user_model_view_set.retrieve(request, username, *args, **kwargs)
         queryset = self.get_queryset(user.data, pk)

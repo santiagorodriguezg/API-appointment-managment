@@ -5,8 +5,11 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import MinLengthValidator, RegexValidator, FileExtensionValidator
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
+from apps.accounts.permissions import create_permissions
 from gestion_consultas.utils import REGEX_LETTERS_ONLY
 
 
@@ -177,6 +180,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         db_table = 'user'
         verbose_name = _('usuario')
         verbose_name_plural = _('usuarios')
+        permissions = [
+            ('password_rest', 'Generate password reset link')
+        ]
 
     def __str__(self):
         return self.first_name
@@ -188,3 +194,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f'{self.first_name} {self.last_name}'.strip()
 
     get_full_name.short_description = _('Nombre completo')
+
+
+@receiver(post_save, sender=User)
+def create_user_permissions(sender, instance, created, **kwargs):
+    if created:
+        create_permissions(sender, instance)

@@ -4,15 +4,14 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.accounts.models import User
-
 
 class Appointment(models.Model):
     """Appointment model. Represents a chat room"""
 
-    user = models.ForeignKey(User, verbose_name=_('user'), related_name='patient', on_delete=models.CASCADE)
+    user = models.ForeignKey('accounts.User', verbose_name=_('user'), related_name='patient', on_delete=models.CASCADE)
     doctor = models.ForeignKey(
-        User, verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True, blank=True
+        'accounts.User', verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True,
+        blank=True
     )
     children = models.JSONField(verbose_name=_('hijos'), null=True, blank=True)
     aggressor = models.CharField(_('datos del posible agresor'), max_length=500, null=True, blank=True)
@@ -29,6 +28,13 @@ class Appointment(models.Model):
         db_table = 'appointment'
         verbose_name = _('cita')
         verbose_name_plural = _('citas')
+
+        permissions = [
+            ('add_appointment_from_me', 'Can add my appointments'),
+            ('change_appointment_from_me', 'Can change my appointments'),
+            ('delete_appointment_from_me', 'Can delete my appointments'),
+            ('view_appointment_from_me', 'Can view my appointments'),
+        ]
 
     def __str__(self):
         return self.description

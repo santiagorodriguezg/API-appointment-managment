@@ -46,7 +46,7 @@ class UsersAdminAPITestCase(APITestCase):
             self.assertEqual(res[i].get('is_superuser'), user.is_superuser)
             self.assertEqual(res[i].get('is_active'), user.is_active)
             self.assertEqual(res[i].get('is_staff'), user.is_staff)
-            self.assertEqual(res[i].get('groups'), list(user.groups.all()))
+            self.assertEqual(res[i].get('groups'), list(user.groups.values_list('id', flat=True)))
             self.assertEqual(res[i].get('user_permissions'), list(user.user_permissions.all()))
 
     def test_user_admin_retrieve_user(self) -> None:
@@ -103,7 +103,7 @@ class UsersDoctorAPITestCase(APITestCase):
         self.assertEqual(response.data.get('count'), 5)
 
         res = response.data.get('results')
-        for i, user in enumerate(User.objects.all()[:3]):
+        for i, user in enumerate(User.objects.order_by('id')[:3]):
             self.assertEqual(res[i].get('first_name'), user.first_name)
             self.assertEqual(res[i].get('role'), user.role)
             self.assertIsNone(res[i].get('is_superuser'))
@@ -207,7 +207,7 @@ class UsersAPITestCase(APITestCase):
             "password": pwd,
             "password2": pwd
         }
-        response = self.client.put(f'{self.url}change-password/', data)
+        response = self.client.post(f'{self.url}change-password/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
 

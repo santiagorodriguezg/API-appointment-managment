@@ -9,6 +9,9 @@ from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound, PermissionDenied
+
+from apps.accounts.models import User
 
 
 def delete_user_sessions(user, token):
@@ -40,6 +43,32 @@ def clean_password2(instance, data):
         raise serializers.ValidationError({'password2': error.messages}, code='password2')
 
     return data
+
+
+def is_account_owner(request_user, username):
+    """Allow access only to objects owned by the requesting user"""
+    user_db = User.objects.filter(username=username).only('id').first()
+    if user_db is None:
+        raise NotFound(detail='Usuario no encontrado.')
+    return request_user.id == user_db.id
+
+
+def check_permissions(user, username, permission):
+    """
+    Verify that the user is a superuser, otherwise that the user is the owner of the resource, or has the necessary
+    permissions.
+
+    :param user: User request
+    :param username: Username of url
+    :param permission: Permission to access
+    :return: None
+    """
+    if not user.is_superuser:
+        if (
+                is_account_owner(user, username) and not user.has_perm(f'{permission}_from_me') or
+                not is_account_owner(user, username) and not user.has_perm(permission)
+        ):
+            raise PermissionDenied()
 
 
 def generate_token(user, token_type):

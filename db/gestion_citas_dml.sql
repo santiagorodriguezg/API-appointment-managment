@@ -4,6 +4,38 @@
 SET client_encoding TO 'UTF8';
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
+-- aut_group table
+
+INSERT INTO public.auth_group(id, name)
+VALUES (1, 'Users'),
+       (2, 'Doctors');
+
+
+-- auth_group_permissions table
+
+INSERT INTO public.auth_group_permissions (id, group_id, permission_id)
+VALUES (1, 1, 32),
+       (2, 1, 38),
+       (3, 1, 39),
+       (4, 1, 41),
+       (5, 1, 42),
+       (6, 1, 45),
+       (7, 1, 46),
+       (8, 1, 47),
+       (9, 1, 48),
+       (10, 1, 49),
+       (11, 1, 30),
+       (12, 2, 32),
+       (13, 2, 41),
+       (14, 2, 42),
+       (15, 2, 45),
+       (16, 2, 46),
+       (17, 2, 47),
+       (18, 2, 48),
+       (19, 2, 49),
+       (20, 2, 30);
+
+
 -- user table
 
 INSERT INTO public."user" (id, password, last_login, is_superuser, role, first_name, last_name, identification_type,
@@ -20,6 +52,13 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
         '2021-04-13 15:24:36.629052', false, 'USR', 'Juan', 'Moreno', 'CC', '7456123', 'juan', 'juan@gmail.com',
         '3124567898', '', 'Duitama', null, null, true, false, '2021-03-25 22:27:34.940033',
         '2021-04-06 16:19:56.661574');
+
+
+-- user_groups table
+
+INSERT INTO user_groups(id, user_id, group_id)
+VALUES (1, 2, 2),
+       (2, 3, 1);
 
 
 -- appointment table
@@ -42,5 +81,8 @@ VALUES (1, '[
 
 
 
+SELECT setval('auth_group_id_seq', 2);
+SELECT setval('auth_group_permissions_id_seq', 20);
 SELECT setval('user_id_seq', 3);
+SELECT setval('user_groups_id_seq', 2);
 SELECT setval('appointment_id_seq', 2);

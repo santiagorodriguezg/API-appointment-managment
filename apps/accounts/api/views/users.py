@@ -3,7 +3,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
@@ -36,7 +36,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """Assign permissions based on action."""
-        if self.action in ['create', 'update', 'destroy', 'partial_update', 'password_reset']:
+        if self.action in ['destroy']:
             permission = [IsAdminUser]
         elif self.action in ['list', 'retrieve']:
             permission = [IsAdminOrDoctorUser]
@@ -77,6 +77,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Handle user create"""
+        if not request.user.has_perm('accounts.add_user'):
+            raise PermissionDenied()
+
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -85,6 +88,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
     def update(self, request, username=None, *args, **kwargs):
         """Update users for given Id"""
+        if not request.user.has_perm('accounts.change_user'):
+            raise PermissionDenied()
+
         qs = self.get_queryset(username)
         if qs is None:
             raise NotFound(detail='Usuario no encontrado.')
@@ -112,7 +118,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['put'], detail=False, url_path='change-password')
+    @action(methods=['post'], detail=False, url_path='change-password')
     def change_password(self, request):
         """User change password"""
         serializer = UserPasswordChangeSerializer(request.user, data=request.data)
@@ -127,6 +133,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True, url_path='password-reset')
     def password_reset(self, request, username=None):
         """User password reset link for given username"""
+        if not request.user.has_perm('accounts.password_reset'):
+            raise PermissionDenied()
+
         serializer = UserPasswordResetSerializer(data={'username': username})
         serializer.is_valid(raise_exception=True)
         serializer.save()

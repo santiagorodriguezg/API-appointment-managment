@@ -1,5 +1,4 @@
 """Appointments tests"""
-
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -127,6 +126,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
 
     def setUp(self) -> None:
         # Authenticate user DOCTOR
+        UserAdminFactory()
         self.user = UserDoctorFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
@@ -232,6 +232,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
 
     def setUp(self) -> None:
         # Authenticate user DOCTOR
+        UserAdminFactory()
         self.user = UserFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
