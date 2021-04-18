@@ -1,21 +1,20 @@
-"""Appointments views"""
+"""Appointment views"""
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
-from rest_framework.exceptions import NotFound
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
+from apps.accounts.api.permissions import check_permissions
 from apps.accounts.api.views.users import UserModelViewSet
 from apps.accounts.models import User
-from apps.accounts.utils import check_permissions
 from apps.appointments.api.serializers.appointments import (
     AppointmentSerializer, AppointmentUserSerializer, AppointmentListSerializer
 )
 from apps.appointments.models import Appointment
-from gestion_consultas.utils import UnaccentedSearchFilter
+from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk
 
 
 class AppointmentListAPIView(ListAPIView):
@@ -59,18 +58,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         queryset = Appointment.objects.order_by('id').filter(user=user['id'])
         if user['role'] == User.Type.DOCTOR:
             queryset = Appointment.objects.order_by('id').filter(doctor=user['id'])
-
-        if pk is not None:
-            try:
-                int(pk)
-            except Exception:
-                raise NotFound(detail=detail)
-            queryset = queryset.filter(pk=pk).first()
-            if queryset is None:
-                raise NotFound(detail=detail)
-            return queryset
-
-        return queryset
+        return get_queryset_with_pk(detail, queryset, pk)
 
     def create(self, request, username=None, *args, **kwargs):
         """Users with ADMIN and USER roles can create appointments."""

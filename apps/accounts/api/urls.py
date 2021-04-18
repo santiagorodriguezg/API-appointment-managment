@@ -10,6 +10,8 @@ router = DefaultRouter()
 router.register(r'accounts', AccountsViewSet, basename='accounts')
 router.register(r'users', UserModelViewSet, basename='users')
 
+user_url = r'users/(?P<username>[-a-zA-Z0-0_]+)'
+
 urlpatterns = [
     path('', include(router.urls)),
 ]

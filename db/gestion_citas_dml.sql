@@ -5,39 +5,36 @@ SET client_encoding TO 'UTF8';
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
 -- aut_group table
-
 INSERT INTO public.auth_group(id, name)
 VALUES (1, 'Users'),
        (2, 'Doctors');
 
 
 -- auth_group_permissions table
-
 INSERT INTO public.auth_group_permissions (id, group_id, permission_id)
 VALUES (1, 1, 32),
        (2, 1, 38),
        (3, 1, 39),
        (4, 1, 41),
-       (5, 1, 42),
-       (6, 1, 45),
-       (7, 1, 46),
-       (8, 1, 47),
-       (9, 1, 48),
-       (10, 1, 49),
+       (5, 1, 46),
+       (6, 1, 49),
+       (7, 1, 54),
+       (8, 1, 55),
+       (9, 1, 56),
+       (10, 1, 57),
        (11, 1, 30),
        (12, 2, 32),
        (13, 2, 41),
-       (14, 2, 42),
-       (15, 2, 45),
-       (16, 2, 46),
-       (17, 2, 47),
-       (18, 2, 48),
-       (19, 2, 49),
+       (14, 2, 46),
+       (15, 2, 49),
+       (16, 2, 54),
+       (17, 2, 55),
+       (18, 2, 56),
+       (19, 2, 57),
        (20, 2, 30);
 
 
 -- user table
-
 INSERT INTO public."user" (id, password, last_login, is_superuser, role, first_name, last_name, identification_type,
                            identification_number, username, email, phone, picture, city, neighborhood, address,
                            is_active, is_staff, created_at, updated_at)
@@ -55,14 +52,12 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
 
 
 -- user_groups table
-
 INSERT INTO user_groups(id, user_id, group_id)
 VALUES (1, 2, 2),
        (2, 3, 1);
 
 
 -- appointment table
-
 INSERT INTO public.appointment (id, children, aggressor, description, audio, start_date, end_date, created_at,
                                 updated_at, doctor_id, user_id)
 VALUES (1, '[
@@ -80,9 +75,22 @@ VALUES (1, '[
         '2021-04-12 22:40:30.033680', 2, 3);
 
 
+-- room table
+INSERT INTO public.room (id, created_at, user_owner_id, user_receiver_id)
+VALUES (1, '2021-04-17 19:16:04.510000', 1, 3),
+       (2, '2021-04-17 19:16:58.066000', 3, 2);
+
+
+-- message table
+INSERT INTO public.message (id, content, created_at, updated_at, room_id, user_id)
+VALUES (1, 'Tiene una nueva cita', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
+       (2, 'Buenos dias', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
+       (3, 'Cuando es la cita?', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
 
 SELECT setval('auth_group_id_seq', 2);
 SELECT setval('auth_group_permissions_id_seq', 20);
 SELECT setval('user_id_seq', 3);
 SELECT setval('user_groups_id_seq', 2);
 SELECT setval('appointment_id_seq', 2);
+SELECT setval('room_id_seq', 2);
+SELECT setval('message_id_seq', 3);

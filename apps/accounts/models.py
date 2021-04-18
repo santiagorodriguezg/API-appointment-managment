@@ -168,7 +168,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_('Designa si este usuario puede acceder al sitio de administración.')
     )
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('fecha de modificación de la cuenta'), auto_now=True)
+    updated_at = models.DateTimeField(_('fecha de actualización'), auto_now=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'

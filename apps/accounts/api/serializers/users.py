@@ -1,4 +1,4 @@
-"""Users serializers"""
+"""User serializers"""
 
 from django.conf import settings
 from rest_framework import serializers
@@ -20,13 +20,33 @@ class UserListAdminSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     """
-    User List model serializer.
+    User list model serializer.
     Lists the fields of the user model to which the DOC user has permissions.
     """
 
     class Meta:
         model = User
         exclude = ('password', 'is_active', 'is_superuser', 'is_staff', 'groups', 'user_permissions')
+
+
+class UserListRelatedSerializer(serializers.ModelSerializer):
+    """
+    User list related serializer
+    Display the user's basic data. Must be used for relational fields.
+    """
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'username', 'picture')
+
+
+class UserListingField(serializers.RelatedField):
+    """
+    Used to define a relational field to serialize a user to a custom string representation, using its username.
+    """
+
+    def to_representation(self, value):
+        return value.username
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

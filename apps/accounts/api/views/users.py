@@ -1,4 +1,4 @@
-"""Users views"""
+"""User views"""
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
@@ -9,11 +9,11 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from apps.accounts.api.permissions import IsAdminOrDoctorUser
+from apps.accounts.models import User
 from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
     UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer
 )
-from apps.accounts.models import User
 from gestion_consultas.utils import UnaccentedSearchFilter
 
 

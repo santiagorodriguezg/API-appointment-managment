@@ -34,6 +34,7 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
+    'channels',
     'corsheaders',
 ]
 
@@ -164,6 +165,18 @@ ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_HOURS = 1
 
 # Default domain
 DEFAULT_DOMAIN = config('DEFAULT_DOMAIN')  # env
+
+# Django channels
+ASGI_APPLICATION = "gestion_consultas.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # django-cors-headers
 CORS_ORIGIN_WHITELIST = [

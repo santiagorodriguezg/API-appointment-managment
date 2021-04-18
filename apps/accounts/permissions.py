@@ -29,8 +29,8 @@ def create_permissions(user_class, user):
             qs = Permission.objects.order_by('id')
             user_perms = qs.filter(content_type=get_content_type(user_class))
             appointment_perms = qs.filter(content_type=get_content_type(Appointment), codename__endswith='from_me')
-            room_perms = qs.filter(content_type=get_content_type(Room))
-            message_perms = qs.filter(content_type=get_content_type(Message))
+            room_perms = qs.filter(content_type=get_content_type(Room), codename__endswith='from_me')
+            message_perms = qs.filter(content_type=get_content_type(Message), codename__endswith='from_me')
 
             permissions_user = [
                 user_perms[1], user_perms[3], *appointment_perms[:2], appointment_perms[3], room_perms[0],

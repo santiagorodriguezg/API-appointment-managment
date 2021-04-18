@@ -22,7 +22,7 @@ class Appointment(models.Model):
     start_date = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
     end_date = models.DateTimeField(_('fecha de finalización'), null=True, blank=True)
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('fecha de modificación de la cuenta'), auto_now=True)
+    updated_at = models.DateTimeField(_('fecha de actualización'), auto_now=True)
 
     class Meta:
         db_table = 'appointment'

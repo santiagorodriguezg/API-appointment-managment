@@ -3,13 +3,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from apps.accounts.api.urls import user_url
 from apps.appointments.api.views.appointments import AppointmentViewSet, AppointmentListAPIView
 
 router = DefaultRouter()
 router.register(
-    r'users/(?P<username>[-a-zA-Z0-0_]+)/appointments',
+    f'{user_url}/appointments',
     AppointmentViewSet,
-    basename='appointments'
+    basename='users-appointments'
 )
 
 urlpatterns = [
