@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from apps.accounts.api.serializers.users import UserListingField, UserListRelatedSerializer
+from apps.accounts.api.serializers.users import UserListRelatedSerializer
 from apps.appointments.models import Appointment
 
 
@@ -40,7 +40,7 @@ class AppointmentUserSerializer(serializers.ModelSerializer):
 class AppointmentListSerializer(serializers.ModelSerializer):
     """Appointment list serializer"""
 
-    user = UserListingField(read_only=True)
+    user = UserListRelatedSerializer(read_only=True)
     doctor = UserListRelatedSerializer(read_only=True)
 
     class Meta:

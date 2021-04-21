@@ -7,21 +7,41 @@ from apps.accounts.models import User
 from apps.chats.models import Room, Message
 
 
-class MessageSerializer(serializers.ModelSerializer):
+# class MessageSerializer(serializers.ModelSerializer):
+#     """Room serializer"""
+#
+#     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+#
+#     class Meta:
+#         model = Message
+#         fields = ('user_receiver', 'content')
+#
+#     def create(self, validated_data):
+#         room = Room.objects.create(
+#             user_owner=self.context['user'],
+#             user_receiver=validated_data['user_receiver']
+#         )
+#         msg = Message.objects.create(**validated_data, room=room, user=self.context['user'])
+#         return msg
+
+
+class MessageSerializer(serializers.Serializer):
     """Room serializer"""
 
     user_receiver = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-
-    class Meta:
-        model = Message
-        fields = ('content',)
+    content = serializers.CharField()
 
     def create(self, validated_data):
-        room = Room.objects.create(
-            user_owner=self.context['user'],
+        user = self.context.get('scope').get('user')
+        print("JAJAJ", user)
+        room, created = Room.objects.get_or_create(
+            user_owner=user,
             user_receiver=validated_data['user_receiver']
         )
-        msg = Message.objects.create(**validated_data, room=room, user=self.context['user'])
+        validated_data.pop('user_receiver')
+        print("VALIDATE", validated_data)
+        msg = Message(room=room, user=user, content=validated_data['content'])
+        msg.save()
         return msg
 
 

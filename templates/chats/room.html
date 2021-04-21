@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat Rooms</title>
+</head>
+
+<body>
+<textarea id="chat-log" cols="100" rows="20"></textarea><br><br>
+
+<p>User: <strong>{{ request.user.username }}</strong></p>
+
+<label for="chat-message-input">Message</label>
+<input id="chat-message-input" type="text" size="100"><br><br>
+
+<input id="chat-message-submit" type="button" value="Send">
+{{ room_name|json_script:"room-name" }}
+<script src="{% static 'js/reconnecting-websocket.min.js' %}"></script>
+<script>
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    {# https://stackoverflow.com/questions/43392889/how-do-you-authenticate-a-websocket-with-token-authentication-on-django-channels    #}
+
+    const token = "2823beab640992f536c2adf5d6bf5aaa71ce1f10";
+    const chatSocket = new ReconnectingWebSocket(
+        `ws://${window.location.host}/ws/chat/${roomName}/?${token}=${token}`
+    );
+
+    chatSocket.onopen = function (e) {
+        chatSocket.send(JSON.stringify({'command': 'fetch_messages'}))
+    };
+
+    chatSocket.onmessage = function (e) {
+        let data = JSON.parse(e.data);
+        console.log("DATA", data)
+        if (data.command === 'fetch_messages') {
+            for (let i = 0; i < data.messages.length; i++) {
+                document.querySelector('#chat-log').value += (data.messages[i].content + '\n');
+            }
+        } else if (data.command === 'create_message') {
+            document.querySelector('#chat-log').value += (data.message.content + '\n');
+        }
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function (e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function (e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+
+        chatSocket.send(JSON.stringify({
+            "command": "create_message",
+            "data": {
+                "room_name": roomName,
+                "user_receiver": 2,
+                "content": message
+            }
+        }));
+        messageInputDom.value = '';
+    };
+
+    function fetchMessages() {
+        chatSocket.send(JSON.stringify({"command": 'fetch_messages'}))
+    }
+
+    function createMessage(data) {
+        document.querySelector('#chat-log').value += (data + '\n')
+    }
+
+</script>
+</body>
+</html>

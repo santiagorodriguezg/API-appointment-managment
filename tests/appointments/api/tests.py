@@ -33,10 +33,10 @@ class AppointmentsAdminAPITestCase(APITestCase):
         self.assertEqual(response.data.get('count'), 2)
 
         appt = response.data.get('results')
-        queryset = Appointment.objects.all()
+        queryset = Appointment.objects.select_related('user', 'doctor').all()
         for i, a in enumerate(queryset):
-            self.assertEqual(appt[i].get('user'), a.user_id)
-            self.assertEqual(appt[i].get('doctor'), a.doctor_id)
+            self.assertEqual(appt[i]['user']['username'], a.user.username)
+            self.assertEqual(appt[i]['doctor']['username'], a.doctor.username)
 
     def test_create_appointment_by_user_admin(self) -> None:
         """Verify that an ADMIN user can create appointments"""
@@ -73,11 +73,11 @@ class AppointmentsAdminAPITestCase(APITestCase):
 
         queryset = Appointment.objects.select_related('user', 'doctor').filter(user=user)
         for i, a in enumerate(queryset):
-            self.assertEqual(appointments[i].get('user'), a.user.id)
+            self.assertEqual(appointments[i]['user']['username'], a.user.username)
             if a.doctor is None:
                 self.assertIsNone(appointments[i].get('doctor'))
                 continue
-            self.assertEqual(appointments[i].get('doctor'), a.doctor.id)
+            self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
 
     def test_retrieve_appointment_by_user_admin(self) -> None:
         """Retrieve appointment from the user given Id"""
@@ -95,8 +95,8 @@ class AppointmentsAdminAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.filter(user=user).count(), 2)
         self.assertEqual(user_res.get('id'), user.id)
         self.assertEqual(appointment_res.get('id'), appointment.id)
-        self.assertEqual(appointment_res.get('user'), user.id)
-        self.assertEqual(appointment_res.get('doctor'), doctor.id)
+        self.assertEqual(appointment_res['user']['username'], user.username)
+        self.assertEqual(appointment_res['doctor']['username'], doctor.username)
 
     def test_update_appointment_by_user_admin(self) -> None:
         """Update appointment for given id"""
@@ -170,8 +170,8 @@ class AppointmentsDoctorAPITestCase(APITestCase):
 
         queryset = Appointment.objects.select_related('user', 'doctor').filter(doctor=self.user)
         for i, a in enumerate(queryset):
-            self.assertEqual(appointments[i].get('user'), a.user.id)
-            self.assertEqual(appointments[i].get('doctor'), a.doctor.id)
+            self.assertEqual(appointments[i]['user']['username'], a.user.username)
+            self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
 
         # Listar citas asociadas al perfil de otro usuario
         url = f'/users/{user.username}/appointments/'
@@ -194,8 +194,8 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.filter(doctor=self.user).count(), 1)
         self.assertEqual(user_res.get('id'), self.user.id)
         self.assertEqual(appointment_res.get('id'), appointment.id)
-        self.assertEqual(appointment_res.get('user'), user.id)
-        self.assertEqual(appointment_res.get('doctor'), self.user.id)
+        self.assertEqual(appointment_res['user']['username'], user.username)
+        self.assertEqual(appointment_res['doctor']['username'], self.user.username)
 
         # Obtener cita asociadas al perfil de otro usuario
         url = f'/users/{user.username}/appointments/{appointment.id}/'
@@ -280,11 +280,11 @@ class AppointmentsPatientAPITestCase(APITestCase):
 
         queryset = Appointment.objects.select_related('user', 'doctor').filter(user=self.user)
         for i, a in enumerate(queryset):
-            self.assertEqual(appointments[i].get('user'), a.user.id)
+            self.assertEqual(appointments[i]['user']['username'], a.user.username)
             if a.doctor is None:
                 self.assertIsNone(appointments[i].get('doctor'))
                 continue
-            self.assertEqual(appointments[i].get('doctor'), a.doctor.id)
+            self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
 
         # Listar citas asociadas al perfil de otro usuario
         url = f'/users/{doctor.username}/appointments/'
@@ -308,8 +308,8 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.filter(user=self.user).count(), 1)
         self.assertEqual(user_res.get('id'), self.user.id)
         self.assertEqual(appointment_res.get('id'), appointment.id)
-        self.assertEqual(appointment_res.get('user'), self.user.id)
-        self.assertEqual(appointment_res.get('doctor'), doctor.id)
+        self.assertEqual(appointment_res['user']['username'], self.user.username)
+        self.assertEqual(appointment_res['doctor']['username'], doctor.username)
 
         # Obtener citas asociadas al perfil de otro usuario
         url = f'/users/{user.username}/appointments/{user_appt.id}/'

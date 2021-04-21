@@ -71,7 +71,7 @@ ROOT_URLCONF = 'gestion_consultas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [Path(BASE_DIR, 'templates')],
+        'DIRS': [Path(BASE_DIR, '../templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,6 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gestion_consultas.wsgi.application'
+ASGI_APPLICATION = "gestion_consultas.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -165,18 +166,6 @@ ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_HOURS = 1
 
 # Default domain
 DEFAULT_DOMAIN = config('DEFAULT_DOMAIN')  # env
-
-# Django channels
-ASGI_APPLICATION = "gestion_consultas.asgi.application"
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
-        },
-    },
-}
 
 # django-cors-headers
 CORS_ORIGIN_WHITELIST = [

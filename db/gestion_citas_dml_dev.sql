@@ -76,9 +76,9 @@ VALUES (1, '[
 
 
 -- room table
-INSERT INTO public.room (id, created_at, user_owner_id, user_receiver_id)
-VALUES (1, '2021-04-17 19:16:04.510000', 1, 3),
-       (2, '2021-04-17 19:16:58.066000', 3, 2);
+INSERT INTO public.room (id, name, created_at, user_owner_id, user_receiver_id)
+VALUES (1, 'room_test_1', '2021-04-17 19:16:04.510000', 1, 3),
+       (2, 'room_test_2', '2021-04-17 19:16:58.066000', 3, 2);
 
 
 -- message table

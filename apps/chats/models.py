@@ -14,6 +14,7 @@ class Room(models.Model):
         'accounts.User', verbose_name=_('usuario con quien comparte el chat'), related_name='user_receiver',
         on_delete=models.CASCADE
     )
+    name = models.CharField(_('nombre'), max_length=60, unique=True)
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
 
     class Meta:

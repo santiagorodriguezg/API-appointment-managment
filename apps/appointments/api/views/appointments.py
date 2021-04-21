@@ -7,13 +7,13 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from apps.accounts.api.permissions import check_permissions
-from apps.accounts.api.views.users import UserModelViewSet
 from apps.accounts.models import User
+from apps.appointments.models import Appointment
 from apps.appointments.api.serializers.appointments import (
     AppointmentSerializer, AppointmentUserSerializer, AppointmentListSerializer
 )
-from apps.appointments.models import Appointment
+from apps.accounts.api.permissions import check_permissions
+from apps.accounts.api.views.users import UserModelViewSet
 from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk
 
 
@@ -27,7 +27,7 @@ class AppointmentListAPIView(ListAPIView):
     queryset = Appointment.objects.all()
     permission_classes = (IsAdminUser,)
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at', 'user__username')
+    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at', 'user__username', 'doctor__username')
     search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     ordering_fields = ['created_at', 'updated_at']
     ordering = ('id',)
@@ -39,7 +39,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
 
     permission_classes = [IsAuthenticated]
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at')
+    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at', 'doctor__username')
     search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     ordering_fields = ['created_at', 'updated_at']
     ordering = ('id',)
@@ -76,11 +76,11 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         """User appointments"""
         check_permissions(request.user, username, 'appointments.view_appointment')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs)
-        queryset = self.filter_queryset(self.get_queryset(user.data))
+        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        queryset = self.filter_queryset(self.get_queryset(user))
         page = self.paginate_queryset(queryset)
         data = {
-            'user': user.data,
+            'user': user,
             'appointments': self.get_serializer(page, many=True).data
         }
         return self.get_paginated_response(data)
@@ -89,10 +89,10 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         """User appointments given Id"""
         check_permissions(request.user, username, 'appointments.view_appointment')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs)
-        queryset = self.get_queryset(user.data, pk)
+        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        queryset = self.get_queryset(user, pk)
         data = {
-            'user': user.data,
+            'user': user,
             'appointment': self.get_serializer(queryset).data
         }
         return Response(data, status=status.HTTP_200_OK)
@@ -101,8 +101,8 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         """Users with ADMIN and USER roles can update appointments."""
         check_permissions(request.user, username, 'appointments.change_appointment')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs)
-        queryset = self.get_queryset(user.data, pk)
+        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        queryset = self.get_queryset(user, pk)
 
         serializer = AppointmentUserSerializer(queryset, data=request.data, context={'request': request})
         if request.user.role == User.Type.ADMIN:

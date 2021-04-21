@@ -6,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from apps.chats.models import Room
+from apps.chats.api.serializers.rooms import RoomSerializer
 from apps.accounts.api.permissions import check_permissions
 from apps.accounts.api.views.users import UserModelViewSet
-from apps.chats.api.serializers.rooms import RoomSerializer
-from apps.chats.models import Room
 from gestion_consultas.utils import get_queryset_with_pk
 
 
@@ -32,20 +32,20 @@ class RoomListViewSet(ReadOnlyModelViewSet):
         """User list chat rooms"""
         check_permissions(request.user, username, 'chats.view_room')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs)
-        queryset = self.filter_queryset(self.get_queryset(user.data))
+        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        queryset = self.filter_queryset(self.get_queryset(user))
         page = self.paginate_queryset(queryset)
 
         rooms = self.get_serializer(page, many=True).data
         for room in rooms:
-            if room['user_owner']['username'] == user.data['username']:
+            if room['user_owner']['username'] == user['username']:
                 room.pop('user_owner')
 
-            if room['user_receiver']['username'] == user.data['username']:
+            if room['user_receiver']['username'] == user['username']:
                 room.pop('user_receiver')
 
         data = {
-            'user': user.data,
+            'user': user,
             'rooms': rooms
         }
         return self.get_paginated_response(data)
@@ -54,18 +54,18 @@ class RoomListViewSet(ReadOnlyModelViewSet):
         """User chat room given Id"""
         check_permissions(request.user, username, 'chats.view_room')
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs)
-        queryset = self.get_queryset(user.data, pk)
+        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        queryset = self.get_queryset(user, pk)
 
         room = self.get_serializer(queryset).data
-        if room['user_owner']['username'] == user.data['username']:
+        if room['user_owner']['username'] == user['username']:
             room.pop('user_owner')
 
-        if room['user_receiver']['username'] == user.data['username']:
+        if room['user_receiver']['username'] == user['username']:
             room.pop('user_receiver')
 
         data = {
-            'user': user.data,
+            'user': user,
             'room': room
         }
         return Response(data, status=status.HTTP_200_OK)

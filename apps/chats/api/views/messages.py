@@ -16,7 +16,6 @@ class MessageListViewSet(ListModelMixin, GenericViewSet):
     """
 
     serializer_class = MessageListSerializer
-    queryset = Message.objects.all()
     permission_classes = (IsAuthenticated,)
     ordering = ('created_at',)
 

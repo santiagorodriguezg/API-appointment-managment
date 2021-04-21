@@ -3,7 +3,7 @@
 from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
-STATICFILES_DIRS = (Path(BASE_DIR, 'static'),)  # NOQA
+STATICFILES_DIRS = (Path(BASE_DIR, '../static'),)  # NOQA
 
 # Django REST Framework
 REST_FRAMEWORK = {
@@ -12,4 +12,11 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 2,
+}
+
+# Django channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
 }
