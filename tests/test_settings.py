@@ -22,6 +22,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 2,
 }
 
+# Django channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 EMAIL_HOST = "localhost"

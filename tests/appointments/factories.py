@@ -7,7 +7,7 @@ from django.utils import timezone
 from factory.fuzzy import FuzzyInteger
 
 from apps.appointments.models import Appointment
-from tests.users.factory import UserFactory
+from tests.users.factories import UserFactory
 
 
 class AppointmentFactory(factory.django.DjangoModelFactory):

@@ -33,11 +33,10 @@ def create_permissions(user_class, user):
             message_perms = qs.filter(content_type=get_content_type(Message), codename__endswith='from_me')
 
             permissions_user = [
-                user_perms[1], user_perms[3], *appointment_perms[:2], appointment_perms[3], room_perms[0],
-                room_perms[3], *message_perms
+                *appointment_perms[:2], appointment_perms[3], room_perms[0], room_perms[3], *message_perms
             ]
             permissions_doctor = [
-                user_perms[1], user_perms[3], appointment_perms[3], room_perms[0], room_perms[3], *message_perms
+                user_perms[3], appointment_perms[3], room_perms[0], room_perms[3], *message_perms
             ]
             # Add permissions to group
             user_group.permissions.set(permissions_user)

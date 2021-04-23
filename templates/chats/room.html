@@ -22,11 +22,12 @@
 <script src="{% static 'js/reconnecting-websocket.min.js' %}"></script>
 <script>
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
-    {# https://stackoverflow.com/questions/43392889/how-do-you-authenticate-a-websocket-with-token-authentication-on-django-channels    #}
 
-    const token = "2823beab640992f536c2adf5d6bf5aaa71ce1f10";
+    const token = "0a865e923c8b1cc34e84890cdabd5cd104369601";
+    const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+
     const chatSocket = new ReconnectingWebSocket(
-        `ws://${window.location.host}/ws/chat/${roomName}/?${token}=${token}`
+        `${ws_scheme}://${window.location.host}/ws/v1/chat/${roomName}/?token=${token}`
     );
 
     chatSocket.onopen = function (e) {

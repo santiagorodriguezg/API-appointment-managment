@@ -35,8 +35,16 @@ class Room(models.Model):
 class Message(models.Model):
     """Message model"""
 
+    class Type(models.TextChoices):
+        AUDIO = 'AD', _('Audio')
+        FILE = 'FL', _('Archivo')
+        IMAGE = 'IMG', _('Imagen')
+        TEXT = 'TXT', _('Texto')
+        VIDEO = 'VD', _('Video')
+
     room = models.ForeignKey(Room, verbose_name=_('chat'), on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', verbose_name=_('usuario'), on_delete=models.CASCADE)
+    type = models.CharField(_('tipo de mensaje'), max_length=4, choices=Type.choices, default=Type.TEXT)
     content = models.TextField(_('contenido'))
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
     updated_at = models.DateTimeField(_('fecha de actualización'), auto_now=True)

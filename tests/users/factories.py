@@ -39,8 +39,6 @@ class UserDoctorFactory(UserFactory):
     """User doctor factory"""
 
     role = User.Type.DOCTOR
-    city = 'Tunja'
-    address = factory.Faker('address')
 
 
 class UserAdminFactory(UserFactory):
@@ -49,8 +47,6 @@ class UserAdminFactory(UserFactory):
     role = User.Type.ADMIN
     is_superuser = True
     is_staff = True
-    city = 'Bogotá'
-    address = factory.Faker('address')
 
 
 class TokenFactory(factory.django.DjangoModelFactory):

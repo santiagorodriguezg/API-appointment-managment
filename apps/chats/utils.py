@@ -1,8 +1,8 @@
 """Chats utilities"""
 
 import pytz
-from django.utils import timezone
 from channels.db import database_sync_to_async
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.chats.models import Room, Message
@@ -64,6 +64,7 @@ def message_to_json(message):
         'id': message.id,
         'room': message.room_id,
         'user': message.user.username,
+        'type': message.type,
         'content': message.content,
         'created_at': convert_to_localtime(message.created_at),
         'updated_at': convert_to_localtime(message.updated_at),

@@ -1,10 +1,11 @@
 """Appointments tests"""
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.appointments.models import Appointment
-from tests.appointments.factory import AppointmentFactory, APPOINTMENT_FACTORY_DICT
-from tests.users.factory import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
+from tests.appointments.factories import AppointmentFactory, APPOINTMENT_FACTORY_DICT
+from tests.users.factories import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
 
 
 class AppointmentsAdminAPITestCase(APITestCase):
@@ -153,7 +154,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.count(), 0)
 
     def test_list_appointments_by_user_doctor(self) -> None:
-        """Verify that a patient can only list his appointments"""
+        """Verify that a doctor can only list his appointments"""
         user = UserFactory()
         AppointmentFactory.create_batch(2)
         AppointmentFactory.create_batch(2, doctor=self.user)

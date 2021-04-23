@@ -12,26 +12,23 @@ VALUES (1, 'Users'),
 
 -- auth_group_permissions table
 INSERT INTO public.auth_group_permissions (id, group_id, permission_id)
-VALUES (1, 1, 32),
-       (2, 1, 38),
-       (3, 1, 39),
-       (4, 1, 41),
-       (5, 1, 46),
-       (6, 1, 49),
-       (7, 1, 54),
-       (8, 1, 55),
-       (9, 1, 56),
-       (10, 1, 57),
-       (11, 1, 30),
-       (12, 2, 32),
-       (13, 2, 41),
-       (14, 2, 46),
-       (15, 2, 49),
-       (16, 2, 54),
-       (17, 2, 55),
-       (18, 2, 56),
-       (19, 2, 57),
-       (20, 2, 30);
+VALUES (1, 1, 38),
+       (2, 1, 39),
+       (3, 1, 41),
+       (4, 1, 46),
+       (5, 1, 49),
+       (6, 1, 54),
+       (7, 1, 55),
+       (8, 1, 56),
+       (9, 1, 57),
+       (10, 2, 32),
+       (11, 2, 41),
+       (12, 2, 46),
+       (13, 2, 49),
+       (14, 2, 54),
+       (15, 2, 55),
+       (16, 2, 56),
+       (17, 2, 57);
 
 
 -- user table
@@ -77,18 +74,18 @@ VALUES (1, '[
 
 -- room table
 INSERT INTO public.room (id, name, created_at, user_owner_id, user_receiver_id)
-VALUES (1, 'room_test_1', '2021-04-17 19:16:04.510000', 1, 3),
-       (2, 'room_test_2', '2021-04-17 19:16:58.066000', 3, 2);
+VALUES (1, 'roomtest1', '2021-04-17 19:16:04.510000', 1, 3),
+       (2, 'roomtest2', '2021-04-17 19:16:58.066000', 3, 2);
 
 
 -- message table
-INSERT INTO public.message (id, content, created_at, updated_at, room_id, user_id)
-VALUES (1, 'Tiene una nueva cita', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
-       (2, 'Buenos dias', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
-       (3, 'Cuando es la cita?', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
+INSERT INTO public.message (id, type, content, created_at, updated_at, room_id, user_id)
+VALUES (1, 'TXT', 'Tiene una nueva cita', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
+       (2, 'TXT', 'Buenos dias', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
+       (3, 'TXT', 'Cuando es la cita?', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
 
 SELECT setval('auth_group_id_seq', 2);
-SELECT setval('auth_group_permissions_id_seq', 20);
+SELECT setval('auth_group_permissions_id_seq', 17);
 SELECT setval('user_id_seq', 3);
 SELECT setval('user_groups_id_seq', 2);
 SELECT setval('appointment_id_seq', 2);

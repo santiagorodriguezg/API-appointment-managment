@@ -7,7 +7,7 @@ Pillow==8.2.0
 python-decouple==3.4
 
 # File cleanup
-django-cleanup==5.1.0
+django-cleanup==5.2.0
 
 # Django REST Framework
 djangorestframework==3.12.4
