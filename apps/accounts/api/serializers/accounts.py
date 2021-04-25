@@ -134,7 +134,7 @@ class PasswordResetSerializer(serializers.Serializer):
 
 
 class PasswordResetFromKeySerializer(serializers.Serializer):
-    """Password reset password from key serializer"""
+    """Password reset from key serializer"""
 
     token = serializers.CharField()
     password = serializers.CharField(min_length=8)

@@ -9,7 +9,7 @@ from tests.users.factories import (
     UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory, USER_FACTORY_DICT, USER_ADMIN_FACTORY_DICT,
     USER_DOCTOR_FACTORY_DICT
 )
-from tests.utils import TEST_PASSWORD
+from tests.utils import TEST_PASSWORD, API_VERSION_V1
 
 
 class UsersAdminAPITestCase(APITestCase):
@@ -20,7 +20,7 @@ class UsersAdminAPITestCase(APITestCase):
         self.user = UserAdminFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        self.url = '/users/'
+        self.url = f'/{API_VERSION_V1}/users/'
 
     def test_user_admin_create_users(self) -> None:
         """Verify that an ADMIN user can create users"""
@@ -82,7 +82,7 @@ class UsersDoctorAPITestCase(APITestCase):
         self.user = UserDoctorFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        self.url = '/users/'
+        self.url = f'/{API_VERSION_V1}/users/'
 
     def test_user_doctor_create_users(self) -> None:
         """Verify that an DOCTOR user can not create users"""
@@ -142,7 +142,7 @@ class UsersPatientAPITestCase(APITestCase):
         self.user = UserFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        self.url = '/users/'
+        self.url = f'/{API_VERSION_V1}/users/'
 
     def test_user_patient_create_users(self):
         """Verify that an patient user can not create users"""
@@ -185,7 +185,7 @@ class UsersAPITestCase(APITestCase):
         self.user = UserFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        self.url = '/users/'
+        self.url = f'/{API_VERSION_V1}/users/'
 
     def test_my_profile(self) -> None:
         """Obtain the profile of the logged in user"""

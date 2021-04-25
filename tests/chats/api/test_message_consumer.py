@@ -11,9 +11,11 @@ from django.urls import re_path
 from apps.chats.api.consumers.messages import MessageConsumer
 from tests.chats.factories import MessageFactory, RoomFactory
 from tests.users.factories import UserAdminFactory, TokenFactory, UserFactory
+from tests.utils import API_VERSION_V1
 
 
 class AuthWebsocketCommunicator(WebsocketCommunicator):
+    """Websocket communicator with user scope"""
 
     def __init__(self, application, path, headers=None, subprotocols=None, user=None):
         super(AuthWebsocketCommunicator, self).__init__(application, path, headers, subprotocols)
@@ -52,7 +54,7 @@ class MessageConsumerTransactionTestCase(TransactionTestCase):
     async def test_create_message_by_user_owner(self) -> None:
         """Create message by a chat room owner user"""
         token = await get_user_token(self.user_owner)
-        url = f'/ws/v1/chat/{self.room_name}/?token={token.key}'
+        url = f'/ws/{API_VERSION_V1}/chat/{self.room_name}/?token={token.key}'
 
         communicator = AuthWebsocketCommunicator(self.application, url, user=self.user_owner)
         connected, subprotocol = await communicator.connect()
@@ -81,7 +83,7 @@ class MessageConsumerTransactionTestCase(TransactionTestCase):
         room, msg = await create_room_and_message(self.user_owner, self.user_receiver)
 
         token = await get_user_token(self.user_receiver)
-        url = f'/ws/v1/chat/{room.name}/?token={token.key}'
+        url = f'/ws/{API_VERSION_V1}/chat/{room.name}/?token={token.key}'
 
         communicator = AuthWebsocketCommunicator(self.application, url, user=self.user_receiver)
         connected, subprotocol = await communicator.connect()

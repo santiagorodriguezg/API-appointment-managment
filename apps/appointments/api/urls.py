@@ -14,6 +14,6 @@ router.register(
 )
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('appointments/', AppointmentListAPIView.as_view(), name='appointments'),
+    path('v1/', include(router.urls)),
+    path('v1/appointments/', AppointmentListAPIView.as_view(), name='appointments'),
 ]

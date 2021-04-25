@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 from apps.appointments.models import Appointment
 from tests.appointments.factories import AppointmentFactory, APPOINTMENT_FACTORY_DICT
 from tests.users.factories import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
+from tests.utils import API_VERSION_V1
 
 
 class AppointmentsAdminAPITestCase(APITestCase):
@@ -28,7 +29,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         doctor = UserDoctorFactory()
         AppointmentFactory.create_batch(2, doctor=doctor)
 
-        response = self.client.get('/appointments/')
+        response = self.client.get(f'/{API_VERSION_V1}/appointments/')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
@@ -46,7 +47,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         APPOINTMENT_FACTORY_DICT.pop('user')
         APPOINTMENT_FACTORY_DICT['doctor'] = doctors[0].id
 
-        url = f'/users/{users[1].username}/appointments/'
+        url = f'/{API_VERSION_V1}/users/{users[1].username}/appointments/'
         response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -62,7 +63,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         AppointmentFactory(user=user)
         AppointmentFactory(user=user, doctor=doctor)
 
-        url = f'/users/{user.username}/appointments/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/'
         response = self.client.get(url)
         res = response.data.get('results')
         appointments = res.get('appointments')
@@ -87,7 +88,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         AppointmentFactory(user=user)
         appointment = AppointmentFactory(user=user, doctor=doctor)
 
-        url = f'/users/{user.username}/appointments/{appointment.id}/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/{appointment.id}/'
         response = self.client.get(url)
         appointment_res = response.data.get('appointment')
         user_res = response.data.get('user')
@@ -109,7 +110,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         APPOINTMENT_FACTORY_DICT['user'] = users[1].id
         APPOINTMENT_FACTORY_DICT['doctor'] = doctors[1].id
 
-        url = f'/users/{users[0].username}/appointments/{appointment.id}/'
+        url = f'/{API_VERSION_V1}/users/{users[0].username}/appointments/{appointment.id}/'
         response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
 
         queryset = Appointment.objects.get(pk=appointment.id, user=users[0])
@@ -131,7 +132,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.user = UserDoctorFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        self.url = f'/users/{self.user.username}/appointments/'
+        self.url = f'/{API_VERSION_V1}/users/{self.user.username}/appointments/'
 
     def test_create_appointment_by_user_doctor(self) -> None:
         """Verify that an DOCTOR user can not create appointments"""
@@ -147,7 +148,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.count(), 0)
 
         # Crear cita asociada al perfil del doctor
-        url = f'/users/{users[1].username}/appointments/'
+        url = f'/{API_VERSION_V1}/users/{users[1].username}/appointments/'
         response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -175,7 +176,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
             self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
 
         # Listar citas asociadas al perfil de otro usuario
-        url = f'/users/{user.username}/appointments/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -199,7 +200,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.assertEqual(appointment_res['doctor']['username'], self.user.username)
 
         # Obtener cita asociadas al perfil de otro usuario
-        url = f'/users/{user.username}/appointments/{appointment.id}/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/{appointment.id}/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -219,7 +220,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.filter(doctor=self.user).count(), 1)
 
         # Actualizar cita asociada al perfil de otro usuario
-        url = f'/users/{users[0].username}/appointments/{appointment.id}/'
+        url = f'/{API_VERSION_V1}/users/{users[0].username}/appointments/{appointment.id}/'
         response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -232,12 +233,12 @@ class AppointmentsPatientAPITestCase(APITestCase):
     """
 
     def setUp(self) -> None:
-        # Authenticate user DOCTOR
+        # Authenticate user PATIENT
         UserAdminFactory()
         self.user = UserFactory()
         self.token = TokenFactory(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
-        self.url = f'/users/{self.user.username}/appointments/'
+        self.url = f'/{API_VERSION_V1}/users/{self.user.username}/appointments/'
 
     def test_create_appointment_by_user_patient(self) -> None:
         """Verify that an patient user can create appointments"""
@@ -257,7 +258,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertIsNone(response.data.get('doctor'))
 
         # Crear cita asociada al perfil de otro usuario
-        url = f'/users/{user.username}/appointments/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/'
         response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -288,7 +289,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
             self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
 
         # Listar citas asociadas al perfil de otro usuario
-        url = f'/users/{doctor.username}/appointments/'
+        url = f'/{API_VERSION_V1}/users/{doctor.username}/appointments/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -313,7 +314,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertEqual(appointment_res['doctor']['username'], doctor.username)
 
         # Obtener citas asociadas al perfil de otro usuario
-        url = f'/users/{user.username}/appointments/{user_appt.id}/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/{user_appt.id}/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -340,7 +341,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
         APPOINTMENT_FACTORY_DICT['user'] = self.user.id
         APPOINTMENT_FACTORY_DICT['doctor'] = None
 
-        url = f'/users/{user.username}/appointments/{user_appt.id}/'
+        url = f'/{API_VERSION_V1}/users/{user.username}/appointments/{user_appt.id}/'
         response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

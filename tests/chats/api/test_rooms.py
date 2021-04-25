@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 from apps.chats.models import Room, Message
 from tests.chats.factories import RoomFactory, MessageFactory
 from tests.users.factories import UserAdminFactory, TokenFactory, UserFactory, UserDoctorFactory
+from tests.utils import API_VERSION_V1
 
 
 class RoomAPITestCase(APITestCase):
@@ -31,7 +32,7 @@ class RoomAPITestCase(APITestCase):
 
     def test_list_chat_rooms_by_owner(self) -> None:
         """List of chat rooms where the user is an owner"""
-        url = f'/users/{self.user_owner.username}/rooms/'
+        url = f'/{API_VERSION_V1}/users/{self.user_owner.username}/rooms/'
         response = self.client.get(url)
         rooms = response.data['results']['rooms']
 
@@ -45,7 +46,7 @@ class RoomAPITestCase(APITestCase):
             self.assertEqual(rooms[i]['user_receiver']['username'], room.user_receiver.username)
 
         # Listar salas de chat asociadas a otro usuario
-        url = f'/users/{self.user_receiver_1.username}/rooms/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_1.username}/rooms/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -55,7 +56,7 @@ class RoomAPITestCase(APITestCase):
         token = TokenFactory(user=self.user_receiver_1)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
-        url = f'/users/{self.user_receiver_1.username}/rooms/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_1.username}/rooms/'
         response = self.client.get(url)
         rooms = response.data['results']['rooms']
 
@@ -69,14 +70,14 @@ class RoomAPITestCase(APITestCase):
             self.assertEqual(rooms[i]['user_owner']['username'], room.user_owner.username)
 
         # Listar salas de chat asociadas a otro usuario
-        url = f'/users/{self.user_receiver_2.username}/rooms/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_2.username}/rooms/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_retrieve_chat_rooms_by_owner(self):
         """Chat room given an Id in which the user is a owner"""
-        url = f'/users/{self.user_owner.username}/rooms/{self.room_1.id}/'
+        url = f'/{API_VERSION_V1}/users/{self.user_owner.username}/rooms/{self.room_1.id}/'
         response = self.client.get(url)
         room = response.data['room']
 
@@ -86,7 +87,7 @@ class RoomAPITestCase(APITestCase):
         self.assertEqual(room['user_receiver']['username'], self.room_1.user_receiver.username)
 
         # Obtener sala de chat asociadas a otro usuario
-        url = f'/users/{self.user_receiver_1.username}/rooms/{self.room_1.id}/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_1.username}/rooms/{self.room_1.id}/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -96,7 +97,7 @@ class RoomAPITestCase(APITestCase):
         token = TokenFactory(user=self.user_receiver_2)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
 
-        url = f'/users/{self.user_receiver_2.username}/rooms/{self.room_2.id}/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_2.username}/rooms/{self.room_2.id}/'
         response = self.client.get(url)
         room = response.data['room']
 
@@ -106,14 +107,14 @@ class RoomAPITestCase(APITestCase):
         self.assertEqual(room['user_owner']['username'], self.room_2.user_owner.username)
 
         # Obtener sala de chat asociadas a otro usuario
-        url = f'/users/{self.user_owner.username}/rooms/{self.room_1.id}/'
+        url = f'/{API_VERSION_V1}/users/{self.user_owner.username}/rooms/{self.room_1.id}/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_retrieve_chat_rooms_with_messages_by_owner(self):
         """Chat room with messages given an Id in which the user is a owner"""
-        url = f'/users/{self.user_owner.username}/rooms/{self.room_1.id}/messages/'
+        url = f'/{API_VERSION_V1}/users/{self.user_owner.username}/rooms/{self.room_1.id}/messages/'
         response = self.client.get(url)
         room = response.data['room']
         messages = room['messages']
@@ -127,7 +128,7 @@ class RoomAPITestCase(APITestCase):
             self.assertEqual(messages[i]['user'], msg.user.username)
 
         # Obtener sala de chat asociadas a otro usuario
-        url = f'/users/{self.user_receiver_1.username}/rooms/{self.room_1.id}/messages/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_1.username}/rooms/{self.room_1.id}/messages/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -136,7 +137,7 @@ class RoomAPITestCase(APITestCase):
         """Chat room with messages given an Id in which the user is a receiver"""
         token = TokenFactory(user=self.user_receiver_2)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
-        url = f'/users/{self.user_receiver_2.username}/rooms/{self.room_2.id}/messages/'
+        url = f'/{API_VERSION_V1}/users/{self.user_receiver_2.username}/rooms/{self.room_2.id}/messages/'
 
         response = self.client.get(url)
         room = response.data['room']
@@ -151,7 +152,7 @@ class RoomAPITestCase(APITestCase):
             self.assertEqual(messages[i]['user'], msg.user.username)
 
         # Obtener sala de chat asociadas a otro usuario
-        url = f'/users/{self.user_owner.username}/rooms/{self.room_1.id}/messages/'
+        url = f'/{API_VERSION_V1}/users/{self.user_owner.username}/rooms/{self.room_1.id}/messages/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

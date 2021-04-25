@@ -20,6 +20,7 @@ class AccountsViewSet(GenericViewSet):
 
     @action(methods=['post'], detail=False)
     def signup(self, request):
+        """User sign up"""
         serializer = UserSignUpSerializer(data=request.data)
         if serializer.is_valid():
             user, token = serializer.save()
@@ -32,6 +33,7 @@ class AccountsViewSet(GenericViewSet):
 
     @action(methods=['post'], detail=False)
     def login(self, request):
+        """User sign in"""
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user, token = serializer.save()
@@ -43,6 +45,7 @@ class AccountsViewSet(GenericViewSet):
 
     @action(methods=['post'], detail=False)
     def logout(self, request):
+        """User logout"""
         token = request.data.get('token')
         if token:
             token = Token.objects.filter(key=token).first()
@@ -56,6 +59,7 @@ class AccountsViewSet(GenericViewSet):
 
     @action(methods=['post'], detail=False, url_path='verify-token')
     def verify_token(self, request):
+        """Verify JWT token used to reset password"""
         serializer = VerifyTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = {
@@ -66,6 +70,7 @@ class AccountsViewSet(GenericViewSet):
 
     @action(methods=['post'], detail=False, url_path='password-reset')
     def password_reset(self, request):
+        """Send password reset email"""
         serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -78,6 +83,7 @@ class AccountsViewSet(GenericViewSet):
 
     @action(methods=['post'], detail=False, url_path='password-reset-from-key')
     def password_reset_from_key(self, request):
+        """Verify JWT token and reset password"""
         serializer = PasswordResetFromKeySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

@@ -1,3 +1,5 @@
+"""Chats API URLs"""
+
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
@@ -12,6 +14,7 @@ router.register(
     RoomListViewSet,
     basename='users-rooms'
 )
+
 router.register(
     f'{user_url}/rooms/(?P<pk>[^/.]+)/messages',
     MessageListViewSet,
@@ -19,5 +22,5 @@ router.register(
 )
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('v1/', include(router.urls)),
 ]
