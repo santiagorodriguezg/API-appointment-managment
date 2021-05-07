@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
@@ -149,6 +149,9 @@ MEDIA_ROOT = Path(BASE_DIR, 'media')
 
 # User model
 AUTH_USER_MODEL = 'accounts.User'
+
+# Admin
+ADMIN_URL = config('DJANGO_ADMIN_URL')
 
 # Security
 CSRF_COOKIE_HTTPONLY = True

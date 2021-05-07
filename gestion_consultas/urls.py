@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(settings.ADMIN_URL, admin.site.urls),
     path('chat/', include('apps.chats.urls')),  # Solo para probar el chat
     path('', include('apps.accounts.api.urls'), name='accounts'),
     path('', include('apps.appointments.api.urls'), name='appointments'),

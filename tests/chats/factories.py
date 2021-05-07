@@ -1,10 +1,10 @@
-"""Chats factory"""
+"""Chats factories"""
 
 import factory
 from django.utils import timezone
 
 from apps.chats.models import Room, Message
-from tests.users.factories import UserFactory, UserAdminFactory
+from tests.accounts.factories import UserFactory, UserAdminFactory
 
 
 class RoomFactory(factory.django.DjangoModelFactory):

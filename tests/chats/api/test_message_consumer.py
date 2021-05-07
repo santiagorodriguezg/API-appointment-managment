@@ -9,8 +9,8 @@ from django.test import TransactionTestCase
 from django.urls import re_path
 
 from apps.chats.api.consumers.messages import MessageConsumer
+from tests.accounts.factories import UserAdminFactory, TokenFactory, UserFactory
 from tests.chats.factories import MessageFactory, RoomFactory
-from tests.users.factories import UserAdminFactory, TokenFactory, UserFactory
 from tests.utils import API_VERSION_V1
 
 

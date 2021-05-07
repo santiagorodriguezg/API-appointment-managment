@@ -1,5 +1,5 @@
 # Base
-Django==3.2
+Django==3.2.2
 psycopg2==2.8.6
 Pillow==8.2.0
 
@@ -20,7 +20,7 @@ django-cors-headers==3.7.0
 argon2-cffi==20.1.0
 
 # JWT
-pyjwt==2.0.1
+pyjwt==2.1.0
 
 # Django channels
 channels==3.0.3

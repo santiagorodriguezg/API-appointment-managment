@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.chats.models import Room, Message
+from tests.accounts.factories import UserAdminFactory, TokenFactory, UserFactory, UserDoctorFactory
 from tests.chats.factories import RoomFactory, MessageFactory
-from tests.users.factories import UserAdminFactory, TokenFactory, UserFactory, UserDoctorFactory
 from tests.utils import API_VERSION_V1
 
 

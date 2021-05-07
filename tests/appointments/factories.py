@@ -1,4 +1,4 @@
-"""Appointments factory"""
+"""Appointments factories"""
 
 from datetime import timedelta
 
@@ -7,7 +7,7 @@ from django.utils import timezone
 from factory.fuzzy import FuzzyInteger
 
 from apps.appointments.models import Appointment
-from tests.users.factories import UserFactory
+from tests.accounts.factories import UserFactory
 
 
 class AppointmentFactory(factory.django.DjangoModelFactory):

@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.appointments.models import Appointment
+from tests.accounts.factories import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
 from tests.appointments.factories import AppointmentFactory, APPOINTMENT_FACTORY_DICT
-from tests.users.factories import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
 from tests.utils import API_VERSION_V1
 
 

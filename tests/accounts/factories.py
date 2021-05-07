@@ -1,4 +1,4 @@
-"""Users factory"""
+"""Accounts factories"""
 
 import factory
 from rest_framework.authtoken.models import Token

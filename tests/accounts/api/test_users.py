@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.accounts.models import User
-from tests.users.factories import (
+from tests.accounts.factories import (
     UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory, USER_FACTORY_DICT, USER_ADMIN_FACTORY_DICT,
     USER_DOCTOR_FACTORY_DICT
 )
