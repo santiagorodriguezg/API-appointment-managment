@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
 
 import os
 
+from decouple import config
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_citas.settings.local')
+settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_citas.settings.{settings}')
 
 application = get_wsgi_application()

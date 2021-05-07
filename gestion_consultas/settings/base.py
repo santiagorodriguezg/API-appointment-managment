@@ -145,7 +145,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 
 # MEDIA
 MEDIA_URL = '/media/'
-MEDIA_ROOT = Path(BASE_DIR, 'media')
+MEDIA_ROOT = Path(BASE_DIR, '../media')
 
 # User model
 AUTH_USER_MODEL = 'accounts.User'

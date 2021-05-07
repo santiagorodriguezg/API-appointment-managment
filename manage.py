@@ -3,10 +3,13 @@
 import os
 import sys
 
+from decouple import config
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_consultas.settings.local')
+    settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_consultas.settings.{settings}')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

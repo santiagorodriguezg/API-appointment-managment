@@ -11,13 +11,16 @@ import os
 
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
+from decouple import config
 from django.core.asgi import get_asgi_application
 from django.urls import re_path
 
 from apps.chats.api.consumers import messages
 from gestion_consultas.middleware import TokenAuthMiddleware
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_citas.settings.local')
+settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_citas.settings.{settings}')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
