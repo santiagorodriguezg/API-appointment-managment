@@ -123,7 +123,7 @@ class PasswordResetSerializer(serializers.Serializer):
         """Send reset password link to given user."""
         token = generate_token(user, 'password_reset')
         url = f'{settings.DEFAULT_DOMAIN}password/reset/key/{token}'
-        template_prefix = 'users/email/password_reset_key'
+        template_prefix = 'accounts/email/password_reset_key'
         context = {'user': user, 'password_reset_url': url}
         subject = render_to_string(f'{template_prefix}_subject.txt', context)
         subject = " ".join(subject.splitlines()).strip()  # Remove superfluous line breaks

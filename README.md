@@ -9,8 +9,7 @@ API REST con Python y Django.
 **PostgreSQL 12, 13**
 
 ## Instalación
-
-1. Instalar versión de python 3.x de acuerdo a su sistema operativo.
+1. Instalar versión de python 3.9 de acuerdo a su sistema operativo.
 
    [Descargar Python](https://www.python.org/downloads/)
 
@@ -41,7 +40,9 @@ cd venv/Scripts/activate
 pip install -r requirements/local.txt
 ```
 
-7. Ejecutar el servidor local:
+7. Configurar variables de entorno en el archivo `.env` (Ver el archivo `.env.example`).
+
+8. Ejecutar el servidor local:
 
 ```bash
 python manage.py runserver

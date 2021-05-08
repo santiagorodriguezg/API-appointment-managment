@@ -153,9 +153,6 @@ AUTH_USER_MODEL = 'accounts.User'
 # Admin
 ADMIN_URL = config('DJANGO_ADMIN_URL')
 
-# Security
-CSRF_COOKIE_HTTPONLY = True
-
 # Email settings
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -172,7 +169,7 @@ DEFAULT_DOMAIN = config('DEFAULT_DOMAIN')  # env
 
 # django-cors-headers
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://localhost:4200"
 ]
-
-CORS_URLS_REGEX = r'^/api.*$'
+CORS_URLS_REGEX = r'^/v[0-9]/api/.*$'

@@ -5,6 +5,12 @@ from .base import *  # NOQA
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = Path(BASE_DIR, '../static')  # NOQA
 
+# Security
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
