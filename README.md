@@ -9,6 +9,7 @@ API REST con Python y Django.
 **PostgreSQL 12, 13**
 
 ## Instalación
+
 1. Instalar versión de python 3.9 de acuerdo a su sistema operativo.
 
    [Descargar Python](https://www.python.org/downloads/)
@@ -16,36 +17,63 @@ API REST con Python y Django.
 
 2. Instalar virtualenv para crear entornos virtuales de Python:
 
-```bash
-pip install virtualenv
-```
+   ```bash
+   pip install virtualenv
+   ```
 
 3. Clonar el proyecto.
 
 4. Crear entorno virtual:
 
-```bash
-virtualenv venv
-```
+   ```bash
+   virtualenv venv
+   ```
 
 5. Activar entorno virtual:
 
-```bash
-cd venv/Scripts/activate
-```
+   ```bash
+   cd venv/Scripts/activate
+   ```
 
 6. Instalar requerimientos:
 
-```bash
-pip install -r requirements/local.txt
-```
+   ```bash
+   pip install -r requirements/local.txt
+   ```
 
 7. Configurar variables de entorno en el archivo `.env` (Ver el archivo `.env.example`).
 
-8. Ejecutar el servidor local:
+
+8. Ejecutar migraciones:
+
+   ```bash
+   python manage.py migrate
+   ```
+
+9. Ejecutar el servidor local:
+
+   ```bash
+   python manage.py runserver
+   ```
+
+## Generar SECRET_KEY para Django Settings
+
+Para generar una cadena aleatoria de 50 caracteres utilizable en el archivo `.env` como valor de ajuste de `SECRET_KEY`
+de Django ejecute el comando:
 
 ```bash
-python manage.py runserver
+python manage.py shell -c 'from django.core.management import utils; print(utils.get_random_secret_key())'
+```
+
+## Tests
+
+Se utiliza `pytest` como framework de prueba. Consultar la [documentación de pytest](https://pytest.org) para mas
+opciones al ejecutar los tests.
+
+Para ejecutar los tests use el siguiente comando:
+
+```bash
+pytest
 ```
 
 ## Configuración de correos electrónicos
@@ -55,12 +83,6 @@ python manage.py runserver
 2. Deshabilitar CAPTCHA para Gmail:
 
    [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha)
-
-## Colaboradores
-
-**Luis Guillermo Gómez**
-
-- [Github](https://github.com/luisgomez29)
 
 ```
 Gracias!.
