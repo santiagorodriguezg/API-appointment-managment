@@ -44,11 +44,11 @@ def clean_password2(instance, data):
 
 def generate_token(user, token_type):
     """Create JWT token"""
-    exp_date = timezone.now() + timedelta(hours=settings.ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_HOURS)
+    exp_date = timezone.now() + timedelta(minutes=settings.ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_MINUTES)
     payload = {
         'user': user.username,
         'exp': int(exp_date.timestamp()),
-        'type': token_type
+        'token_type': token_type
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS384")
 
@@ -67,7 +67,7 @@ def verify_token(token):
     except jwt.PyJWTError:
         raise invalid_token
 
-    if payload['type'] != 'password_reset':
+    if payload['token_type'] != 'password_reset':
         raise invalid_token
 
     return payload

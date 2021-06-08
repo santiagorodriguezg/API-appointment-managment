@@ -162,7 +162,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # env
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # env
 
 # Determines the expiration date of email password reset mails (# of hours).
-ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_HOURS = 1
+ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_MINUTES = 15
 
 # Default domain
 DEFAULT_DOMAIN = config('DEFAULT_DOMAIN')  # env

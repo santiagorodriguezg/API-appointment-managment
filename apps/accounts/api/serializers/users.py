@@ -151,4 +151,4 @@ class UserPasswordResetSerializer(serializers.Serializer):
     def save(self, **kwargs):
         """Generate password reset link to given user."""
         token = generate_token(self.instance, 'password_reset')
-        self.context['password_reset_url'] = f'{settings.DEFAULT_DOMAIN}password/reset/key/{token}'
+        self.context['password_reset_url'] = f'{settings.DEFAULT_DOMAIN}/password/reset/key/{token}'

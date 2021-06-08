@@ -18,20 +18,8 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{token}}",
+								"value": "Token {{token}}",
 								"type": "text"
-							},
-							{
-								"key": "Authorization",
-								"value": "{{token_doctor}}",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "Authorization",
-								"value": "{{token_user}}",
-								"type": "text",
-								"disabled": true
 							}
 						],
 						"body": {
@@ -39,12 +27,46 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{host}}/users",
+							"raw": "{{host}}/{{api_version}}/users/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"users"
+								"{{api_version}}",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "is_superuser",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "is_active",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "role",
+									"value": "ADMIN",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "gomez",
+									"disabled": true
+								},
+								{
+									"key": "ordering",
+									"value": "first_name",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "3",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -57,13 +79,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{token_doctor}}",
+								"value": "Token {{token}}",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"user_type\": \"DOC\",\r\n    \"first_name\": \"Julian\",\r\n    \"last_name\": \"Franco\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12348975\",\r\n    \"username\": \"julianfranco\",\r\n    \"email\": \"julian@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
+							"raw": "{\r\n    \"role\": \"USR\",\r\n    \"first_name\": \"Maria\",\r\n    \"last_name\": \"Lopez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12489931\",\r\n    \"username\": \"maria\",\r\n    \"email\": \"maria@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -71,11 +93,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/users/",
+							"raw": "{{host}}/{{api_version}}/users/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
+								"{{api_version}}",
 								"users",
 								""
 							]
@@ -87,26 +110,21 @@
 				{
 					"name": "Me",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{token_doctor}}",
-								"type": "text",
-								"disabled": true
-							},
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
+								"value": "Token {{token}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "{{host}}/users/me/",
+							"raw": "{{host}}/{{api_version}}/users/me/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
+								"{{api_version}}",
 								"users",
 								"me",
 								""
@@ -122,7 +140,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "{{token}}",
+								"value": "Token {{token}}",
 								"type": "text"
 							}
 						],
@@ -136,11 +154,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/users/change-password/",
+							"raw": "{{host}}/{{api_version}}/users/change-password/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
+								"{{api_version}}",
 								"users",
 								"change-password",
 								""
@@ -150,9 +169,9 @@
 					"response": []
 				},
 				{
-					"name": "Update user profile",
+					"name": "Update my profile",
 					"request": {
-						"method": "POST",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Authorization",
@@ -170,13 +189,525 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/users/profile/",
+							"raw": "{{host}}/{{api_version}}/users/me/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
+								"{{api_version}}",
 								"users",
-								"profile",
+								"me",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"role\": \"DOC\",\r\n    \"first_name\": \"Julian\",\r\n    \"last_name\": \"Franco\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12348975\",\r\n    \"username\": \"julianfranco\",\r\n    \"email\": \"julian@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/2/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"2",
+								""
+							]
+						},
+						"description": "Un usuario ADMIN puede actualizar cualquier perfil de un usuario "
+					},
+					"response": []
+				},
+				{
+					"name": "Update partial my profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"city\": \"Medellin\",\r\n    \"address\": \"Plaza Bolivar\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/me/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"me",
+								""
+							]
+						},
+						"description": "Actualiza uno o varios campos, pero no todo el perfil del usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "Password reset by ADMIN",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/carlos/password-reset/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"carlos",
+								"password-reset",
+								""
+							]
+						},
+						"description": "Genera el enlace de restablecimiento de la contraseña para un usuario"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);\r",
+									"postman.setEnvironmentVariable(\"token\", data.access_token);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "password",
+									"value": "lg123456",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "luis",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "juan",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "carlos",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/accounts/login/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"accounts",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/accounts/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"accounts",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"Santiago\",\r\n    \"last_name\": \"Rodriguez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"987322\",\r\n    \"phone\": \"3152366674\",\r\n    \"city\": \"Tunja\",\r\n    \"neighborhood\": \"Santa Lucia\",\r\n    \"address\": \"Cra #15 23-24\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/accounts/signup/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"accounts",
+								"signup",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Password reset from key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJ1c2VyIjoibHVpc2dvbWV6IiwiZXhwIjoxNjE4MDc2MTIyLCJ0eXBlIjoicGFzc3dvcmRfcmVzZXRhc2RhcyJ9.OUyMu9HTsRjExB8FUu53MYwC07gK19uiyqHlGjOFuYt45QnCC54RW0DKqzHoNnzx",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "lg123457",
+									"type": "text"
+								},
+								{
+									"key": "password2",
+									"value": "lg123457",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/accounts/password-reset-key",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"accounts",
+								"password-reset-key"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify token password reset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJ1c2VyIjoibHVpc2dvbWV6IiwiZXhwIjoxNjE4MDgxNzg5LCJ0eXBlIjoicGFzc3dvcmRfcmVzZXQifQ.TQGCKZeDcuSl8z_iwiCYAgxH2jMvIchiWbAz2WVT4dSB2e7WW-m-vGPas6OVFAUF",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/accounts/verify-token/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"accounts",
+								"verify-token",
+								""
+							]
+						},
+						"description": "Verifica el token JWT para recuperar la cuenta"
+					},
+					"response": []
+				},
+				{
+					"name": "Password reset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "juanmoreno",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/accounts/password-reset/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"accounts",
+								"password-reset",
+								""
+							]
+						},
+						"description": "Verifica que la cuenta del usuario exista"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointments",
+			"item": [
+				{
+					"name": "Appointments list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/{{api_version}}/appointments/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"appointments",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "tunja",
+									"disabled": true
+								},
+								{
+									"key": "doctor__username",
+									"value": "carlos",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lista todas las citas de todos los usuarios, solo por usuarios ADMIN"
+					},
+					"response": []
+				},
+				{
+					"name": "User Appointments list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/juan/appointments/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"juan",
+								"appointments",
+								"1"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "tunja",
+									"disabled": true
+								},
+								{
+									"key": "ordering",
+									"value": "-created_at",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User appointment update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"children\": [\r\n        {\r\n            \"name\": \"Luis Gomez\",\r\n            \"age\": 14\r\n        },\r\n        {\r\n            \"name\": \"Ana Perez\",\r\n            \"age\": 8\r\n        }\r\n    ],\r\n    \"aggressor\": \"Actualizar datos aggressor\",\r\n    \"description\": \"Estoy actualziando cita\",\r\n    \"doctor\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/juan/appointments/2/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"juan",
+								"appointments",
+								"2",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User appointment create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"doctor\": 1,\r\n    \"children\": \"\",\r\n    \"aggressor\": \"No hay nada\",\r\n    \"description\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"carlos",
+								"appointments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User appointment partial update",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"doctor\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/juan/appointments/1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"juan",
+								"appointments",
+								"1",
 								""
 							]
 						}
@@ -186,97 +717,71 @@
 			]
 		},
 		{
-			"name": "Auth",
+			"name": "Chats",
 			"item": [
 				{
-					"name": "login",
+					"name": "User rooms list",
 					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/luis/rooms/1/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"luis",
+								"rooms",
+								"1",
+								""
+							],
+							"query": [
 								{
-									"key": "username",
-									"value": "luisgomez",
-									"type": "text"
+									"key": "limit",
+									"value": "1",
+									"disabled": true
 								},
 								{
-									"key": "password",
-									"value": "lg123456",
-									"type": "text"
-								},
-								{
-									"key": "email",
-									"value": "carlos@gmail.com",
-									"type": "text",
+									"key": "offset",
+									"value": "1",
 									"disabled": true
 								}
 							]
-						},
-						"url": {
-							"raw": "{{host}}/login/",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"login",
-								""
-							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "logout",
+					"name": "User messages room",
 					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "token",
-									"value": "1874cd852a1d35945f9b84ef7381887a99488218",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{host}}/logout/",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"logout",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "signup",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"first_name\": \"Santiago\",\r\n    \"last_name\": \"Rpdriguez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"98732256\",\r\n    \"username\": \"santiago\",\r\n    \"email\": \"santiago@gmail.com\",\r\n    \"phone\": \"3152366674\",\r\n    \"city\": null,\r\n    \"address\": null,\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{token}}",
+								"type": "text"
 							}
-						},
+						],
 						"url": {
-							"raw": "{{host}}/signup/",
+							"raw": "{{host}}/{{api_version}}/users/juan/rooms/1/messages",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"signup",
-								""
+								"{{api_version}}",
+								"users",
+								"juan",
+								"rooms",
+								"1",
+								"messages"
 							]
 						}
 					},
