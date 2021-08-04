@@ -1,7 +1,7 @@
 # Base
-Django==3.2.4
-psycopg2==2.8.6
-Pillow==8.2.0
+Django==3.2.6
+psycopg2==2.9.1
+Pillow==8.3.1
 
 # Environment
 python-decouple==3.4
@@ -23,5 +23,5 @@ argon2-cffi==20.1.0
 pyjwt==2.1.0
 
 # Django channels
-channels==3.0.3
-channels-redis==3.2.0
+channels==3.0.4
+channels-redis==3.3.0

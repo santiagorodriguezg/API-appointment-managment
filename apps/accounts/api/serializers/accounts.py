@@ -113,10 +113,13 @@ class PasswordResetSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         """Send password reset email"""
+
         if self.instance.email is None:
             self.context['send_email'] = False
         else:
-            self.send_password_reset_email(self.instance)
+            send = self.send_password_reset_email(self.instance)
+            self.context['send_email'] = send == 1
+
         return self.instance
 
     def send_password_reset_email(self, user):
@@ -130,7 +133,7 @@ class PasswordResetSerializer(serializers.Serializer):
         content = render_to_string(f'{template_prefix}_message.html', context)
         msg = EmailMultiAlternatives(subject, content, settings.DEFAULT_FROM_EMAIL, [user.email])
         msg.attach_alternative(content, "text/html")
-        self.context['send_email'] = msg.send() == 1
+        return msg.send()
 
 
 class PasswordResetFromKeySerializer(serializers.Serializer):

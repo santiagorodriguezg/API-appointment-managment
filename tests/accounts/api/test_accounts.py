@@ -33,8 +33,11 @@ class AccountsAPITestCase(APITestCase):
 
     def test_logout(self) -> None:
         """Verify that the user is logged out"""
+        token = TokenFactory()
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+
         url = reverse('accounts-logout')
-        response = self.client.post(url, {'token': TokenFactory().key})
+        response = self.client.post(url, {'token': token.key})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data.get('success'))
 
