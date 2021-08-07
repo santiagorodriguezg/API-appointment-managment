@@ -1,7 +1,8 @@
 """Chats models"""
-
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from encrypted_fields import fields
 
 
 class Room(models.Model):
@@ -45,7 +46,12 @@ class Message(models.Model):
     room = models.ForeignKey(Room, verbose_name=_('chat'), on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', verbose_name=_('usuario'), on_delete=models.CASCADE)
     type = models.CharField(_('tipo de mensaje'), max_length=4, choices=Type.choices, default=Type.TEXT)
-    content = models.TextField(_('contenido'))
+    _content_data = fields.EncryptedTextField(default='')
+    content = fields.SearchField(
+        hash_key='60763429ba2a5bf74b7f94fb4db97c42ad37b0af59af5e8c5bb6592f1ecd752d',
+        encrypted_field_name="_content_data",
+        verbose_name=_('contenido')
+    )
     created_at = models.DateTimeField(_('fecha de registro'), auto_now_add=True)
     updated_at = models.DateTimeField(_('fecha de actualización'), auto_now=True)
 

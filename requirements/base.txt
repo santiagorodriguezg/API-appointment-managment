@@ -26,3 +26,6 @@ djangorestframework-simplejwt==4.7.2
 # Django channels
 channels==3.0.4
 channels-redis==3.3.0
+
+# Django Searchable Encrypted Fields
+django-searchable-encrypted-fields==0.1.9

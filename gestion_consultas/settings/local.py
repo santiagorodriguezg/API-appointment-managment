@@ -19,7 +19,7 @@ REST_FRAMEWORK = {
 # SIMPLE JWT
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
 
@@ -28,9 +28,16 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'username',
     'USER_ID_CLAIM': 'user_username',
 
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=10),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+# A list of hex-encoded 32 byte keys
+# You only need one unless / until rotating keys
+# https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#rotating-encryption-keys
+FIELD_ENCRYPTION_KEYS = [
+    '3f86f4ab3bb03b21f081c45ab8e0d1a55d29c8d000e0993a7c70573b3678eef6',
+]
 
 # Django channels
 # https://pypi.org/project/channels-redis/

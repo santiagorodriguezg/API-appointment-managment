@@ -58,12 +58,34 @@ API REST con Python y Django.
 
 ## Generar SECRET_KEY para Django Settings
 
-Para generar una cadena aleatoria de 50 caracteres utilizable en el archivo `.env` como valor de ajuste de `SECRET_KEY`
-de Django ejecute el comando:
+Para generar una cadena aleatoria de 50 caracteres utilizable en el archivo `.env` como valor de ajuste
+de `settings.SECRET_KEY` de Django ejecute el comando:
 
 ```bash
 python manage.py shell -c 'from django.core.management import utils; print(utils.get_random_secret_key())'
 ```
+
+## Generar llaves de encriptación (Mensajes chat)
+
+Los mensajes en formato de texto enviados a través del chat son encriptados antes de guardarse en la base de datos. Para
+generar la llave de encriptación utilizada como valor de ajuste de `settings.FIELD_ENCRYPTION_KEYS` ejecute en la
+terminal el comando:
+
+```bash
+python manage.py shell
+```
+
+Luego:
+
+```python
+import secrets
+
+secrets.token_hex(32)
+```
+
+Visitar el siguiente enlace
+para [más información](https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#generating-encryption-keys)
+.
 
 ## Tests
 
@@ -83,8 +105,8 @@ pytest
 2. Deshabilitar CAPTCHA para Gmail:
 
    [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha).
-   
-   Visitar para [Más información](https://support.google.com/mail/?p=BadCredentials).
+
+   Visitar el siguiente enlace para [más información](https://support.google.com/mail/?p=BadCredentials).
 
 ```
 Gracias!.

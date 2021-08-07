@@ -23,7 +23,7 @@
 <script>
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI4Mjk1NjMyLCJqdGkiOiJhYjdjZTU4YWJjNGQ0YTJjYmMxYzE3YzNkYjM5OTQxOCIsInVzZXJfdXNlcm5hbWUiOiJqdWFuIn0.o5KkE4alQwZrBn9r5D7dh5MjgkAvuJ_orf1wksI23nY";
+    const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI4MzcxMTY2LCJqdGkiOiI1MGQwNzdhZTExMjM0ZDU5YWMwMDZiMzU2MjFjZDY5MSIsInVzZXJfdXNlcm5hbWUiOiJsdWlzIn0.aBjPYeoPdC4SqPyXWbUL_4j5IIwsEv-r0BsDhZPXgig"
     const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
 
     const chatSocket = new ReconnectingWebSocket(

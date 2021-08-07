@@ -39,6 +39,13 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=5),
 }
 
+# A list of hex-encoded 32 byte keys
+# You only need one unless / until rotating keys
+# https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#rotating-encryption-keys
+FIELD_ENCRYPTION_KEYS = [
+    'd5c1ac291a84327ab3768728f8c656a26b89f88eed61d3befd4d123905453a23',
+]
+
 # Django channels
 # https://pypi.org/project/channels-redis/
 CHANNEL_LAYERS = {

@@ -36,6 +36,7 @@ THIRD_PARTY_APPS = [
     'django_filters',
     'channels',
     'corsheaders',
+    'encrypted_fields',
 ]
 
 LOCAL_APPS = [
