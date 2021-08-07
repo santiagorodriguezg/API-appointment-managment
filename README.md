@@ -67,8 +67,11 @@ python manage.py shell -c 'from django.core.management import utils; print(utils
 
 ## Generar llaves de encriptación (Mensajes chat)
 
-Los mensajes en formato de texto enviados a través del chat son encriptados antes de guardarse en la base de datos. Para
-generar la llave de encriptación utilizada como valor de ajuste de `settings.FIELD_ENCRYPTION_KEYS` ejecute en la
+Los mensajes en formato de texto enviados a través del chat son encriptados antes de guardarse en la base de datos. Se
+utiliza el cifrado AES-256 con el modo GCM (a través de la
+biblioteca [Pycryptodome](https://www.pycryptodome.org/en/latest/src/cipher/aes.html)).
+
+Para generar la llave de encriptación utilizada como valor de ajuste de `settings.FIELD_ENCRYPTION_KEYS` ejecute en la
 terminal el comando:
 
 ```bash
