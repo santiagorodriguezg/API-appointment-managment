@@ -1,18 +1,21 @@
 """Account serializers"""
 
+import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
 from apps.accounts.utils import clean_password2, delete_user_sessions, generate_token, verify_token
 
 
-class UserSignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.ModelSerializer):
     """
     User sign up serializer.
     Handle sign up data validation and user creation.
@@ -20,11 +23,15 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
     password2 = serializers.CharField(min_length=8)
 
+    @classmethod
+    def get_token(cls, user):
+        return RefreshToken.for_user(user)
+
     class Meta:
         model = User
         fields = (
-            'first_name', 'last_name', 'identification_type', 'identification_number', 'email', 'phone', 'city',
-            'neighborhood', 'address', 'password', 'password2'
+            'first_name', 'last_name', 'username', 'identification_type', 'identification_number', 'email', 'phone',
+            'city', 'neighborhood', 'address', 'password', 'password2'
         )
 
     def validate(self, data):
@@ -40,12 +47,13 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         user.role = User.Type.USER
         user.last_login = timezone.now()
         user.save()
-        # Create token
-        token = Token.objects.create(user=user)
-        return user, token.key
+        refresh = self.get_token(user)  # Get tokens
+        self.context['refresh'] = str(refresh)
+        self.context['access'] = str(refresh.access_token)
+        return user
 
 
-class UserLoginSerializer(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
     """
     User login serializer.
     Handle the login request data.
@@ -53,6 +61,10 @@ class UserLoginSerializer(serializers.Serializer):
 
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, max_length=64)
+
+    @classmethod
+    def get_token(cls, user):
+        return RefreshToken.for_user(user)
 
     def validate(self, data):
         """Check credentials"""
@@ -72,25 +84,42 @@ class UserLoginSerializer(serializers.Serializer):
     def create(self, data):
         """Create token to identify the user and update the last login date"""
         user = data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        if not created:
-            # Delete users sessions and generate new token
-            delete_user_sessions(user, token)
-            token = Token.objects.create(user=user)
-        # Update the last login date
-        user.last_login = timezone.now()
-        user.save(update_fields=['last_login'])
-        return user, token.key
+        delete_user_sessions(user)  # Delete users sessions
+        update_last_login(None, user)  # Update the last login date
+        refresh = self.get_token(user)  # Get tokens
+        self.context['refresh'] = str(refresh)
+        self.context['access'] = str(refresh.access_token)
+        return user
+
+
+class LogoutSerializer(serializers.Serializer):
+    """User logout serializer"""
+
+    refresh = serializers.CharField(required=True)
+
+    def save(self, **kwargs):
+        try:
+            token = self.validated_data['refresh']
+            RefreshToken(token).blacklist()
+
+            # Delete users sessions
+            decode_jwt = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.SIMPLE_JWT['ALGORITHM']])
+            user = User.objects.get(username=decode_jwt['user_username'])
+            delete_user_sessions(user)
+        except TokenError:
+            raise serializers.ValidationError(
+                {'errors': 'El token es inválido o ha expirado'}, code='token_invalid'
+            )
 
 
 class VerifyTokenSerializer(serializers.Serializer):
     """Verify token serializer"""
     token = serializers.CharField()
 
-    def validate_token(self, data):
+    def validate_token(self, value):
         """Verify token is valid."""
-        self.context['payload'] = verify_token(data)
-        return data
+        self.context['payload'] = verify_token(value)
+        return value
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -101,15 +130,15 @@ class PasswordResetSerializer(serializers.Serializer):
 
     username = serializers.CharField()
 
-    def validate_username(self, data):
+    def validate_username(self, value):
         """Verify that the user account exists"""
-        user = User.objects.filter(username=data, is_active=True).first()
+        user = User.objects.filter(username=value, is_active=True).first()
         if user is None:
             raise serializers.ValidationError(
                 {'errors': 'El usuario no está asignado a ninguna cuenta.'}, code='account_not_found'
             )
         self.instance = user
-        return data
+        return value
 
     def save(self, **kwargs):
         """Send password reset email"""
@@ -143,10 +172,10 @@ class PasswordResetFromKeySerializer(serializers.Serializer):
     password = serializers.CharField(min_length=8)
     password2 = serializers.CharField(min_length=8)
 
-    def validate_token(self, data):
+    def validate_token(self, value):
         """Verify token is valid."""
-        self.context['payload'] = verify_token(data)
-        return data
+        self.context['payload'] = verify_token(value)
+        return value
 
     def validate(self, data):
         """Verify passwords match"""

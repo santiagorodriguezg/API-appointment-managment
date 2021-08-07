@@ -21,6 +21,7 @@ argon2-cffi==20.1.0
 
 # JWT
 pyjwt==2.1.0
+djangorestframework-simplejwt==4.7.2
 
 # Django channels
 channels==3.0.4

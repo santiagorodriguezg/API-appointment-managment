@@ -1,5 +1,7 @@
 """Production settings."""
 
+from datetime import timedelta
+
 from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
@@ -21,6 +23,20 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 25,
+}
+
+# SIMPLE JWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
+    'ROTATE_REFRESH_TOKENS': True,
+
+    'USER_ID_FIELD': 'username',
+    'USER_ID_CLAIM': 'user_username',
+
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=15),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=5),
 }
 
 # Django channels

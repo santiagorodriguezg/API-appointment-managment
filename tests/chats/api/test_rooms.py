@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.chats.models import Room, Message
-from tests.accounts.factories import UserAdminFactory, TokenFactory, UserFactory, UserDoctorFactory
+from tests.accounts.factories import UserAdminFactory, UserFactory, UserDoctorFactory
 from tests.chats.factories import RoomFactory, MessageFactory
-from tests.utils import API_VERSION_V1
+from tests.utils import API_VERSION_V1, AccessTokenTest
 
 
 class RoomAPITestCase(APITestCase):
@@ -16,8 +16,8 @@ class RoomAPITestCase(APITestCase):
         self.user_owner = UserAdminFactory()
         self.user_receiver_1 = UserFactory()
         self.user_receiver_2 = UserDoctorFactory()
-        self.token = TokenFactory(user=self.user_owner)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user_owner)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
 
         self.room_1 = RoomFactory(user_owner=self.user_owner, user_receiver=self.user_receiver_1)
         self.room_2 = RoomFactory(user_owner=self.user_owner, user_receiver=self.user_receiver_2)
@@ -53,8 +53,8 @@ class RoomAPITestCase(APITestCase):
 
     def test_list_chat_rooms_by_receiver(self):
         """List of chat rooms in which the user is a receiver"""
-        token = TokenFactory(user=self.user_receiver_1)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        token = AccessTokenTest().for_user(self.user_receiver_1)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(token)}')
 
         url = f'/{API_VERSION_V1}/users/{self.user_receiver_1.username}/rooms/'
         response = self.client.get(url)
@@ -94,8 +94,8 @@ class RoomAPITestCase(APITestCase):
 
     def test_retrieve_chat_rooms_by_receiver(self):
         """Chat room given an Id in which the user is a receiver"""
-        token = TokenFactory(user=self.user_receiver_2)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        token = AccessTokenTest().for_user(self.user_receiver_2)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(token)}')
 
         url = f'/{API_VERSION_V1}/users/{self.user_receiver_2.username}/rooms/{self.room_2.id}/'
         response = self.client.get(url)
@@ -135,8 +135,8 @@ class RoomAPITestCase(APITestCase):
 
     def test_retrieve_chat_rooms_with_messages_by_receiver(self):
         """Chat room with messages given an Id in which the user is a receiver"""
-        token = TokenFactory(user=self.user_receiver_2)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        token = AccessTokenTest().for_user(self.user_receiver_2)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(token)}')
         url = f'/{API_VERSION_V1}/users/{self.user_receiver_2.username}/rooms/{self.room_2.id}/messages/'
 
         response = self.client.get(url)

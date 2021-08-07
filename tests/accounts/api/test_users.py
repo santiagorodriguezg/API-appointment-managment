@@ -6,10 +6,10 @@ from rest_framework.test import APITestCase
 
 from apps.accounts.models import User
 from tests.accounts.factories import (
-    UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory, USER_FACTORY_DICT, USER_ADMIN_FACTORY_DICT,
+    UserFactory, UserAdminFactory, UserDoctorFactory, USER_FACTORY_DICT, USER_ADMIN_FACTORY_DICT,
     USER_DOCTOR_FACTORY_DICT
 )
-from tests.utils import TEST_PASSWORD, API_VERSION_V1
+from tests.utils import TEST_PASSWORD, API_VERSION_V1, AccessTokenTest
 
 
 class UsersAdminAPITestCase(APITestCase):
@@ -18,8 +18,8 @@ class UsersAdminAPITestCase(APITestCase):
     def setUp(self) -> None:
         # Authenticate user ADMIN
         self.user = UserAdminFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_VERSION_V1}/users/'
 
     def test_user_admin_create_users(self) -> None:
@@ -80,8 +80,8 @@ class UsersDoctorAPITestCase(APITestCase):
     def setUp(self) -> None:
         # Authenticate user DOCTOR
         self.user = UserDoctorFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_VERSION_V1}/users/'
 
     def test_user_doctor_create_users(self) -> None:
@@ -140,8 +140,8 @@ class UsersPatientAPITestCase(APITestCase):
     def setUp(self) -> None:
         # Authenticate user PATIENT
         self.user = UserFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_VERSION_V1}/users/'
 
     def test_user_patient_create_users(self):
@@ -183,8 +183,8 @@ class UsersAPITestCase(APITestCase):
     def setUp(self) -> None:
         # Authenticate user PATIENT
         self.user = UserFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_VERSION_V1}/users/'
 
     def test_my_profile(self) -> None:

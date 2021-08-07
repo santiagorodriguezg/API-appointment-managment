@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.appointments.models import Appointment
-from tests.accounts.factories import UserFactory, UserAdminFactory, TokenFactory, UserDoctorFactory
+from tests.accounts.factories import UserFactory, UserAdminFactory, UserDoctorFactory
 from tests.appointments.factories import AppointmentFactory, APPOINTMENT_FACTORY_DICT
-from tests.utils import API_VERSION_V1
+from tests.utils import API_VERSION_V1, AccessTokenTest
 
 
 class AppointmentsAdminAPITestCase(APITestCase):
@@ -18,8 +18,8 @@ class AppointmentsAdminAPITestCase(APITestCase):
     def setUp(self) -> None:
         # Authenticate user ADMIN
         self.user = UserAdminFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
 
     def test_appointments_list(self) -> None:
         """
@@ -130,8 +130,8 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         # Authenticate user DOCTOR
         UserAdminFactory()
         self.user = UserDoctorFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_VERSION_V1}/users/{self.user.username}/appointments/'
 
     def test_create_appointment_by_user_doctor(self) -> None:
@@ -236,8 +236,8 @@ class AppointmentsPatientAPITestCase(APITestCase):
         # Authenticate user PATIENT
         UserAdminFactory()
         self.user = UserFactory()
-        self.token = TokenFactory(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        self.token = AccessTokenTest().for_user(self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_VERSION_V1}/users/{self.user.username}/appointments/'
 
     def test_create_appointment_by_user_patient(self) -> None:

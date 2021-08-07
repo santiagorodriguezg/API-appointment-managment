@@ -2,6 +2,7 @@
 
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from apps.accounts.api.views.accounts import AccountsViewSet
 from apps.accounts.api.views.users import UserModelViewSet
@@ -14,4 +15,6 @@ user_url = r'users/(?P<username>[-a-zA-Z0-0_]+)'
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]

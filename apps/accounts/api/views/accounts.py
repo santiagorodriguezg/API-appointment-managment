@@ -1,19 +1,15 @@
 """Account views"""
 
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from apps.accounts.api.serializers.accounts import (
-    UserSignUpSerializer, UserLoginSerializer, PasswordResetSerializer, PasswordResetFromKeySerializer,
-    VerifyTokenSerializer
+    SignUpSerializer, LoginSerializer, PasswordResetSerializer, PasswordResetFromKeySerializer,
+    VerifyTokenSerializer, LogoutSerializer
 )
 from apps.accounts.api.serializers.users import UserListSerializer
-from apps.accounts.utils import delete_user_sessions
-from gestion_consultas.exceptions import BadRequest
 
 
 class AccountsViewSet(GenericViewSet):
@@ -22,11 +18,12 @@ class AccountsViewSet(GenericViewSet):
     @action(methods=['post'], detail=False)
     def signup(self, request):
         """User sign up"""
-        serializer = UserSignUpSerializer(data=request.data)
+        serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
-            user, token = serializer.save()
+            user = serializer.save()
             data = {
-                'access_token': token,
+                'access': serializer.context['access'],
+                'refresh': serializer.context['refresh'],
                 'user': UserListSerializer(user).data,
             }
             return Response(data, status=status.HTTP_201_CREATED)
@@ -35,30 +32,25 @@ class AccountsViewSet(GenericViewSet):
     @action(methods=['post'], detail=False)
     def login(self, request):
         """User sign in"""
-        serializer = UserLoginSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user, token = serializer.save()
+        user = serializer.save()
         data = {
-            'access_token': token,
+            'access': serializer.context['access'],
+            'refresh': serializer.context['refresh'],
             'user': UserListSerializer(user).data,
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
-    @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated])
+    @action(methods=['post'], detail=False)
     def logout(self, request):
         """User logout"""
-        token = request.data.get('token')
-        if token:
-            token = Token.objects.filter(key=token).first()
-            if token:
-                user = token.user
-                # Delete users sessions
-                delete_user_sessions(user, token)
-                return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
-            raise BadRequest('No se ha encontrado un usuario con estas credenciales')
-        raise BadRequest('No se ha encontrado un token en la petición')
+        serializer = LogoutSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='verify-token')
+    @action(methods=['post'], detail=False, url_path='token/verify')
     def verify_token(self, request):
         """Verify JWT token used to reset password"""
         serializer = VerifyTokenSerializer(data=request.data)
@@ -69,7 +61,7 @@ class AccountsViewSet(GenericViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='password-reset')
+    @action(methods=['post'], detail=False, url_path='password/reset')
     def password_reset(self, request):
         """Send password reset email"""
         serializer = PasswordResetSerializer(data=request.data)

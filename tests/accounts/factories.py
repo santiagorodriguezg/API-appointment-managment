@@ -1,14 +1,13 @@
 """Accounts factories"""
 
 import factory
-from rest_framework.authtoken.models import Token
 
 from apps.accounts.models import User
 from tests.utils import TEST_PASSWORD
 
 
 class UserFactory(factory.django.DjangoModelFactory):
-    """User factory"""
+    """User base factory"""
 
     class Meta:
         model = User
@@ -18,7 +17,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     role = User.Type.USER
     identification_type = User.IdentificationType.CC
     identification_number = factory.Faker('bothify', text='########')
-    username = factory.LazyAttribute(lambda o: f"{o.first_name}{o.last_name}".lower())
+    username = factory.LazyAttribute(lambda o: f'{o.first_name}{o.last_name}'.lower())
     email = factory.Faker('free_email')
     phone = factory.Faker('bothify', text='3#########')
     city = factory.Faker('city')
@@ -47,15 +46,6 @@ class UserAdminFactory(UserFactory):
     role = User.Type.ADMIN
     is_superuser = True
     is_staff = True
-
-
-class TokenFactory(factory.django.DjangoModelFactory):
-    """Token factory"""
-
-    class Meta:
-        model = Token
-
-    user = factory.SubFactory(UserFactory)
 
 
 USER_FACTORY_DICT = factory.build(dict, FACTORY_CLASS=UserFactory)

@@ -11,7 +11,7 @@ from django.utils import timezone
 from rest_framework import serializers
 
 
-def delete_user_sessions(user, token):
+def delete_user_sessions(user):
     """Delete the authentication token and user sessions."""
 
     all_sessions = Session.objects.filter(expire_date__gte=timezone.now())
@@ -22,7 +22,6 @@ def delete_user_sessions(user, token):
             if session_user:
                 if user.id == int(session_user):
                     session.delete()
-    token.delete()
 
 
 def clean_password2(instance, data):

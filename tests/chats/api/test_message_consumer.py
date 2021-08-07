@@ -9,9 +9,9 @@ from django.test import TransactionTestCase
 from django.urls import re_path
 
 from apps.chats.api.consumers.messages import MessageConsumer
-from tests.accounts.factories import UserAdminFactory, TokenFactory, UserFactory
+from tests.accounts.factories import UserAdminFactory, UserFactory
 from tests.chats.factories import MessageFactory, RoomFactory
-from tests.utils import API_VERSION_V1
+from tests.utils import API_VERSION_V1, AccessTokenTest
 
 
 class AuthWebsocketCommunicator(WebsocketCommunicator):
@@ -23,10 +23,10 @@ class AuthWebsocketCommunicator(WebsocketCommunicator):
             self.scope['user'] = user
 
 
-@database_sync_to_async
 def get_user_token(user):
     """Get user token"""
-    return TokenFactory(user=user)
+    token = AccessTokenTest().for_user(user)
+    return str(token)
 
 
 @database_sync_to_async
@@ -53,8 +53,8 @@ class MessageConsumerTransactionTestCase(TransactionTestCase):
 
     async def test_create_message_by_user_owner(self) -> None:
         """Create message by a chat room owner user"""
-        token = await get_user_token(self.user_owner)
-        url = f'/ws/{API_VERSION_V1}/chat/{self.room_name}/?token={token.key}'
+        token = get_user_token(self.user_owner)
+        url = f'/ws/{API_VERSION_V1}/chat/{self.room_name}/?token={token}'
 
         communicator = AuthWebsocketCommunicator(self.application, url, user=self.user_owner)
         connected, subprotocol = await communicator.connect()
@@ -82,8 +82,8 @@ class MessageConsumerTransactionTestCase(TransactionTestCase):
         """Get messages by user receiver"""
         room, msg = await create_room_and_message(self.user_owner, self.user_receiver)
 
-        token = await get_user_token(self.user_receiver)
-        url = f'/ws/{API_VERSION_V1}/chat/{room.name}/?token={token.key}'
+        token = get_user_token(self.user_receiver)
+        url = f'/ws/{API_VERSION_V1}/chat/{room.name}/?token={token}'
 
         communicator = AuthWebsocketCommunicator(self.application, url, user=self.user_receiver)
         connected, subprotocol = await communicator.connect()

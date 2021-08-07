@@ -6,8 +6,8 @@ from rest_framework.test import APITestCase
 
 from apps.accounts.models import User
 from apps.accounts.utils import generate_token
-from tests.accounts.factories import UserFactory, TokenFactory, USER_FACTORY_DICT
-from tests.utils import TEST_PASSWORD
+from tests.accounts.factories import UserFactory, USER_FACTORY_DICT
+from tests.utils import TEST_PASSWORD, RefreshTokenTest
 
 
 class AccountsAPITestCase(APITestCase):
@@ -33,11 +33,12 @@ class AccountsAPITestCase(APITestCase):
 
     def test_logout(self) -> None:
         """Verify that the user is logged out"""
-        token = TokenFactory()
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        user = UserFactory()
+        token = RefreshTokenTest().for_user(user)
+        # self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
         url = reverse('accounts-logout')
-        response = self.client.post(url, {'token': token.key})
+        response = self.client.post(url, {'refresh': str(token)})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data.get('success'))
 
@@ -66,7 +67,7 @@ class AccountsAPITestCase(APITestCase):
         self.assertDictEqual(response.data, expected)
 
     def test_verify_token(self) -> None:
-        """Verify JWT token"""
+        """verifies a JWT token except for access and refresh tokens"""
         user = UserFactory()
         token_type = 'password_reset'
         token = generate_token(user, token_type)

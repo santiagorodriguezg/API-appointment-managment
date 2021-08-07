@@ -82,7 +82,9 @@ pytest
 
 2. Deshabilitar CAPTCHA para Gmail:
 
-   [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha)
+   [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha).
+   
+   Visitar para [Más información](https://support.google.com/mail/?p=BadCredentials).
 
 ```
 Gracias!.
