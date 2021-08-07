@@ -44,6 +44,11 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+# A list of hex-encoded 32 byte keys
+FIELD_ENCRYPTION_KEYS = [
+    '9d9847ffd2d5f356a60f0f9910d8255f741237e2070300dc4a8c5c983a3245a7',
+]
+
 # Django channels
 CHANNEL_LAYERS = {
     "default": {
