@@ -5,44 +5,51 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.accounts.models import User
-from apps.accounts.utils import generate_token
 from tests.accounts.factories import UserFactory, USER_FACTORY_DICT
 from tests.utils import TEST_PASSWORD, RefreshTokenTest
 
 
-class AccountsAPITestCase(APITestCase):
-    """Accounts API test case"""
+class SignUpAPIViewTest(APITestCase):
+    """Register user with role USER"""
 
-    def test_signup(self) -> None:
-        """Register user with role USER"""
-        response = self.client.post(reverse('accounts-signup'), USER_FACTORY_DICT)
+    def test_post(self):
+        response = self.client.post(reverse('signup'), USER_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(User.objects.get().first_name, USER_FACTORY_DICT.get('first_name'))
 
-    def test_login(self) -> None:
-        """Verify user is logged in"""
+
+class LoginAPIViewTest(APITestCase):
+    """Verify user is logged in"""
+
+    def test_post(self):
         user = UserFactory()
         data = {
             'username': user.username,
             'password': TEST_PASSWORD,
         }
-        response = self.client.post(reverse('accounts-login'), data)
+        response = self.client.post(reverse('login'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertContains(response, user.role, status_code=status.HTTP_201_CREATED)
 
-    def test_logout(self) -> None:
-        """Verify that the user is logged out"""
+
+class LogoutAPIViewTest(APITestCase):
+    """Verify that the user is logged out"""
+
+    def test_post(self):
         user = UserFactory()
         token = RefreshTokenTest().for_user(user)
         # self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
-        url = reverse('accounts-logout')
+        url = reverse('logout')
         response = self.client.post(url, {'refresh': str(token)})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data.get('success'))
 
-    def test_password_reset_when_user_has_email(self) -> None:
+
+class PasswordResetEmailAPIViewTest(APITestCase):
+
+    def test_password_reset_when_user_has_email(self):
         """Reset password when user has email address"""
         user = UserFactory()
         expected = {
@@ -50,7 +57,7 @@ class AccountsAPITestCase(APITestCase):
             'username': user.username,
             'email': user.email
         }
-        response = self.client.post(reverse('accounts-password-reset'), {'username': user.username})
+        response = self.client.post(reverse('password_reset_email'), {'username': user.username})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.data, expected)
 
@@ -62,16 +69,6 @@ class AccountsAPITestCase(APITestCase):
             'username': user.username,
             'email': user.email
         }
-        response = self.client.post(reverse('accounts-password-reset'), {'username': user.username})
+        response = self.client.post(reverse('password_reset_email'), {'username': user.username})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.data, expected)
-
-    def test_verify_token(self) -> None:
-        """verifies a JWT token except for access and refresh tokens"""
-        user = UserFactory()
-        token_type = 'password_reset'
-        token = generate_token(user, token_type)
-        response = self.client.post(reverse('accounts-verify-token'), {'token': token})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertContains(response, user.username)
-        self.assertContains(response, token_type)

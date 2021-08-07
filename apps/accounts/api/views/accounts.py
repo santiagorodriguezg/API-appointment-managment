@@ -1,24 +1,22 @@
-"""Account views"""
+"""Accounts views"""
 
-from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework import status, generics
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
 from apps.accounts.api.serializers.accounts import (
-    SignUpSerializer, LoginSerializer, PasswordResetSerializer, PasswordResetFromKeySerializer,
-    VerifyTokenSerializer, LogoutSerializer
+    SignupSerializer, LoginSerializer, LogoutSerializer, PasswordResetEmailSerializer, PasswordResetCompleteSerializer
 )
 from apps.accounts.api.serializers.users import UserListSerializer
+from apps.accounts.utils import get_user_from_uidb64, password_reset_check_token
 
 
-class AccountsViewSet(GenericViewSet):
-    """Accounts API view."""
+class SignupAPIView(generics.GenericAPIView):
+    """User sign up view"""
 
-    @action(methods=['post'], detail=False)
-    def signup(self, request):
-        """User sign up"""
-        serializer = SignUpSerializer(data=request.data)
+    serializer_class = SignupSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             data = {
@@ -29,42 +27,41 @@ class AccountsViewSet(GenericViewSet):
             return Response(data, status=status.HTTP_201_CREATED)
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=False)
-    def login(self, request):
-        """User sign in"""
-        serializer = LoginSerializer(data=request.data)
+
+class LoginAPIView(generics.GenericAPIView):
+    """User sign in view"""
+
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
         data = {
             'access': serializer.context['access'],
             'refresh': serializer.context['refresh'],
-            'user': UserListSerializer(user).data,
+            'user': UserListSerializer(serializer.instance).data,
         }
         return Response(data, status=status.HTTP_201_CREATED)
 
-    @action(methods=['post'], detail=False)
-    def logout(self, request):
-        """User logout"""
-        serializer = LogoutSerializer(data=request.data)
+
+class LogoutAPIView(generics.GenericAPIView):
+    """User logout view"""
+    serializer_class = LogoutSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='token/verify')
-    def verify_token(self, request):
-        """Verify JWT token used to reset password"""
-        serializer = VerifyTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = {
-            'success': True,
-            'payload': serializer.context['payload'],
-        }
-        return Response(data, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='password/reset')
-    def password_reset(self, request):
-        """Send password reset email"""
-        serializer = PasswordResetSerializer(data=request.data)
+class PasswordResetEmailAPIView(generics.GenericAPIView):
+    """Send password reset email"""
+
+    serializer_class = PasswordResetEmailSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         data = {
@@ -74,15 +71,29 @@ class AccountsViewSet(GenericViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='password-reset-from-key')
-    def password_reset_from_key(self, request):
-        """Verify JWT token and reset password"""
-        serializer = PasswordResetFromKeySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                'success': True,
-                'message': 'Restablecimiento de contraseña completado',
-            }
-            return Response(data, status=status.HTTP_200_OK)
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetConfirmAPIView(generics.GenericAPIView):
+    """Verify that the token to reset the user's password is valid"""
+
+    serializer_class = PasswordResetCompleteSerializer
+
+    def post(self, request, uidb64, token, *args, **kwargs):
+        user = get_user_from_uidb64(uidb64)
+        password_reset_check_token(user, token)
+        return Response({"data": "TODO BIEN"}, status=status.HTTP_200_OK)
+
+
+class PasswordResetCompleteAPIView(generics.GenericAPIView):
+    """Reset the user's password"""
+
+    serializer_class = PasswordResetCompleteSerializer
+
+    def patch(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        data = {
+            'success': True,
+            'message': 'Restablecimiento de contraseña completado',
+        }
+        return Response(data, status=status.HTTP_200_OK)

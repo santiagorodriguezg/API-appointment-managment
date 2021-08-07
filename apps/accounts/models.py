@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.permissions import create_permissions
 from gestion_consultas.utils import REGEX_LETTERS_ONLY
@@ -187,13 +188,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.first_name
 
-    def get_full_name(self):
-        """
-        Return the first_name plus the last_name, with a space in between.
-        """
+    def full_name(self):
+        """Return the first_name plus the last_name, with a space in between."""
         return f'{self.first_name} {self.last_name}'.strip()
 
-    get_full_name.short_description = _('Nombre completo')
+    def tokens(self):
+        """Return access and refresh JWT tokens."""
+        return RefreshToken.for_user(self)
+
+    full_name.short_description = _('Nombre completo')
 
 
 @receiver(post_save, sender=User)

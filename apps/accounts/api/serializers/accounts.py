@@ -4,28 +4,30 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
-from apps.accounts.utils import clean_password2, delete_user_sessions, generate_token, verify_token
+from apps.accounts.utils import (
+    clean_password2, delete_user_sessions, generate_token, verify_token, get_user_from_uidb64,
+    password_reset_check_token
+)
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignupSerializer(serializers.ModelSerializer):
     """
     User sign up serializer.
     Handle sign up data validation and user creation.
     """
 
     password2 = serializers.CharField(min_length=8)
-
-    @classmethod
-    def get_token(cls, user):
-        return RefreshToken.for_user(user)
 
     class Meta:
         model = User
@@ -47,7 +49,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         user.role = User.Type.USER
         user.last_login = timezone.now()
         user.save()
-        refresh = self.get_token(user)  # Get tokens
+        refresh = user.tokens()  # Get tokens
         self.context['refresh'] = str(refresh)
         self.context['access'] = str(refresh.access_token)
         return user
@@ -62,10 +64,6 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(min_length=8, max_length=64)
 
-    @classmethod
-    def get_token(cls, user):
-        return RefreshToken.for_user(user)
-
     def validate(self, data):
         """Check credentials"""
 
@@ -78,18 +76,13 @@ class LoginSerializer(serializers.Serializer):
         # if not user.is_verified:
         #     raise serializers.ValidationError('Account is not active yet :(')
 
-        data['user'] = user
-        return data
-
-    def create(self, data):
-        """Create token to identify the user and update the last login date"""
-        user = data['user']
-        delete_user_sessions(user)  # Delete users sessions
         update_last_login(None, user)  # Update the last login date
-        refresh = self.get_token(user)  # Get tokens
+        delete_user_sessions(user)  # Delete users sessions
+        refresh = user.tokens()  # Get tokens
         self.context['refresh'] = str(refresh)
         self.context['access'] = str(refresh.access_token)
-        return user
+        self.instance = user
+        return data
 
 
 class LogoutSerializer(serializers.Serializer):
@@ -112,22 +105,10 @@ class LogoutSerializer(serializers.Serializer):
             )
 
 
-class VerifyTokenSerializer(serializers.Serializer):
-    """Verify token serializer"""
-    token = serializers.CharField()
-
-    def validate_token(self, value):
-        """Verify token is valid."""
-        self.context['payload'] = verify_token(value)
-        return value
-
-
-class PasswordResetSerializer(serializers.Serializer):
+class PasswordResetEmailSerializer(serializers.Serializer):
     """
-    Find user account serializer.
-    Finds the user account given a user name and send email reset password.
+    Finds the user account given a username and send email reset password.
     """
-
     username = serializers.CharField()
 
     def validate_username(self, value):
@@ -146,44 +127,45 @@ class PasswordResetSerializer(serializers.Serializer):
         if self.instance.email is None:
             self.context['send_email'] = False
         else:
-            send = self.send_password_reset_email(self.instance)
+            send = self.send_password_reset_email()
             self.context['send_email'] = send == 1
 
         return self.instance
 
-    def send_password_reset_email(self, user):
+    def send_password_reset_email(self):
         """Send reset password link to given user."""
-        token = generate_token(user, 'password_reset')
-        url = f'{settings.DEFAULT_DOMAIN}/password/reset/key/{token}'
+        uidb64 = urlsafe_base64_encode(force_bytes(self.instance.id))
+        token = PasswordResetTokenGenerator().make_token(self.instance)
+        url = f'{settings.DEFAULT_DOMAIN}/password/reset/{uidb64}/{token}'
         template_prefix = 'accounts/email/password_reset_key'
-        context = {'user': user, 'password_reset_url': url}
+        context = {'user': self.instance, 'password_reset_url': url}
         subject = render_to_string(f'{template_prefix}_subject.txt', context)
         subject = " ".join(subject.splitlines()).strip()  # Remove superfluous line breaks
         content = render_to_string(f'{template_prefix}_message.html', context)
-        msg = EmailMultiAlternatives(subject, content, settings.DEFAULT_FROM_EMAIL, [user.email])
+        msg = EmailMultiAlternatives(subject, content, settings.DEFAULT_FROM_EMAIL, [self.instance.email])
         msg.attach_alternative(content, "text/html")
         return msg.send()
 
 
-class PasswordResetFromKeySerializer(serializers.Serializer):
-    """Password reset from key serializer"""
-
+class PasswordResetCompleteSerializer(serializers.Serializer):
+    """
+    Update the user's password
+    """
+    password = serializers.CharField()
+    password2 = serializers.CharField()
     token = serializers.CharField()
-    password = serializers.CharField(min_length=8)
-    password2 = serializers.CharField(min_length=8)
+    uidb64 = serializers.CharField()
 
-    def validate_token(self, value):
-        """Verify token is valid."""
-        self.context['payload'] = verify_token(value)
-        return value
+    class Meta:
+        fields = ['password', 'password2', 'token', 'uidb64']
 
     def validate(self, data):
-        """Verify passwords match"""
+        user = get_user_from_uidb64(data.get('uidb64'))
+        password_reset_check_token(user, data.get('token'))
+        self.instance = user
         return clean_password2(self.instance, data)
 
     def save(self, **kwargs):
         """Update user´s password"""
-        payload = self.context['payload']
-        user = User.objects.get(username=payload['user'], is_active=True)
-        user.set_password(self.validated_data['password2'])
-        user.save(update_fields=['password', 'updated_at'])
+        self.instance.set_password(self.validated_data['password2'])
+        self.instance.save(update_fields=['password', 'updated_at'])

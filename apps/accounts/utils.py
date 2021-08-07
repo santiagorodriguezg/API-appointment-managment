@@ -5,10 +5,15 @@ from datetime import timedelta
 import jwt
 from django.conf import settings
 from django.contrib.auth import password_validation
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.http import urlsafe_base64_decode
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
+
+from apps.accounts.models import User
 
 
 def delete_user_sessions(user):
@@ -39,6 +44,21 @@ def clean_password2(instance, data):
         raise serializers.ValidationError({'password2': error.messages}, code='password2')
 
     return data
+
+
+def get_user_from_uidb64(uidb64):
+    try:
+        # urlsafe_base64_decode() decodes to bytestring
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist, ValidationError):
+        user = None
+    return user
+
+
+def password_reset_check_token(user, token):
+    if not PasswordResetTokenGenerator().check_token(user, token):
+        raise AuthenticationFailed(detail="El token no es válido, solicite uno nuevo")
 
 
 def generate_token(user, token_type):
