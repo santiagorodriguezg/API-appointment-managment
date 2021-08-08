@@ -1,7 +1,8 @@
 """Development settings."""
 
-import re
 from datetime import timedelta
+
+from decouple import config, Csv
 
 from .base import *  # NOQA
 

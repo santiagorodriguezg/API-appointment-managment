@@ -16,8 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
 from apps.accounts.utils import (
-    clean_password2, delete_user_sessions, generate_token, verify_token, get_user_from_uidb64,
-    password_reset_check_token
+    clean_password2, delete_user_sessions, get_user_from_uidb64, password_reset_check_token
 )
 
 

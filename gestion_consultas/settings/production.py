@@ -2,6 +2,8 @@
 
 from datetime import timedelta
 
+from decouple import config, Csv
+
 from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
