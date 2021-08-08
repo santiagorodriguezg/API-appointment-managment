@@ -124,6 +124,30 @@ pytest
 
    Visitar el siguiente enlace para [más información](https://support.google.com/mail/?p=BadCredentials).
 
+## Despliegue a producción con Docker
+
+1. Ingresar a la carpeta del proyecto.
+
+   ```bash
+   cd /gestion-consultas-api
+   ```
+
+2. Hacer backup de la base de datos.
+3. Configurar variables de entorno en el archivo `.env` (Ver el archivo `.env.example`).
+4. Ejecutar el archivo `deployment.sh`.
+
+   ```bash
+   . deployment.sh
+   ```
+
+## Iniciar contenedores Docker
+
+Para iniciar los contenedores detenidos ejecutar el comando:
+
+```bash
+docker start $(docker ps -aqf "name=gestion-consultas")
+```
+
 ```
 Gracias!.
 ```
