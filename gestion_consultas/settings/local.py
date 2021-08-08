@@ -20,17 +20,14 @@ REST_FRAMEWORK = {
 # SIMPLE JWT
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
 SIMPLE_JWT = {
+    'ALGORITHM': 'HS256',
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ROTATE_REFRESH_TOKENS': True,
-
-    'ALGORITHM': 'HS256',
-
-    'USER_ID_FIELD': 'username',
-    'USER_ID_CLAIM': 'user_username',
-
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=10),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'USER_ID_FIELD': 'username',
+    'USER_ID_CLAIM': 'user_username',
 }
 
 # A list of hex-encoded 32 byte keys

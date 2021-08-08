@@ -36,8 +36,9 @@ INSERT INTO public."user" (id, password, last_login, is_superuser, role, first_n
                            identification_number, username, email, phone, picture, city, neighborhood, address,
                            is_active, is_staff, created_at, updated_at)
 VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ$HXkzz+zSJt9WdBEZy75Fcg',
-        '2021-04-13 15:10:42.660823', true, 'ADMIN', 'Luis', 'Gómez', 'CC', '1234567', 'luis', 'luis@gmail.com',
-        '3144823086', '', 'Tunja', null, null, true, true, '2021-03-25 23:24:20.752790', '2021-04-06 16:18:09.497649'),
+        '2021-04-13 15:10:42.660823', true, 'ADMIN', 'Luis', 'Gómez', 'CC', '1234567', 'luis',
+        'luisgaleano002@outlook.com', '3144823086', '', 'Tunja', null, null, true, true, '2021-03-25 23:24:20.752790',
+        '2021-04-06 16:18:09.497649'),
        (2, 'argon2$argon2id$v=19$m=102400,t=2,p=8$Z0xRSXlQZlZBMU9KcjdUc0hEa1hQVA$NQruGAhdQgdqZOyDhfM3jQ',
         '2021-04-13 15:26:45.766843', false, 'DOC', 'Carlos', 'Perez', 'CC', '54632189', 'carlos',
         'carlos@gmail.com', '3123456789', '', 'Sogamoso', null, null, true, false, '2021-03-25 22:27:34.940033',
@@ -80,9 +81,9 @@ VALUES (1, 'roomtest1', '2021-04-17 19:16:04.510000', 1, 3),
 
 -- message table
 INSERT INTO public.message (id, type, content, _content_data, created_at, updated_at, room_id, user_id)
-VALUES (1, 'TXT', 'Tiene una nueva cita','', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
-       (2, 'TXT', 'Buenos dias','', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
-       (3, 'TXT', 'Cuando es la cita?','', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
+VALUES (1, 'TXT', 'Tiene una nueva cita', '', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
+       (2, 'TXT', 'Buenos dias', '', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
+       (3, 'TXT', 'Cuando es la cita?', '', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
 
 SELECT setval('auth_group_id_seq', 2);
 SELECT setval('auth_group_permissions_id_seq', 17);

@@ -80,7 +80,11 @@ class PasswordResetConfirmAPIView(generics.GenericAPIView):
     def post(self, request, uidb64, token, *args, **kwargs):
         user = get_user_from_uidb64(uidb64)
         password_reset_check_token(user, token)
-        return Response({"data": "TODO BIEN"}, status=status.HTTP_200_OK)
+        data = {
+            'success': True,
+            'message': 'El token es valido'
+        }
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class PasswordResetCompleteAPIView(generics.GenericAPIView):
