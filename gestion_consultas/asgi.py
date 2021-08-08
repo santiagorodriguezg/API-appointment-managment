@@ -20,7 +20,7 @@ from apps.chats.api.consumers import messages
 from gestion_consultas.middleware import JwtAuthMiddleware
 
 settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_citas.settings.{settings}')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_consultas.settings.{settings}')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),

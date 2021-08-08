@@ -3,15 +3,24 @@ version: "3.9"
 services:
   postgres_server:
     image: postgres:13
+    restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PWD}
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups
+
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/var/lib/redis/data
 
   web:
     build: .
@@ -20,21 +29,22 @@ services:
       python manage.py migrate --noinput
       && python manage.py collectstatic --noinput
       && python manage.py runserver 0.0.0.0:8000
-      && gunicorn gestion_citas.wsgi:application --bind 0.0.0.0:8000
+      && daphne -b 0.0.0.0 -p 8000 gestion_consultas.asgi:application
       "
     expose:
-      - 8000
+      - "8000"
     volumes:
       - .:/code
       - static:/code/static
       - media:/code/media
     depends_on:
       - postgres_server
+      - redis
 
   nginx:
     build: ./nginx
     ports:
-      - 8080:80
+      - "8080:80"
     volumes:
       - static:/code/static
       - media:/code/media
@@ -44,5 +54,6 @@ services:
 volumes:
   local_postgres_data:
   local_postgres_data_backups:
+  redis:
   static:
   media:

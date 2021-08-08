@@ -1,5 +1,6 @@
 """Development settings."""
 
+import re
 from datetime import timedelta
 
 from .base import *  # NOQA
@@ -35,9 +36,7 @@ SIMPLE_JWT = {
 # A list of hex-encoded 32 byte keys
 # You only need one unless / until rotating keys
 # https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#rotating-encryption-keys
-FIELD_ENCRYPTION_KEYS = [
-    '3f86f4ab3bb03b21f081c45ab8e0d1a55d29c8d000e0993a7c70573b3678eef6',
-]
+FIELD_ENCRYPTION_KEYS = config('FIELD_ENCRYPTION_KEYS', cast=Csv())
 
 # Django channels
 # https://pypi.org/project/channels-redis/

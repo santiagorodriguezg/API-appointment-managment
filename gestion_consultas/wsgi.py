@@ -13,6 +13,6 @@ from decouple import config
 from django.core.wsgi import get_wsgi_application
 
 settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_citas.settings.{settings}')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_consultas.settings.{settings}')
 
 application = get_wsgi_application()

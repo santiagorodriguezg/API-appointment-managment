@@ -90,6 +90,19 @@ Visitar el siguiente enlace
 para [más información](https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#generating-encryption-keys)
 .
 
+## Generar constraseña para Redis
+
+Es importante especificar un valor muy fuerte y largo como contraseña. En lugar de crear una contraseña puede usar el
+siguiente comando para generar una aleatoria:
+
+```bash
+openssl rand 60 | openssl base64 -A
+```
+
+Visitar el siguiente enlace
+para [más información](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04#step-4-%E2%80%94-configuring-a-redis-password)
+.
+
 ## Tests
 
 Se utiliza `pytest` como framework de prueba. Consultar la [documentación de pytest](https://pytest.org) para mas
