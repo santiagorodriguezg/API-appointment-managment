@@ -1,4 +1,4 @@
-# Gestión de citas para la Fundación de la Mujer en Boyacá
+# Gestión de consultas para la Casa de la Mujer Tunja - Boyacá.
 
 API REST con Python y Django.
 
@@ -41,7 +41,8 @@ API REST con Python y Django.
    pip install -r requirements/local.txt
    ```
 
-7. Configurar variables de entorno en el archivo `.env` (Ver el archivo `.env.example`).
+7. Configurar variables de entorno en el archivo `.env`. Ver el archivo `.env.example` y la
+   sección [configuración](#configuracin).
 
 
 8. Ejecutar migraciones:
@@ -56,7 +57,9 @@ API REST con Python y Django.
    python manage.py runserver
    ```
 
-## Generar SECRET_KEY para Django Settings
+## Configuración
+
+### Generar SECRET_KEY para Django Settings
 
 Para generar una cadena aleatoria de 50 caracteres utilizable en el archivo `.env` como valor de ajuste
 de `settings.SECRET_KEY` de Django ejecute el comando:
@@ -65,7 +68,7 @@ de `settings.SECRET_KEY` de Django ejecute el comando:
 python manage.py shell -c 'from django.core.management import utils; print(utils.get_random_secret_key())'
 ```
 
-## Generar llaves de encriptación (Mensajes chat)
+### Generar llaves de encriptación (Mensajes chat)
 
 Los mensajes en formato de texto enviados a través del chat son encriptados antes de guardarse en la base de datos. Se
 utiliza el cifrado AES-256 con el modo GCM (a través de la
@@ -90,7 +93,7 @@ Visitar el siguiente enlace
 para [más información](https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#generating-encryption-keys)
 .
 
-## Generar constraseña para Redis
+### Generar contraseña para Redis
 
 Es importante especificar un valor muy fuerte y largo como contraseña. En lugar de crear una contraseña puede usar el
 siguiente comando para generar una aleatoria:
@@ -103,6 +106,16 @@ Visitar el siguiente enlace
 para [más información](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04#step-4-%E2%80%94-configuring-a-redis-password)
 .
 
+### Correos electrónicos
+
+1. Habilitar la opción `Acceso de aplicaciones poco seguras`.
+
+2. Deshabilitar CAPTCHA para Gmail:
+
+   [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha).
+
+   Visitar el siguiente enlace para [más información](https://support.google.com/mail/?p=BadCredentials).
+
 ## Tests
 
 Se utiliza `pytest` como framework de prueba. Consultar la [documentación de pytest](https://pytest.org) para mas
@@ -114,17 +127,9 @@ Para ejecutar los tests use el siguiente comando:
 pytest
 ```
 
-## Configuración de correos electrónicos
+## Despliegues en servidores
 
-1. Habilitar la opción `Acceso de aplicaciones poco seguras`.
-
-2. Deshabilitar CAPTCHA para Gmail:
-
-   [Deshabilitar CAPTCHA](https://www.google.com/accounts/UnlockCaptcha).
-
-   Visitar el siguiente enlace para [más información](https://support.google.com/mail/?p=BadCredentials).
-
-## Despliegue a producción con Docker
+### Despliegue a producción con Docker
 
 1. Ingresar a la carpeta del proyecto.
 
@@ -140,14 +145,10 @@ pytest
    . deployment.sh
    ```
 
-## Iniciar contenedores Docker
+### Iniciar contenedores Docker
 
 Para iniciar los contenedores detenidos ejecutar el comando:
 
 ```bash
 docker start $(docker ps -aqf "name=gestion-consultas")
-```
-
-```
-Gracias!.
 ```
