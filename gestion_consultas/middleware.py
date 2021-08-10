@@ -1,12 +1,12 @@
-"""Token authentication middleware"""
+"""JWT Token authentication middleware"""
 
 from urllib.parse import parse_qs
 
+from channels.db import database_sync_to_async
+from channels.middleware import BaseMiddleware
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import close_old_connections
-from channels.db import database_sync_to_async
-from channels.middleware import BaseMiddleware
 from jwt import decode as jwt_decode
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import UntypedToken

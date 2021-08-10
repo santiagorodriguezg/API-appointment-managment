@@ -1,4 +1,4 @@
-"""Filters"""
+"""Appointments filters"""
 
 from django_filters import FilterSet, MultipleChoiceFilter, OrderingFilter
 

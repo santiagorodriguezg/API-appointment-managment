@@ -8,18 +8,6 @@ from apps.accounts.models import User
 from apps.chats.models import Room, Message
 
 
-def convert_to_localtime(utctime):
-    """
-    Converts UTC date to local date.
-    :param utctime: UTC date
-    :return: Date converted into 12-hour format
-    """
-    fmt = '%d/%m/%Y %I:%M %p'
-    utc = utctime.replace(tzinfo=pytz.UTC)
-    local_tz = utc.astimezone(timezone.get_current_timezone())
-    return local_tz.strftime(fmt)
-
-
 @database_sync_to_async
 def create_chat_message(data, user):
     """Create a new message in DB"""
@@ -40,6 +28,18 @@ def create_chat_message(data, user):
 def get_messages(room_name):
     """Get chat room messages"""
     return list(Message.objects.select_related('user').filter(room__name=room_name))
+
+
+def convert_to_localtime(utctime):
+    """
+    Converts UTC date to local date.
+    :param utctime: UTC date
+    :return: Date converted into 12-hour format
+    """
+    fmt = '%d/%m/%Y %I:%M %p'
+    utc = utctime.replace(tzinfo=pytz.UTC)
+    local_tz = utc.astimezone(timezone.get_current_timezone())
+    return local_tz.strftime(fmt)
 
 
 def messages_to_json(messages):

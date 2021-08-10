@@ -18,7 +18,6 @@ class BadRequest(APIException):
                 "error detail"
             ]
         }
-
     """
 
     status_code = status.HTTP_400_BAD_REQUEST

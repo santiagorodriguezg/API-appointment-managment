@@ -1,3 +1,7 @@
+"""
+Chat views. It is only used to test the chat.
+"""
+
 from django.shortcuts import render
 
 
