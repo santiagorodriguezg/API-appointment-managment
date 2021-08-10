@@ -1,6 +1,6 @@
 """Appointment serializers"""
 
-from rest_framework import serializers
+from rest_framework import serializers, fields
 
 from apps.accounts.api.serializers.users import UserListRelatedSerializer
 from apps.appointments.models import Appointment
@@ -11,6 +11,8 @@ class AppointmentSerializer(serializers.ModelSerializer):
     Appointment serializer
     Used by user ADMIN
     """
+
+    type = fields.MultipleChoiceField(choices=Appointment.APPOINTMENT_TYPE_CHOICES)
 
     class Meta:
         model = Appointment
@@ -30,6 +32,7 @@ class AppointmentUserSerializer(serializers.ModelSerializer):
     """
 
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    type = fields.MultipleChoiceField(choices=Appointment.APPOINTMENT_TYPE_CHOICES)
 
     class Meta:
         model = Appointment

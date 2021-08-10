@@ -42,7 +42,7 @@ API REST con Python y Django.
    ```
 
 7. Configurar variables de entorno en el archivo `.env`. Ver el archivo `.env.example` y la
-   sección [configuración](#configuracin).
+   sección [configuración](#configuración).
 
 
 8. Ejecutar migraciones:

@@ -3,16 +3,23 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from multiselectfield import MultiSelectField
 
 
 class Appointment(models.Model):
     """Appointment model. Represents a chat room"""
+
+    APPOINTMENT_TYPE_CHOICES = [
+        ('PSY', _('Psicológica')),
+        ('JUD', _('Judicial')),
+    ]
 
     user = models.ForeignKey('accounts.User', verbose_name=_('user'), related_name='patient', on_delete=models.CASCADE)
     doctor = models.ForeignKey(
         'accounts.User', verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True,
         blank=True
     )
+    type = MultiSelectField(verbose_name=_('tipo'), choices=APPOINTMENT_TYPE_CHOICES, min_choices=1)
     children = models.JSONField(verbose_name=_('hijos'), null=True, blank=True)
     aggressor = models.CharField(_('datos del posible agresor'), max_length=500, null=True, blank=True)
     description = models.TextField(_('descripción'), null=True, blank=True)
@@ -37,4 +44,4 @@ class Appointment(models.Model):
         ]
 
     def __str__(self):
-        return self.description
+        return self.description if self.description else ''

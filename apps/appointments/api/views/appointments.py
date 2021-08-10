@@ -1,5 +1,4 @@
 """Appointment views"""
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
 from rest_framework.filters import OrderingFilter
@@ -7,13 +6,14 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
+from apps.accounts.api.permissions import check_permissions
+from apps.accounts.api.views.users import UserModelViewSet
 from apps.accounts.models import User
-from apps.appointments.models import Appointment
+from apps.appointments.api.filters.appointments import AppointmentFilter
 from apps.appointments.api.serializers.appointments import (
     AppointmentSerializer, AppointmentUserSerializer, AppointmentListSerializer
 )
-from apps.accounts.api.permissions import check_permissions
-from apps.accounts.api.views.users import UserModelViewSet
+from apps.appointments.models import Appointment
 from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk
 
 
@@ -27,9 +27,8 @@ class AppointmentListAPIView(ListAPIView):
     queryset = Appointment.objects.all()
     permission_classes = (IsAdminUser,)
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at', 'user__username', 'doctor__username')
     search_fields = ['~user__city', '~user__neighborhood', '~user__address']
-    ordering_fields = ['created_at', 'updated_at']
+    filterset_class = AppointmentFilter
     ordering = ('id',)
 
 
