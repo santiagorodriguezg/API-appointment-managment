@@ -80,10 +80,10 @@ VALUES (1, 'roomtest1', '2021-04-17 19:16:04.510000', 1, 3),
 
 
 -- message table
-INSERT INTO public.message (id, type, content, _content_data, created_at, updated_at, room_id, user_id)
-VALUES (1, 'TXT', 'Tiene una nueva cita', '', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
-       (2, 'TXT', 'Buenos dias', '', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
-       (3, 'TXT', 'Cuando es la cita?', '', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
+-- INSERT INTO public.message (id, type, content, _content_data, created_at, updated_at, room_id, user_id)
+-- VALUES (1, 'TXT', 'Tiene una nueva cita', '', '2021-04-17 19:16:41.491000', '2021-04-17 19:16:41.491000', 1, 1),
+--        (2, 'TXT', 'Buenos dias', '', '2021-04-17 19:17:27.622000', '2021-04-17 19:17:27.622000', 2, 3),
+--        (3, 'TXT', 'Cuando es la cita?', '', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
 
 SELECT setval('auth_group_id_seq', 2);
 SELECT setval('auth_group_permissions_id_seq', 17);
@@ -91,4 +91,4 @@ SELECT setval('user_id_seq', 3);
 SELECT setval('user_groups_id_seq', 2);
 SELECT setval('appointment_id_seq', 2);
 SELECT setval('room_id_seq', 2);
-SELECT setval('message_id_seq', 3);
+-- SELECT setval('message_id_seq', 3);

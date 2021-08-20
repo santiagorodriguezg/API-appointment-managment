@@ -113,6 +113,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         _('número de identificación'),
         max_length=10,
         unique=True,
+        null=True,
+        blank=True,
         error_messages={
             'unique': _('Ya existe un usuario con este número de identificación.')
         },
@@ -133,17 +135,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(
         _('correo electrónico'),
         max_length=60,
+        unique=True,
         blank=True,
         null=True,
         error_messages={
             'unique': _('Ya existe un contacto con este correo electrónico.')
         }
     )
-    phone = models.CharField(verbose_name=_('teléfono'), max_length=12)
+    phone = models.CharField(verbose_name=_('teléfono'), max_length=12, null=True, blank=True)
     picture = models.ImageField(_('foto de perfil'), upload_to='users/pictures', null=True, blank=True, validators=[
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'])
     ])
-    city = models.CharField(_('ciudad'), max_length=60, validators=[
+    city = models.CharField(_('ciudad'), max_length=60, null=True, blank=True, validators=[
         RegexValidator(
             regex=REGEX_LETTERS_ONLY,
             message=_('El nombre de la ciudad debe tener solo letras (A-Z).'),

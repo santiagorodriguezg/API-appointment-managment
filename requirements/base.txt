@@ -17,14 +17,14 @@ djangorestframework==3.12.4
 django-filter==2.4.0
 
 # Cors headers
-django-cors-headers==3.7.0
+django-cors-headers==3.8.0
 
 # Passwords security
 argon2-cffi==20.1.0
 
 # JWT
 pyjwt==2.1.0
-djangorestframework-simplejwt==4.7.2
+djangorestframework-simplejwt==4.8.0
 
 # Django channels
 channels==3.0.4

@@ -4,7 +4,7 @@ from datetime import timedelta
 
 import factory
 from django.utils import timezone
-from factory.fuzzy import FuzzyInteger
+from factory.fuzzy import FuzzyInteger, FuzzyChoice
 
 from apps.appointments.models import Appointment
 from tests.accounts.factories import UserFactory
@@ -19,6 +19,9 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Appointment
 
+    type = factory.List([
+        FuzzyChoice(choices=Appointment.APPOINTMENT_TYPE_CHOICES, getter=lambda c: c[0])
+    ])
     children = factory.List([
         factory.Dict({
             'name': factory.Faker('name'),

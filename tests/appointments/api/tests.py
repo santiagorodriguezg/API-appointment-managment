@@ -50,6 +50,9 @@ class AppointmentsAdminAPITestCase(APITestCase):
         url = f'/{API_VERSION_V1}/users/{users[1].username}/appointments/'
         response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
 
+        print("DATA", APPOINTMENT_FACTORY_DICT)
+        print("RES", response.data)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Appointment.objects.count(), 1)
         self.assertEqual(response.data.get('doctor'), APPOINTMENT_FACTORY_DICT.get('doctor'))
