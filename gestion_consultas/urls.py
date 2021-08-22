@@ -21,7 +21,7 @@ from django.urls import path, include
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path('chat/', include('apps.chats.urls')),  # Solo para probar el chat
-    path('', include('apps.accounts.api.urls'), name='accounts'),
-    path('', include('apps.appointments.api.urls'), name='appointments'),
-    path('', include('apps.chats.api.urls'), name='chats'),
+    path('api/', include('apps.accounts.api.urls'), name='accounts'),
+    path('api/', include('apps.appointments.api.urls'), name='appointments'),
+    path('api/', include('apps.chats.api.urls'), name='chats'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.tokens import Token
 
 TEST_PASSWORD = 'sr123456'
 API_VERSION_V1 = 'v1'
+API_ENDPOINT_V1 = f'api/{API_VERSION_V1}'
 
 
 class RefreshTokenTest(Token):

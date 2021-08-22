@@ -31,11 +31,11 @@ BASE_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'django_filters',
     'channels',
-    'corsheaders',
     'multiselectfield',
     'encrypted_fields',
 ]
@@ -61,6 +61,7 @@ PASSWORD_HASHERS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -172,6 +173,7 @@ DEFAULT_DOMAIN = config('DEFAULT_DOMAIN')  # env
 # django-cors-headers
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
-    "http://localhost:4200"
+    "http://localhost:4200",
 ]
-CORS_URLS_REGEX = r'^/v[0-9]/api/.*$'
+
+CORS_URLS_REGEX = r'^/api/v[0-9]/.*$'

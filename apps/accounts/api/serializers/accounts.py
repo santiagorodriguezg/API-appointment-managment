@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -61,16 +62,14 @@ class LoginSerializer(serializers.Serializer):
     """
 
     username = serializers.CharField()
-    password = serializers.CharField(min_length=8, max_length=64)
+    password = serializers.CharField()
 
     def validate(self, data):
         """Check credentials"""
 
         user = authenticate(username=data['username'], password=data['password'])
         if not user:
-            raise serializers.ValidationError({
-                'errors': 'Usuario o contraseña incorrectos'
-            }, code='authorization')
+            raise AuthenticationFailed(detail='Usuario o contraseña incorrectos')
 
         # if not user.is_verified:
         #     raise serializers.ValidationError('Account is not active yet :(')
