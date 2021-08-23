@@ -36,12 +36,12 @@ def clean_password2(instance, data):
     password2 = data.get("password2")
     if password1 and password2 and password1 != password2:
         raise serializers.ValidationError(
-            {'password2': 'Las contraseñas ingresadas no coinciden'}, code='password_mismatch',
+            {'password': 'Las contraseñas ingresadas no coinciden'}, code='password_mismatch',
         )
     try:
         password_validation.validate_password(password2, instance)
     except ValidationError as error:
-        raise serializers.ValidationError({'password2': error.messages}, code='password2')
+        raise serializers.ValidationError({'password': error.messages}, code='password2')
 
     return data
 

@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, NotFound
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -113,9 +113,8 @@ class PasswordResetEmailSerializer(serializers.Serializer):
         """Verify that the user account exists"""
         user = User.objects.filter(username=value, is_active=True).first()
         if user is None:
-            raise serializers.ValidationError(
-                {'errors': 'El usuario no está asignado a ninguna cuenta.'}, code='account_not_found'
-            )
+            raise NotFound(detail='El usuario no está asignado a ninguna cuenta.')
+
         self.instance = user
         return value
 

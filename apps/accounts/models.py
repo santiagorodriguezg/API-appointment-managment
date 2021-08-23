@@ -91,11 +91,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         MinLengthValidator(limit_value=2, message=_('El nombre debe tener al menos 2 caracteres.')),
         RegexValidator(
             regex=REGEX_LETTERS_ONLY,
-            message=_('El nombre debe tener solo letras (A-Z).'),
+            message=_('Su nombre debe tener solo letras (A-Z).'),
             code='invalid_first_name'
         ),
     ])
-    last_name = models.CharField(_('apellidos'), max_length=60, null=True, blank=True, validators=[
+    last_name = models.CharField(_('apellidos'), max_length=60, validators=[
         MinLengthValidator(limit_value=2, message=_('Sus apellidos deben tener al menos 2 caracteres.')),
         RegexValidator(
             regex=REGEX_LETTERS_ONLY,
@@ -139,7 +139,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True,
         null=True,
         error_messages={
-            'unique': _('Ya existe un contacto con este correo electrónico.')
+            'unique': _('Ya existe un usuario con este correo electrónico.')
         }
     )
     phone = models.CharField(verbose_name=_('teléfono'), max_length=12, null=True, blank=True)
