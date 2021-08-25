@@ -55,7 +55,7 @@ class MessageConsumer(AsyncWebsocketConsumer):
         else:
             content = {
                 'command': data['command'],
-                'messages': "Acción no permitida"
+                'messages': "Acción no permitida."
             }
             await self.send(text_data=json.dumps(content))
 

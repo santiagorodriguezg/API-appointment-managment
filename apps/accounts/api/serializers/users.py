@@ -116,7 +116,7 @@ class UserPasswordChangeSerializer(serializers.Serializer):
         """Validate that the old_password field is correct."""
 
         if not self.instance.check_password(value):
-            raise serializers.ValidationError('Su contraseña actual es incorrecta', code='password_incorrect')
+            raise serializers.ValidationError('Su contraseña actual es incorrecta.', code='password_incorrect')
         return value
 
     def validate(self, data):

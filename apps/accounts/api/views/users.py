@@ -9,11 +9,11 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from apps.accounts.api.permissions import IsAdminOrDoctorUser
-from apps.accounts.models import User
 from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
     UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer
 )
+from apps.accounts.models import User
 from gestion_consultas.utils import UnaccentedSearchFilter
 
 
@@ -125,7 +125,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {'success': True, 'message': 'Su contraseña fue actualizada correctamente'},
+                {'success': True, 'message': 'Su contraseña fue actualizada correctamente.'},
                 status=status.HTTP_201_CREATED
             )
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

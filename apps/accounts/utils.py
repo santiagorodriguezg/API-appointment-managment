@@ -36,7 +36,7 @@ def clean_password2(instance, data):
     password2 = data.get("password2")
     if password1 and password2 and password1 != password2:
         raise serializers.ValidationError(
-            {'password': 'Las contraseñas ingresadas no coinciden'}, code='password_mismatch',
+            {'password': 'Las contraseñas ingresadas no coinciden.'}, code='password_mismatch',
         )
     try:
         password_validation.validate_password(password2, instance)
@@ -58,7 +58,9 @@ def get_user_from_uidb64(uidb64):
 
 def password_reset_check_token(user, token):
     if not PasswordResetTokenGenerator().check_token(user, token):
-        raise AuthenticationFailed(detail="El token no es válido, solicite uno nuevo")
+        raise AuthenticationFailed(
+            detail='El enlace de restablecimiento de la contraseña es inválido, por favor solicite uno nuevo.'
+        )
 
 
 def generate_token(user, token_type):

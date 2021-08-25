@@ -435,7 +435,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"first_name\": \"Santiago\",\r\n    \"last_name\": \"Rodriguez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"987322\",\r\n    \"phone\": \"3152366674\",\r\n    \"city\": \"Tunja\",\r\n    \"neighborhood\": \"Santa Lucia\",\r\n    \"address\": \"Cra #15 23-24\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
+							"raw": "{   \r\n    \"username\": \"santiago\",\r\n    \"first_name\": \"Santiago\",\r\n    \"last_name\": \"Rodriguez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"987322\",\r\n    \"phone\": \"3152366674\",\r\n    \"city\": \"Tunja\",\r\n    \"neighborhood\": \"Santa Lucia\",\r\n    \"address\": \"Cra #15 23-24\",\r\n    \"password\": \"12345678\",\r\n    \"password2\": \"\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -443,12 +443,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/accounts/signup/",
+							"raw": "{{host}}/{{api_version}}/signup/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"accounts",
+								"{{api_version}}",
 								"signup",
 								""
 							]
@@ -457,45 +457,33 @@
 					"response": []
 				},
 				{
-					"name": "Password reset from key",
+					"name": "Verify token Password reset",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "token",
-									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJ1c2VyIjoibHVpc2dvbWV6IiwiZXhwIjoxNjE4MDc2MTIyLCJ0eXBlIjoicGFzc3dvcmRfcmVzZXRhc2RhcyJ9.OUyMu9HTsRjExB8FUu53MYwC07gK19uiyqHlGjOFuYt45QnCC54RW0DKqzHoNnzx",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "lg123457",
-									"type": "text"
-								},
-								{
-									"key": "password2",
-									"value": "lg123457",
-									"type": "text"
-								}
-							]
+							"formdata": []
 						},
 						"url": {
-							"raw": "{{host}}/accounts/password-reset-key",
+							"raw": "{{host}}/{{api_version}}/password/reset/MQ/arwkkq-8d1dc5b770becb13474684493faedbe3/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"accounts",
-								"password-reset-key"
+								"{{api_version}}",
+								"password",
+								"reset",
+								"MQ",
+								"arwkkq-8d1dc5b770becb13474684493faedbe3",
+								""
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Verify token password reset",
+					"name": "API Verify token",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -504,18 +492,18 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": "asd",
+									"value": "JWT",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{host}}/accounts/token/verify/",
+							"raw": "{{host}}/{{api_version}}/token/verify/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"accounts",
+								"{{api_version}}",
 								"token",
 								"verify",
 								""
@@ -607,16 +595,16 @@
 								},
 								{
 									"key": "password2",
-									"value": "lg1234567",
+									"value": "lg12345678",
 									"type": "text"
 								},
 								{
 									"key": "token",
-									"value": "ar2ios-c10e4c6facc573eb90ea2d8decb82876",
+									"value": "arwkkq-8d1dc5b770becb13474684493faedbe3",
 									"type": "text"
 								},
 								{
-									"key": "uidb64",
+									"key": "uid",
 									"value": "MQ",
 									"type": "text"
 								}

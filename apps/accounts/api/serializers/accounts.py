@@ -99,7 +99,7 @@ class LogoutSerializer(serializers.Serializer):
             delete_user_sessions(user)
         except TokenError:
             raise serializers.ValidationError(
-                {'errors': 'El token es inválido o ha expirado'}, code='token_invalid'
+                {'errors': 'El token es inválido o ha expirado.'}, code='token_invalid'
             )
 
 
@@ -151,13 +151,13 @@ class PasswordResetCompleteSerializer(serializers.Serializer):
     password = serializers.CharField()
     password2 = serializers.CharField()
     token = serializers.CharField()
-    uidb64 = serializers.CharField()
+    uid = serializers.CharField()
 
     class Meta:
-        fields = ['password', 'password2', 'token', 'uidb64']
+        fields = ['password', 'password2', 'token', 'uid']
 
     def validate(self, data):
-        user = get_user_from_uidb64(data.get('uidb64'))
+        user = get_user_from_uidb64(data.get('uid'))
         password_reset_check_token(user, data.get('token'))
         self.instance = user
         return clean_password2(self.instance, data)

@@ -52,7 +52,7 @@ class LogoutAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'success': True, 'message': 'Logout exitoso'}, status=status.HTTP_200_OK)
+        return Response({'success': True, 'message': 'Logout exitoso.'}, status=status.HTTP_200_OK)
 
 
 class PasswordResetEmailAPIView(generics.GenericAPIView):
@@ -82,7 +82,7 @@ class PasswordResetConfirmAPIView(generics.GenericAPIView):
         password_reset_check_token(user, token)
         data = {
             'success': True,
-            'message': 'El token es valido'
+            'message': 'El token es valido.'
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -98,6 +98,6 @@ class PasswordResetCompleteAPIView(generics.GenericAPIView):
         serializer.save()
         data = {
             'success': True,
-            'message': 'Restablecimiento de contraseña completado',
+            'message': 'Restablecimiento de contraseña completado.',
         }
         return Response(data, status=status.HTTP_200_OK)
