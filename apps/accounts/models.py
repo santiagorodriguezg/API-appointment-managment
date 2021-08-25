@@ -85,6 +85,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class IdentificationType(models.TextChoices):
         CC = 'CC', _('Cédula de Ciudadanía')
         CE = 'CE', _('Cédula de Extranjería')
+        NIT = 'NIT', _('Nit')
 
     role = models.CharField(_('tipo de usuario'), max_length=8, choices=Type.choices, default=Type.USER)
     first_name = models.CharField(_('nombre'), max_length=60, validators=[
@@ -105,7 +106,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ])
     identification_type = models.CharField(
         _('tipo de identificación'),
-        max_length=2,
+        max_length=3,
         choices=IdentificationType.choices,
         default=IdentificationType.CC
     )
