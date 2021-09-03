@@ -1,7 +1,7 @@
 # Base
-Django==3.2.6
+Django==3.2.7
 psycopg2==2.9.1
-Pillow==8.3.1
+Pillow==8.3.2
 
 # Environment
 python-decouple==3.4
@@ -20,7 +20,7 @@ django-filter==2.4.0
 django-cors-headers==3.8.0
 
 # Passwords security
-argon2-cffi==20.1.0
+argon2-cffi==21.1.0
 
 # JWT
 pyjwt==2.1.0

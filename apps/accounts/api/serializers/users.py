@@ -108,7 +108,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 class UserPasswordChangeSerializer(serializers.Serializer):
     """User password change serializer."""
 
-    password_old = serializers.CharField(min_length=8)
+    password_old = serializers.CharField()
     password = serializers.CharField(min_length=8)
     password2 = serializers.CharField(min_length=8)
 

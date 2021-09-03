@@ -118,7 +118,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=False, url_path='change-password')
+    @action(methods=['patch'], detail=False, url_path='password/change')
     def change_password(self, request):
         """User change password"""
         serializer = UserPasswordChangeSerializer(request.user, data=request.data)
