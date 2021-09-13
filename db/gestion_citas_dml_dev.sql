@@ -58,19 +58,24 @@ VALUES (1, 2, 2),
 -- appointment table
 INSERT INTO public.appointment (id, type, children, aggressor, description, audio, start_date, end_date, created_at,
                                 updated_at, doctor_id, user_id)
-VALUES (1, 'PSY,JUD', '[
+VALUES (1, 'PSY,LEG', '[
   {
-    "age": 14,
-    "name": "Maria Hernandez"
+    "name": "Maria Hernandez",
+    "age": 14
   },
   {
-    "age": 8,
-    "name": "Ana Hernandez"
+    "name": "Ana Hernandez",
+    "age": 8
   }
-]', 'Actualizar datos aggressor', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415',
-        '2021-04-12 22:56:04.356851', null, 3),
-       (2, 'JUD', null, 'Pedro Martinez', 'Violencia intrafamiliar', '', null, null, '2021-04-11 15:48:40.920204',
-        '2021-04-12 22:40:30.033680', 2, 3);
+]', '{
+  "name": "Juan Moreno",
+  "identification_number": 1007143234,
+  "phone": 3143498163,
+  "address": "Tunja",
+  "more_info": "Lugar de trabajo: Claro"
+}', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415', '2021-04-12 22:56:04.356851', null, 3),
+       (2, 'LEG', null, null, 'Violencia intrafamiliar', '', null, null, '2021-09-10 21:16:37.951541 +00:00',
+        '2021-09-10 21:16:37.951541 +00:00', 2, 3);
 
 
 -- room table

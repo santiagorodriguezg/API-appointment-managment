@@ -7,7 +7,14 @@ from apps.accounts.models import User
 from apps.accounts.utils import clean_password2, generate_token
 
 
-class UserListAdminSerializer(serializers.ModelSerializer):
+class UserBaseModelSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField()
+
+    def get_full_name(self, obj):
+        return obj.full_name()
+
+
+class UserListAdminSerializer(UserBaseModelSerializer):
     """
     User list ADMIN serializer.
     If the user has ADMIN permissions it lists all fields of the user model.
@@ -18,7 +25,7 @@ class UserListAdminSerializer(serializers.ModelSerializer):
         exclude = ('password',)
 
 
-class UserListSerializer(serializers.ModelSerializer):
+class UserListSerializer(UserBaseModelSerializer):
     """
     User list model serializer.
     Lists the fields of the user model to which the DOC user has permissions.
@@ -29,7 +36,7 @@ class UserListSerializer(serializers.ModelSerializer):
         exclude = ('password', 'is_active', 'is_superuser', 'is_staff', 'groups', 'user_permissions')
 
 
-class UserListRelatedSerializer(serializers.ModelSerializer):
+class UserListRelatedSerializer(UserBaseModelSerializer):
     """
     User list related serializer
     Display the user's basic data. Must be used for relational fields.
@@ -37,7 +44,7 @@ class UserListRelatedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'username', 'picture')
+        fields = ('first_name', 'last_name', 'full_name', 'username', 'identification_number', 'picture')
 
 
 class UserListingField(serializers.RelatedField):
@@ -49,7 +56,7 @@ class UserListingField(serializers.RelatedField):
         return value.username
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(UserBaseModelSerializer):
     """
     User create serializer.
     An ADMIN user can create users of any type.
@@ -80,7 +87,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
+class UserUpdateSerializer(UserBaseModelSerializer):
     """
     User update serializer.
     An ADMIN user can update users of any type.
@@ -91,7 +98,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         exclude = ('password', 'last_login', 'created_at', 'updated_at', 'groups', 'user_permissions')
 
 
-class UserProfileUpdateSerializer(serializers.ModelSerializer):
+class UserProfileUpdateSerializer(UserBaseModelSerializer):
     """
     User profile serializer.
     A user can update your profile

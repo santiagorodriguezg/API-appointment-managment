@@ -35,7 +35,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         self.assertEqual(response.data.get('count'), 2)
 
         appt = response.data.get('results')
-        queryset = Appointment.objects.select_related('user', 'doctor').all()
+        queryset = Appointment.objects.select_related('user', 'doctor').order_by('-created_at')
         for i, a in enumerate(queryset):
             self.assertEqual(appt[i]['user']['username'], a.user.username)
             self.assertEqual(appt[i]['doctor']['username'], a.doctor.username)
@@ -65,15 +65,12 @@ class AppointmentsAdminAPITestCase(APITestCase):
 
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/'
         response = self.client.get(url)
-        res = response.data.get('results')
-        appointments = res.get('appointments')
-        user_res = res.get('user')
+        appointments = response.data.get('results')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
-        self.assertEqual(user_res.get('id'), user.id)
 
-        queryset = Appointment.objects.select_related('user', 'doctor').filter(user=user)
+        queryset = Appointment.objects.select_related('user', 'doctor').filter(user=user).order_by('-created_at')
         for i, a in enumerate(queryset):
             self.assertEqual(appointments[i]['user']['username'], a.user.username)
             if a.doctor is None:
@@ -90,13 +87,12 @@ class AppointmentsAdminAPITestCase(APITestCase):
 
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{appointment.id}/'
         response = self.client.get(url)
-        appointment_res = response.data.get('appointment')
-        user_res = response.data.get('user')
+        appointment_res = response.data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Appointment.objects.filter(user=user).count(), 2)
-        self.assertEqual(user_res.get('id'), user.id)
-        self.assertEqual(appointment_res.get('id'), appointment.id)
+
+        self.assertEqual(appointment_res['id'], appointment.id)
         self.assertEqual(appointment_res['user']['username'], user.username)
         self.assertEqual(appointment_res['doctor']['username'], doctor.username)
 
@@ -162,15 +158,12 @@ class AppointmentsDoctorAPITestCase(APITestCase):
 
         # Listar citas asociadas al perfil del doctor
         response = self.client.get(self.url)
-        res = response.data.get('results')
-        user_res = res.get('user')
-        appointments = res.get('appointments')
+        appointments = response.data.get('results')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
-        self.assertEqual(user_res.get('id'), self.user.id)
 
-        queryset = Appointment.objects.select_related('user', 'doctor').filter(doctor=self.user)
+        queryset = Appointment.objects.select_related('user', 'doctor').filter(doctor=self.user).order_by('-created_at')
         for i, a in enumerate(queryset):
             self.assertEqual(appointments[i]['user']['username'], a.user.username)
             self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
@@ -189,13 +182,11 @@ class AppointmentsDoctorAPITestCase(APITestCase):
 
         url = f'{self.url}{appointment.id}/'
         response = self.client.get(url)
-        appointment_res = response.data.get('appointment')
-        user_res = response.data.get('user')
+        appointment_res = response.data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Appointment.objects.filter(doctor=self.user).count(), 1)
-        self.assertEqual(user_res.get('id'), self.user.id)
-        self.assertEqual(appointment_res.get('id'), appointment.id)
+        self.assertEqual(appointment_res['id'], appointment.id)
         self.assertEqual(appointment_res['user']['username'], user.username)
         self.assertEqual(appointment_res['doctor']['username'], self.user.username)
 
@@ -272,15 +263,12 @@ class AppointmentsPatientAPITestCase(APITestCase):
         AppointmentFactory.create_batch(2)
 
         response = self.client.get(self.url)
-        res = response.data.get('results')
-        user_res = res.get('user')
-        appointments = res.get('appointments')
+        appointments = response.data.get('results')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
-        self.assertEqual(user_res.get('id'), self.user.id)
 
-        queryset = Appointment.objects.select_related('user', 'doctor').filter(user=self.user)
+        queryset = Appointment.objects.select_related('user', 'doctor').filter(user=self.user).order_by('-created_at')
         for i, a in enumerate(queryset):
             self.assertEqual(appointments[i]['user']['username'], a.user.username)
             if a.doctor is None:
@@ -303,13 +291,11 @@ class AppointmentsPatientAPITestCase(APITestCase):
 
         url = f'{self.url}{appointment.id}/'
         response = self.client.get(url)
-        appointment_res = response.data.get('appointment')
-        user_res = response.data.get('user')
+        appointment_res = response.data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Appointment.objects.filter(user=self.user).count(), 1)
-        self.assertEqual(user_res.get('id'), self.user.id)
-        self.assertEqual(appointment_res.get('id'), appointment.id)
+        self.assertEqual(appointment_res['id'], appointment.id)
         self.assertEqual(appointment_res['user']['username'], self.user.username)
         self.assertEqual(appointment_res['doctor']['username'], doctor.username)
 

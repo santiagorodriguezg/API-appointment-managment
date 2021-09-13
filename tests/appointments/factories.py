@@ -19,16 +19,23 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Appointment
 
-    type = factory.List([
-        FuzzyChoice(choices=Appointment.APPOINTMENT_TYPE_CHOICES, getter=lambda c: c[0])
-    ])
+    type = FuzzyChoice(choices=Appointment.APPOINTMENT_TYPE_CHOICES, getter=lambda c: c[0])
     children = factory.List([
         factory.Dict({
             'name': factory.Faker('name'),
-            'age': FuzzyInteger(1, 18)
+            'age': FuzzyInteger(1, 18),
         }) for _ in range(2)
     ])
-    aggressor = factory.Faker('name')
+    aggressor = factory.List([
+        factory.Dict({
+            'name': factory.Faker('name'),
+            'age': FuzzyInteger(1, 18),
+            'identification_number': factory.Faker('bothify', text='########'),
+            'phone': factory.Faker('bothify', text='3#########'),
+            'address': factory.Faker('address'),
+            'more_info': factory.Faker('sentence'),
+        })
+    ])
     description = factory.Faker('text')
     start_date = factory.LazyFunction(timezone.now)
     end_date = factory.LazyAttribute(lambda o: o.start_date + timedelta(days=2))

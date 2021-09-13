@@ -36,7 +36,6 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'django_filters',
     'channels',
-    'multiselectfield',
     'encrypted_fields',
 ]
 

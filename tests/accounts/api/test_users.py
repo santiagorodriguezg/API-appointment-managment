@@ -207,7 +207,7 @@ class UsersAPITestCase(APITestCase):
             "password": pwd,
             "password2": pwd
         }
-        response = self.client.post(f'{self.url}change-password/', data)
+        response = self.client.patch(f'{self.url}password/change/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data.get('success'))
 

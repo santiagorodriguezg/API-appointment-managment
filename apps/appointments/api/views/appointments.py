@@ -30,7 +30,7 @@ class AppointmentListAPIView(ListAPIView):
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
     search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     filterset_class = AppointmentFilter
-    ordering = ('id',)
+    ordering = ('-created_at',)
 
 
 class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -39,10 +39,8 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
 
     permission_classes = [IsAuthenticated]
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = ('start_date', 'end_date', 'created_at', 'updated_at', 'doctor__username')
-    search_fields = ['~user__city', '~user__neighborhood', '~user__address']
-    ordering_fields = ['created_at', 'updated_at']
-    ordering = ('id',)
+    filterset_class = AppointmentFilter
+    ordering = ('-created_at',)
 
     def get_serializer_class(self):
         """Assign serializer based on action."""
@@ -79,11 +77,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
         queryset = self.filter_queryset(self.get_queryset(user))
         page = self.paginate_queryset(queryset)
-        data = {
-            'user': user,
-            'appointments': self.get_serializer(page, many=True).data
-        }
-        return self.get_paginated_response(data)
+        return self.get_paginated_response(self.get_serializer(page, many=True).data)
 
     def retrieve(self, request, username=None, pk=None, *args, **kwargs):
         """User appointments given Id"""
@@ -91,11 +85,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
         user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
         queryset = self.get_queryset(user, pk)
-        data = {
-            'user': user,
-            'appointment': self.get_serializer(queryset).data
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(self.get_serializer(queryset).data, status=status.HTTP_200_OK)
 
     def update(self, request, username=None, pk=None, *args, **kwargs):
         """Users with ADMIN and USER roles can update appointments."""

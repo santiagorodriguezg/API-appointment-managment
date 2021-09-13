@@ -3,15 +3,14 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from multiselectfield import MultiSelectField
 
 
 class Appointment(models.Model):
     """Appointment model. Represents a chat room"""
 
     APPOINTMENT_TYPE_CHOICES = [
-        ('PSY', _('Psicológica')),
-        ('JUD', _('Judicial')),
+        ('PSY', _('Psicosocial')),
+        ('LEG', _('Jurídica')),
     ]
 
     user = models.ForeignKey('accounts.User', verbose_name=_('user'), related_name='patient', on_delete=models.CASCADE)
@@ -19,12 +18,12 @@ class Appointment(models.Model):
         'accounts.User', verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True,
         blank=True
     )
-    type = MultiSelectField(verbose_name=_('tipo'), choices=APPOINTMENT_TYPE_CHOICES, min_choices=1)
-    children = models.JSONField(verbose_name=_('hijos'), null=True, blank=True)
-    aggressor = models.CharField(_('datos del posible agresor'), max_length=500, null=True, blank=True)
+    type = models.CharField(verbose_name=_('tipo de cita'), max_length=7)
+    children = models.JSONField(verbose_name=_('datos de los hijos'), null=True, blank=True)
+    aggressor = models.JSONField(verbose_name=_('datos del agresor'), null=True, blank=True)
     description = models.TextField(_('descripción'), null=True, blank=True)
     audio = models.FileField(_('audio'), upload_to='appointments/audio', null=True, blank=True, validators=[
-        FileExtensionValidator(allowed_extensions=['mp3', 'mp4'])
+        FileExtensionValidator(allowed_extensions=['mp3', 'mp4', 'ogg', 'm4a'])
     ])
     start_date = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
     end_date = models.DateTimeField(_('fecha de finalización'), null=True, blank=True)
