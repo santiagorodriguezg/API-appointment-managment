@@ -40,7 +40,8 @@ class UsersAdminAPITestCase(APITestCase):
         self.assertEqual(response.data.get('count'), 4)
 
         res = response.data.get('results')
-        for i, user in enumerate(User.objects.prefetch_related('groups', 'user_permissions').all()[:2]):
+        qs = User.objects.prefetch_related('groups', 'user_permissions').order_by('-created_at')[:2]
+        for i, user in enumerate(qs):
             self.assertEqual(res[i].get('first_name'), user.first_name)
             self.assertEqual(res[i].get('role'), user.role)
             self.assertEqual(res[i].get('is_superuser'), user.is_superuser)
@@ -103,7 +104,7 @@ class UsersDoctorAPITestCase(APITestCase):
         self.assertEqual(response.data.get('count'), 5)
 
         res = response.data.get('results')
-        for i, user in enumerate(User.objects.order_by('id')[:3]):
+        for i, user in enumerate(User.objects.order_by('-created_at')[:3]):
             self.assertEqual(res[i].get('first_name'), user.first_name)
             self.assertEqual(res[i].get('role'), user.role)
             self.assertIsNone(res[i].get('is_superuser'))

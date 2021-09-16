@@ -49,7 +49,7 @@ class SignupSerializer(serializers.ModelSerializer):
         user.role = User.Type.USER
         user.last_login = timezone.now()
         user.save()
-        refresh = user.tokens()  # Get tokens
+        refresh = user.get_tokens()  # Get tokens
         self.context['refresh'] = str(refresh)
         self.context['access'] = str(refresh.access_token)
         return user
@@ -76,7 +76,7 @@ class LoginSerializer(serializers.Serializer):
 
         update_last_login(None, user)  # Update the last login date
         delete_user_sessions(user)  # Delete users sessions
-        refresh = user.tokens()  # Get tokens
+        refresh = user.get_tokens()  # Get tokens
         self.context['refresh'] = str(refresh)
         self.context['access'] = str(refresh.access_token)
         self.instance = user

@@ -1,10 +1,9 @@
 """Appointments filters"""
 
-from django.db.models import Value
-from django.db.models.functions import Concat
 from django_filters import FilterSet, CharFilter, MultipleChoiceFilter, OrderingFilter
 
 from apps.appointments.models import Appointment
+from gestion_consultas.utils import filter_by_full_name
 
 
 class AppointmentFilter(FilterSet):
@@ -23,11 +22,12 @@ class AppointmentFilter(FilterSet):
     class Meta:
         model = Appointment
         fields = [
-            'start_date', 'end_date', 'created_at', 'updated_at', 'doctor__username'
+            'id', 'start_date', 'end_date', 'created_at', 'updated_at', 'doctor__username'
         ]
 
     order_by = OrderingFilter(
         fields=(
+            ('id', 'id'),
             ('created_at', 'created_at'),
             ('updated_at', 'updated_at'),
         )
@@ -39,5 +39,4 @@ class AppointmentFilter(FilterSet):
 
     @classmethod
     def filter_by_full_name(cls, queryset, name, value):
-        return (queryset.annotate(full_name=Concat('user__first_name', Value(' '), 'user__last_name')).
-                filter(full_name__unaccent__icontains=value))
+        return filter_by_full_name(queryset, 'user__first_name', 'user__last_name', value)

@@ -13,7 +13,7 @@ class UserBaseModelSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):
-        return obj.full_name()
+        return obj.get_full_name()
 
 
 class UserListAdminSerializer(UserBaseModelSerializer):

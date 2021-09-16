@@ -8,6 +8,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
+from apps.accounts.api.filters.users import UserFilter
 from apps.accounts.api.permissions import IsAdminOrDoctorUser
 from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
@@ -26,12 +27,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
     serializer_class = UserListAdminSerializer
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    filterset_fields = (
-        'identification_type', 'identification_number', 'role', 'is_active', 'is_superuser', 'created_at', 'updated_at'
-    )
-    search_fields = ['~first_name', '~last_name', '~city', '~neighborhood', '~address']
-    ordering_fields = ['first_name', 'last_name', 'created_at', 'updated_at']
-    ordering = ('id',)
+    filterset_class = UserFilter
+    search_fields = ['~city', '~neighborhood', '~address']
+    ordering = ('-created_at',)
     lookup_field = 'username'
 
     def get_permissions(self):

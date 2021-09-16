@@ -190,15 +190,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.first_name
 
-    def full_name(self):
+    def get_full_name(self):
         """Return the first_name plus the last_name, with a space in between."""
         return f'{self.first_name} {self.last_name}'.strip()
 
-    def tokens(self):
+    def get_tokens(self):
         """Return access and refresh JWT tokens."""
         return RefreshToken.for_user(self)
 
-    full_name.short_description = _('Nombre completo')
+    get_full_name.short_description = _('Nombre completo')
 
 
 @receiver(post_save, sender=User)

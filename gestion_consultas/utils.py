@@ -1,5 +1,7 @@
 """Project utilities"""
 
+from django.db.models import Value
+from django.db.models.functions import Concat
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
 
@@ -38,3 +40,16 @@ def get_queryset_with_pk(detail, queryset, pk):
         return queryset
 
     return queryset
+
+
+def filter_by_full_name(queryset, first_name_field, last_name_field, value):
+    """
+    Filter by user's full name
+
+    :param queryset: QuerySet
+    :param first_name_field: Field indicating the user's first name
+    :param last_name_field: Field indicating the user's last name
+    :param value: Value to be searched
+    """
+    return (queryset.annotate(full_name=Concat(first_name_field, Value(' '), last_name_field)).
+            filter(full_name__unaccent__icontains=value))

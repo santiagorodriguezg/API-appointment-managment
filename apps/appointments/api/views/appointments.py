@@ -28,8 +28,8 @@ class AppointmentListAPIView(ListAPIView):
     queryset = Appointment.objects.all()
     permission_classes = (IsAdminUser,)
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
-    search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     filterset_class = AppointmentFilter
+    search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     ordering = ('-created_at',)
 
 
