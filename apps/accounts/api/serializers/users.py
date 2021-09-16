@@ -8,6 +8,8 @@ from apps.accounts.utils import clean_password2, generate_token
 
 
 class UserBaseModelSerializer(serializers.ModelSerializer):
+    """User base model serializer add full_name field"""
+
     full_name = serializers.SerializerMethodField()
 
     def get_full_name(self, obj):

@@ -44,7 +44,7 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
         'carlos@gmail.com', '3123456789', '', 'Sogamoso', null, null, true, false, '2021-03-25 22:27:34.940033',
         '2021-04-06 16:19:24.743649'),
        (3, 'argon2$argon2id$v=19$m=102400,t=2,p=8$bXNlR3AxanV4Y1hvYlFGZ3I0MVpISA$UtXFvptFX3bpziHXniXKhg',
-        '2021-04-13 15:24:36.629052', false, 'USR', 'Juan', 'Moreno', 'CC', '7456123', 'juan', 'juan@gmail.com',
+        '2021-04-13 15:24:36.629052', false, 'USR', 'Ana', 'Hernandez', 'CC', '7456123', 'ana', 'ana@gmail.com',
         '3124567898', '', 'Duitama', null, null, true, false, '2021-03-25 22:27:34.940033',
         '2021-04-06 16:19:56.661574');
 

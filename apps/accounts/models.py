@@ -114,8 +114,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         _('número de identificación'),
         max_length=10,
         unique=True,
-        null=True,
-        blank=True,
         error_messages={
             'unique': _('Ya existe un usuario con este número de identificación.')
         },
