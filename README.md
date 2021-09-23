@@ -1,6 +1,7 @@
-# Gestión de consultas para la Casa de la Mujer Tunja - Boyacá.
+# Gestión de consultas para la Casa De La Mujer Tunja - Boyacá (REST API).
 
-API REST con Python y Django.
+REST API con Python y Django. Ver repositorio de
+la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-frontend).
 
 ## Requerimientos
 
@@ -8,7 +9,7 @@ API REST con Python y Django.
 
 **PostgreSQL 12, 13**
 
-## Instalación
+## Instalación en local
 
 1. Instalar versión de python 3.9 de acuerdo a su sistema operativo.
 
@@ -21,7 +22,7 @@ API REST con Python y Django.
    pip install virtualenv
    ```
 
-3. Clonar el proyecto.
+3. Clonar el proyecto e ingresar a la carpeta.
 
 4. Crear entorno virtual:
 
@@ -51,7 +52,7 @@ API REST con Python y Django.
    python manage.py migrate
    ```
 
-9. Ejecutar el servidor local:
+9. Ejecutar la aplicación en el modo de desarrollo:
 
    ```bash
    python manage.py runserver
