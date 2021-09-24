@@ -60,6 +60,14 @@ la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-fron
 
 ## Configuración
 
+### Crear usuario administrador desde la consola
+
+Para crear un usuario administrador (rol `ADMIN`) desde la consola ejecutar el comando:
+
+```bash
+python manage.py createsuperuser
+```
+
 ### Generar SECRET_KEY para Django Settings
 
 Para generar una cadena aleatoria de 50 caracteres utilizable en el archivo `.env` como valor de ajuste
@@ -128,7 +136,7 @@ Para ejecutar los tests use el siguiente comando:
 pytest
 ```
 
-## Despliegues en servidores
+## Despliegue en servidores
 
 ### Despliegue a producción con Docker
 
