@@ -39,7 +39,7 @@ class LoginAPIView(generics.GenericAPIView):
         data = {
             'access': serializer.context['access'],
             'refresh': serializer.context['refresh'],
-            'user': UserListSerializer(serializer.instance).data,
+            'user': UserListSerializer(serializer.instance, context={'request': request}).data,
         }
         return Response(data, status=status.HTTP_201_CREATED)
 

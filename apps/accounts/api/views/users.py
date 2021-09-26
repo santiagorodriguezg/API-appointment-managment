@@ -92,7 +92,8 @@ class UserModelViewSet(viewsets.ModelViewSet):
         qs = self.get_queryset(username)
         if qs is None:
             raise NotFound(detail='Usuario no encontrado.')
-        serializer = UserUpdateSerializer(qs, data=request.data)
+        partial = request.method == 'PATCH'
+        serializer = UserUpdateSerializer(qs, data=request.data, partial=partial, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -110,7 +111,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             partial = request.method == 'PATCH'
-            serializer = UserProfileUpdateSerializer(user, data=request.data, partial=partial)
+            serializer = UserProfileUpdateSerializer(
+                user, data=request.data, partial=partial, context={'request': request}
+            )
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -133,7 +133,7 @@ class PasswordResetEmailSerializer(serializers.Serializer):
         """Send reset password link to given user."""
         uidb64 = urlsafe_base64_encode(force_bytes(self.instance.id))
         token = PasswordResetTokenGenerator().make_token(self.instance)
-        url = f'{settings.DEFAULT_DOMAIN}/accounts/password/reset/{uidb64}/{token}'
+        url = f'{settings.CLIENT_DOMAIN}/accounts/password/reset/{uidb64}/{token}'
         template_prefix = 'accounts/email/password_reset_key'
         context = {'user': self.instance, 'password_reset_url': url}
         subject = render_to_string(f'{template_prefix}_subject.txt', context)
