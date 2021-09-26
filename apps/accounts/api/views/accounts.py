@@ -72,7 +72,7 @@ class PasswordResetEmailAPIView(generics.GenericAPIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class PasswordResetConfirmAPIView(generics.GenericAPIView):
+class PasswordResetVerifyTokenAPIView(generics.GenericAPIView):
     """Verify that the token to reset the user's password is valid"""
 
     serializer_class = PasswordResetCompleteSerializer

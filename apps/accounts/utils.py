@@ -9,9 +9,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sessions.models import Session
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, NotFound
 
 from apps.accounts.models import User
 
@@ -27,6 +28,14 @@ def delete_user_sessions(user):
             if session_user:
                 if user.id == int(session_user):
                     session.delete()
+
+
+def validate_username(value):
+    """Verify that the user account exists"""
+    user = User.objects.filter(username=value, is_active=True).first()
+    if user is not None:
+        return user
+    raise NotFound(detail='El usuario no está asignado a ninguna cuenta.', code='user_not_found')
 
 
 def clean_password2(instance, data):
@@ -56,6 +65,13 @@ def get_user_from_uidb64(uidb64):
     return user
 
 
+def generate_password_reset_link(user):
+    """Generate password reset link"""
+    uidb64 = urlsafe_base64_encode(force_bytes(user.id))
+    token = PasswordResetTokenGenerator().make_token(user)
+    return f'{settings.CLIENT_DOMAIN}/accounts/password/reset/{uidb64}/{token}'
+
+
 def password_reset_check_token(user, token):
     if not PasswordResetTokenGenerator().check_token(user, token):
         raise AuthenticationFailed(
@@ -63,6 +79,7 @@ def password_reset_check_token(user, token):
         )
 
 
+# Unused
 def generate_token(user, token_type):
     """Create JWT token"""
     exp_date = timezone.now() + timedelta(minutes=settings.ACCOUNT_EMAIL_PASSWORD_RESET_EXPIRE_MINUTES)
@@ -74,6 +91,7 @@ def generate_token(user, token_type):
     return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS384")
 
 
+# Unused
 def verify_token(token):
     """
     Verify token is valid.

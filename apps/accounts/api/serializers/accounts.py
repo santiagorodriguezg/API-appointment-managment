@@ -4,20 +4,18 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed, NotFound
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
 from apps.accounts.utils import (
-    clean_password2, delete_user_sessions, get_user_from_uidb64, password_reset_check_token
+    clean_password2, delete_user_sessions, get_user_from_uidb64, password_reset_check_token, validate_username,
+    generate_password_reset_link
 )
 
 
@@ -111,11 +109,7 @@ class PasswordResetEmailSerializer(serializers.Serializer):
 
     def validate_username(self, value):
         """Verify that the user account exists"""
-        user = User.objects.filter(username=value, is_active=True).first()
-        if user is None:
-            raise NotFound(detail='El usuario no está asignado a ninguna cuenta.')
-
-        self.instance = user
+        self.instance = validate_username(value)
         return value
 
     def save(self, **kwargs):
@@ -131,9 +125,7 @@ class PasswordResetEmailSerializer(serializers.Serializer):
 
     def send_password_reset_email(self):
         """Send reset password link to given user."""
-        uidb64 = urlsafe_base64_encode(force_bytes(self.instance.id))
-        token = PasswordResetTokenGenerator().make_token(self.instance)
-        url = f'{settings.CLIENT_DOMAIN}/accounts/password/reset/{uidb64}/{token}'
+        url = generate_password_reset_link(self.instance)
         template_prefix = 'accounts/email/password_reset_key'
         context = {'user': self.instance, 'password_reset_url': url}
         subject = render_to_string(f'{template_prefix}_subject.txt', context)

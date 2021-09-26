@@ -68,10 +68,11 @@ class UsersAdminAPITestCase(APITestCase):
     def test_user_admin_password_reset(self) -> None:
         """Verify that ADMIN user can send a password reset link"""
         user = UserFactory(email=None)
-        url = f'{self.url}{user.username}/password-reset/'
+        url = f'{self.url}{user.username}/password/reset/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data.get('success'))
+        self.assertIsNotNone(response.data.get('password_reset_url'))
+        self.assertEqual(response.data.get('username'), user.username)
         self.assertContains(response, 'password_reset_url')
 
 
@@ -130,7 +131,7 @@ class UsersDoctorAPITestCase(APITestCase):
     def test_user_doctor_password_reset(self) -> None:
         """Verify that DOCTOR user can not send a password reset link"""
         user = UserFactory(email=None)
-        url = f'{self.url}{user.username}/password-reset/'
+        url = f'{self.url}{user.username}/password/reset/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -173,7 +174,7 @@ class UsersPatientAPITestCase(APITestCase):
     def test_user_patient_password_reset(self) -> None:
         """Verify that patient user can not send a password reset link"""
         user = UserFactory(email=None)
-        url = f'{self.url}{user.username}/password-reset/'
+        url = f'{self.url}{user.username}/password/reset/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 

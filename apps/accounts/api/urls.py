@@ -5,8 +5,8 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from apps.accounts.api.views.accounts import (
-    PasswordResetEmailAPIView, PasswordResetConfirmAPIView, PasswordResetCompleteAPIView, SignupAPIView, LoginAPIView,
-    LogoutAPIView
+    PasswordResetEmailAPIView, PasswordResetVerifyTokenAPIView, PasswordResetCompleteAPIView, SignupAPIView,
+    LoginAPIView, LogoutAPIView
 )
 from apps.accounts.api.views.users import UserModelViewSet
 
@@ -22,8 +22,12 @@ urlpatterns = [
     path('v1/logout/', LogoutAPIView.as_view(), name='logout'),
 
     path('v1/password/reset/', PasswordResetEmailAPIView.as_view(), name="password_reset_email"),
-    path('v1/password/reset/<uidb64>/<token>/', PasswordResetConfirmAPIView.as_view(), name='password_reset_confirm'),
-    path('v1/password/reset/complete/', PasswordResetCompleteAPIView.as_view(), name='password-reset-complete'),
+    path(
+        'v1/password/reset/<uidb64>/<token>/',
+        PasswordResetVerifyTokenAPIView.as_view(),
+        name='password_reset_verify_token'
+    ),
+    path('v1/password/reset/complete/', PasswordResetCompleteAPIView.as_view(), name='password_reset_complete'),
 
     path('v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

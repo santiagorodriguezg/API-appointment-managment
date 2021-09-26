@@ -131,7 +131,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
             )
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['get'], detail=True, url_path='password-reset')
+    @action(methods=['get'], detail=True, url_path='password/reset')
     def password_reset(self, request, username=None):
         """User password reset link for given username"""
         if not request.user.has_perm('accounts.password_reset'):
@@ -139,9 +139,10 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
         serializer = UserPasswordResetSerializer(data={'username': username})
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
         data = {
-            'success': True,
+            'username': user.username,
+            'full_name': user.get_full_name(),
             'password_reset_url': serializer.context['password_reset_url'],
         }
         return Response(data, status=status.HTTP_200_OK)

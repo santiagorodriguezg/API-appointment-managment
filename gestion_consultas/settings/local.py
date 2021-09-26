@@ -2,8 +2,6 @@
 
 from datetime import timedelta
 
-from decouple import config, Csv
-
 from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
@@ -34,7 +32,7 @@ SIMPLE_JWT = {
 # A list of hex-encoded 32 byte keys
 # You only need one unless / until rotating keys
 # https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#rotating-encryption-keys
-FIELD_ENCRYPTION_KEYS = config('FIELD_ENCRYPTION_KEYS', cast=Csv())
+FIELD_ENCRYPTION_KEYS = config('FIELD_ENCRYPTION_KEYS', cast=Csv())  # NOQA
 
 # Django channels
 # https://pypi.org/project/channels-redis/
