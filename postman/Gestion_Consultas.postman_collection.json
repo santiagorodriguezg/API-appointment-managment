@@ -70,6 +70,11 @@
 									"key": "limit",
 									"value": "3",
 									"disabled": true
+								},
+								{
+									"key": "full_name",
+									"value": "luis",
+									"disabled": true
 								}
 							]
 						}
@@ -146,7 +151,7 @@
 					"response": []
 				},
 				{
-					"name": "User change password",
+					"name": "User password change",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -158,11 +163,11 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"password_old\": \"lg123456\",\r\n    \"password\":\"lg654321\",\r\n    \"password2\":\"lg654321\"\r\n}",
+							"raw": "{\r\n    \"password_old\": \"lg123456A\",\r\n    \"password\":\"lg654321\",\r\n    \"password2\":\"lg654321\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -170,14 +175,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/change-password/",
+							"raw": "{{host}}/{{api_version}}/users/password/change/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"change-password",
+								"password",
+								"change",
 								""
 							]
 						}
@@ -187,14 +193,18 @@
 				{
 					"name": "Update my profile",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{token}}",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"first_name\": \"Guillermo\",\r\n    \"last_name\": \"Galeano\",\r\n    \"identification_type\": \"CE\",\r\n    \"identification_number\": \"785236525\",\r\n    \"username\": \"guillermo\",\r\n    \"email\": \"guillermo@gmail.com\",\r\n    \"phone\": \"3457824633\",\r\n    \"city\": null,\r\n    \"address\": null\r\n}",
@@ -232,11 +242,11 @@
 								}
 							]
 						},
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"role\": \"DOC\",\r\n    \"first_name\": \"Julian\",\r\n    \"last_name\": \"Franco\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12348975\",\r\n    \"username\": \"julianfranco\",\r\n    \"email\": \"julian@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\"\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -244,14 +254,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/2/",
+							"raw": "{{host}}/{{api_version}}/users/ana/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"2",
+								"ana",
 								""
 							]
 						},
@@ -315,15 +325,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/carlos/password-reset/",
+							"raw": "{{host}}/{{api_version}}/users/ana/password/reset/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"carlos",
-								"password-reset",
+								"ana",
+								"password",
+								"reset",
 								""
 							]
 						},
@@ -369,19 +380,19 @@
 								{
 									"key": "username",
 									"value": "luis",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "username",
-									"value": "juan",
+									"value": "ana",
 									"type": "text",
 									"disabled": true
 								},
 								{
 									"key": "username",
 									"value": "carlos",
-									"type": "text",
-									"disabled": true
+									"type": "text"
 								}
 							]
 						},
@@ -492,7 +503,7 @@
 							"formdata": [
 								{
 									"key": "token",
-									"value": "JWT",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYzMDUzNzcyNiwianRpIjoiYzk3ZWEzOTMzMDE0NDZhODlkYTkzMDNkN2NiOWY1ZTAiLCJ1c2VyX3VzZXJuYW1lIjoibHVpcyJ9.zuzOC_x593Zd_tEW8yHi8OTOfwAbdBmFtYhbTzC0VJU",
 									"type": "text"
 								}
 							]
@@ -514,7 +525,7 @@
 					"response": []
 				},
 				{
-					"name": "Password reset",
+					"name": "Password reset (send email)",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -523,7 +534,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "luis",
+									"value": "ana",
 									"type": "text"
 								}
 							]
@@ -566,12 +577,12 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/token/refresh/",
+							"raw": "{{host}}/{{api_version}}/token/refresh/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
+								"{{api_version}}",
 								"token",
 								"refresh",
 								""
@@ -659,7 +670,7 @@
 							"query": [
 								{
 									"key": "search",
-									"value": "duitama",
+									"value": "Tunja",
 									"disabled": true
 								},
 								{
@@ -669,7 +680,22 @@
 								},
 								{
 									"key": "type",
+									"value": "LEG",
+									"disabled": true
+								},
+								{
+									"key": "type",
 									"value": "PSY",
+									"disabled": true
+								},
+								{
+									"key": "user__identification_number",
+									"value": "12",
+									"disabled": true
+								},
+								{
+									"key": "user__full_name",
+									"value": "ana moreno",
 									"disabled": true
 								}
 							]
@@ -694,26 +720,36 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/juan/appointments/1",
+							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"juan",
+								"carlos",
 								"appointments",
-								"1"
+								""
 							],
 							"query": [
 								{
-									"key": "search",
-									"value": "tunja",
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "0",
 									"disabled": true
 								},
 								{
 									"key": "ordering",
-									"value": "-created_at",
+									"value": "created_at",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "LEG",
 									"disabled": true
 								}
 							]
@@ -778,13 +814,14 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"doctor\": 2,\r\n    \"type\": [\"JUD\",\"PSY\"],\r\n    \"children\": \"\",\r\n    \"aggressor\": \"No hay nada\",\r\n    \"description\": null\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "type",
+									"value": "LEG",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
@@ -864,7 +901,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/luis/rooms/1/",
+							"raw": "{{host}}/{{api_version}}/users/luis/rooms/",
 							"host": [
 								"{{host}}"
 							],
@@ -873,7 +910,6 @@
 								"users",
 								"luis",
 								"rooms",
-								"1",
 								""
 							],
 							"query": [

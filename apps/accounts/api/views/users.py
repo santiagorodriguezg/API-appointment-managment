@@ -61,7 +61,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
         if request.user.role == User.Type.ADMIN:
             serializer = self.get_serializer(qs)
         else:
-            serializer = UserListSerializer(qs)
+            serializer = UserListSerializer(qs, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
@@ -70,7 +70,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         if request.user.role == User.Type.DOCTOR:
-            serializer = UserListSerializer(page, many=True)
+            serializer = UserListSerializer(page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     def create(self, request, *args, **kwargs):
