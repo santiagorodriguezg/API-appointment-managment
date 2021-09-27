@@ -9,7 +9,46 @@
 			"name": "Users",
 			"item": [
 				{
-					"name": "users_list",
+					"name": "User create (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"role\": \"USR\",\r\n    \"first_name\": \"Maria\",\r\n    \"last_name\": \"Lopez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12489931\",\r\n    \"username\": \"maria\",\r\n    \"email\": \"maria@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								""
+							]
+						},
+						"description": "Un usuario ADMIN puede crear usuarios de cualquier tipo"
+					},
+					"response": []
+				},
+				{
+					"name": "users_list (ADMIN, DOC)",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -82,7 +121,7 @@
 					"response": []
 				},
 				{
-					"name": "User create",
+					"name": "Users Get One (ADMIN, DOC)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -94,29 +133,20 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"role\": \"USR\",\r\n    \"first_name\": \"Maria\",\r\n    \"last_name\": \"Lopez\",\r\n    \"identification_type\": \"CC\",\r\n    \"identification_number\": \"12489931\",\r\n    \"username\": \"maria\",\r\n    \"email\": \"maria@gmail.com\",\r\n    \"phone\": \"3004586235\",\r\n    \"city\": \"Tunja\",\r\n    \"address\": \"Plaza Real\",\r\n    \"password\": \"lg123456\",\r\n    \"password2\": \"lg123456\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/",
+							"raw": "{{host}}/{{api_version}}/users/luis/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
+								"luis",
 								""
 							]
-						},
-						"description": "Un usuario ADMIN puede crear usuarios de cualquier tipo"
+						}
 					},
 					"response": []
 				},
@@ -151,47 +181,7 @@
 					"response": []
 				},
 				{
-					"name": "User password change",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"password_old\": \"lg123456A\",\r\n    \"password\":\"lg654321\",\r\n    \"password2\":\"lg654321\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{host}}/{{api_version}}/users/password/change/",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"{{api_version}}",
-								"users",
-								"password",
-								"change",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update my profile",
+					"name": "Update My Profile",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -230,7 +220,7 @@
 					"response": []
 				},
 				{
-					"name": "User update",
+					"name": "Update Partial My Profile",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -246,7 +236,86 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\r\n    \"city\": \"Medellin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/me/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"me",
+								""
+							]
+						},
+						"description": "Actualiza uno o varios campos, pero no todo el perfil del usuario"
+					},
+					"response": []
+				},
+				{
+					"name": "User Update (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"\",\r\n    \"last_name\": \"\",\r\n    \"identification_number\": \"\",\r\n    \"username\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/ana/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"ana",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Partial Update (ADMIN)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"last_name\": \"Hernández\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -270,7 +339,7 @@
 					"response": []
 				},
 				{
-					"name": "Update partial my profile",
+					"name": "User Password Change",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -286,7 +355,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"city\": \"Medellin\",\r\n    \"address\": \"Plaza Bolivar\"\r\n}",
+							"raw": "{\r\n    \"password_old\": \"lg123456A\",\r\n    \"password\":\"lg654321\",\r\n    \"password2\":\"lg654321\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -294,18 +363,18 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/me/",
+							"raw": "{{host}}/{{api_version}}/users/password/change/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"me",
+								"password",
+								"change",
 								""
 							]
-						},
-						"description": "Actualiza uno o varios campos, pero no todo el perfil del usuario"
+						}
 					},
 					"response": []
 				},
@@ -386,13 +455,13 @@
 								{
 									"key": "username",
 									"value": "ana",
-									"type": "text",
-									"disabled": true
+									"type": "text"
 								},
 								{
 									"key": "username",
 									"value": "carlos",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							]
 						},
@@ -468,7 +537,7 @@
 					"response": []
 				},
 				{
-					"name": "Verify token Password reset",
+					"name": "Verify Token Password Reset",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -494,7 +563,7 @@
 					"response": []
 				},
 				{
-					"name": "API Verify token",
+					"name": "API Verify Token",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -525,7 +594,7 @@
 					"response": []
 				},
 				{
-					"name": "Password reset (send email)",
+					"name": "Password Reset (send email)",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -556,7 +625,7 @@
 					"response": []
 				},
 				{
-					"name": "API token refresh",
+					"name": "API Token Refresh",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -643,7 +712,48 @@
 			"name": "Appointments",
 			"item": [
 				{
-					"name": "Appointments list",
+					"name": "User Appointment Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "type",
+									"value": "LEG",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"carlos",
+								"appointments",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Appointments List (ADMIN)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -705,7 +815,7 @@
 					"response": []
 				},
 				{
-					"name": "User Appointments list",
+					"name": "User Appointments List (ADMIN)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -720,14 +830,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"carlos",
+								"ana",
 								"appointments",
 								""
 							],
@@ -758,7 +868,7 @@
 					"response": []
 				},
 				{
-					"name": "User appointment update",
+					"name": "User Appointment Update (ADMIN, USER)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -782,14 +892,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/juan/appointments/2/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/2/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"juan",
+								"ana",
 								"appointments",
 								"2",
 								""
@@ -799,81 +909,21 @@
 					"response": []
 				},
 				{
-					"name": "User appointment create",
+					"name": "User Appointment Partial Update (ADMIN, USER)",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "type",
-									"value": "LEG",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"{{api_version}}",
-								"users",
-								"carlos",
-								"appointments",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "User appointment partial update",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "PATCH",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"doctor\": 1\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/juan/appointments/1/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/2/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"juan",
+								"ana",
 								"appointments",
-								"1",
+								"2",
 								""
 							]
 						}
@@ -886,7 +936,7 @@
 			"name": "Chats",
 			"item": [
 				{
-					"name": "User rooms list",
+					"name": "User Rooms List",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -901,14 +951,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/luis/rooms/",
+							"raw": "{{host}}/{{api_version}}/users/ana/rooms/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"luis",
+								"ana",
 								"rooms",
 								""
 							],

@@ -94,9 +94,12 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
         queryset = self.get_queryset(user, pk)
 
-        serializer = AppointmentUserSerializer(queryset, data=request.data, context={'request': request})
+        partial = request.method == 'PATCH'
+        serializer = AppointmentUserSerializer(
+            queryset, data=request.data, partial=partial, context={'request': request}
+        )
         if request.user.role == User.Type.ADMIN:
-            serializer = self.get_serializer(queryset, data=request.data)
+            serializer = self.get_serializer(queryset, data=request.data, partial=partial)
 
         if serializer.is_valid():
             serializer.save()
