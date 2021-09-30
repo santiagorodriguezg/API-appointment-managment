@@ -1,10 +1,11 @@
 """User views"""
-
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import OrderingFilter
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
@@ -42,26 +43,38 @@ class UserModelViewSet(viewsets.ModelViewSet):
             permission = [IsAuthenticated]
         return [p() for p in permission]
 
-    def get_queryset(self, username=None):
+    def get_queryset(self):
         """Get the list of items for this view."""
         queryset = User.objects.all()
         if self.request.user.role == User.Type.ADMIN:
-            return queryset if username is None else queryset.filter(username=username).first()
+            return queryset
+
         # DOCTOR User
-        if username is None:
-            return queryset.filter(is_active=True).defer(*UserListSerializer.Meta.exclude)
-        return queryset.filter(is_active=True, username=username).defer(*UserListSerializer.Meta.exclude).first()
+        return queryset.filter(is_active=True).defer(*UserListSerializer.Meta.exclude)
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Perform the lookup filtering.
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        username = self.kwargs[lookup_url_kwarg]
+
+        obj = queryset.filter(is_active=True, username=username).defer(*UserListSerializer.Meta.exclude).first()
+
+        if self.request.user.role == User.Type.ADMIN:
+            obj = queryset.filter(username=username).first()
+
+        if obj is not None:
+            return obj
+        raise NotFound(detail='Usuario no encontrado.')
 
     def retrieve(self, request, username=None, *args, **kwargs):
         """User by username"""
-        qs = self.get_queryset(username)
-        if qs is None:
-            raise NotFound(detail='Usuario no encontrado.')
-
+        user = self.get_object()
         if request.user.role == User.Type.ADMIN:
-            serializer = self.get_serializer(qs)
+            serializer = self.get_serializer(user)
         else:
-            serializer = UserListSerializer(qs, context={'request': request})
+            serializer = UserListSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
@@ -89,11 +102,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
         if not request.user.has_perm('accounts.change_user'):
             raise PermissionDenied()
 
-        qs = self.get_queryset(username)
-        if qs is None:
-            raise NotFound(detail='Usuario no encontrado.')
+        user = self.get_object()
         partial = request.method == 'PATCH'
-        serializer = UserUpdateSerializer(qs, data=request.data, partial=partial, context={'request': request})
+        serializer = UserUpdateSerializer(user, data=request.data, partial=partial, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -102,17 +113,17 @@ class UserModelViewSet(viewsets.ModelViewSet):
     @action(methods=['get', 'put', 'patch'], detail=False)
     def me(self, request):
         """Get and update the logged-in user's profile"""
-        user = request.user
         if request.method == 'GET':
-            if user.role == User.Type.ADMIN:
-                serializer = self.get_serializer(self.get_queryset(user.username))
+            user = self.get_object()
+            if request.user.role == User.Type.ADMIN:
+                serializer = self.get_serializer(user)
             else:
-                serializer = UserListSerializer(self.get_queryset(user.username))
+                serializer = UserListSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             partial = request.method == 'PATCH'
             serializer = UserProfileUpdateSerializer(
-                user, data=request.data, partial=partial, context={'request': request}
+                request.user, data=request.data, partial=partial, context={'request': request}
             )
             if serializer.is_valid():
                 serializer.save()
