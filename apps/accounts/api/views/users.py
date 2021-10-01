@@ -1,21 +1,20 @@
 """User views"""
-from django.http import Http404
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
-from apps.accounts.api.filters.users import UserFilter
+from apps.accounts.models import User
 from apps.accounts.api.permissions import IsAdminOrDoctorUser
+from apps.accounts.api.filters.users import UserFilter
 from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
     UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer
 )
-from apps.accounts.models import User
 from gestion_consultas.utils import UnaccentedSearchFilter
 
 
@@ -57,7 +56,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
 
         # Perform the lookup filtering.
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        username = self.kwargs[lookup_url_kwarg]
+        username = self.kwargs[lookup_url_kwarg] if self.kwargs else self.request.user.username
 
         obj = queryset.filter(is_active=True, username=username).defer(*UserListSerializer.Meta.exclude).first()
 
@@ -111,7 +110,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get', 'put', 'patch'], detail=False)
-    def me(self, request):
+    def profile(self, request):
         """Get and update the logged-in user's profile"""
         if request.method == 'GET':
             user = self.get_object()

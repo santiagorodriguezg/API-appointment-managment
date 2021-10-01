@@ -2,8 +2,8 @@
 
 from rest_framework import serializers
 
-from apps.accounts.api.serializers.users import UserListRelatedSerializer
 from apps.chats.models import Room
+from apps.accounts.api.serializers.users import UserListRelatedSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):

@@ -44,3 +44,19 @@ class Appointment(models.Model):
 
     def __str__(self):
         return self.description if self.description else ''
+
+
+class AppointmentMultimedia(models.Model):
+    """Appointment Multimedia model"""
+
+    appointment = models.ForeignKey(
+        Appointment, verbose_name=_('cita'), related_name='multimedia', on_delete=models.CASCADE
+    )
+    file = models.FileField(_('archivo'), upload_to='appointments/files', null=True, blank=True, validators=[
+        FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'pdf'])
+    ])
+
+    class Meta:
+        db_table = 'appointment_multimedia'
+        verbose_name = _('archivo de la cita')
+        verbose_name_plural = _('archivos de las citas')

@@ -2,18 +2,9 @@
 
 from rest_framework import serializers, fields
 
+from apps.appointments.models import Appointment, AppointmentMultimedia
 from apps.accounts.api.serializers.users import UserListRelatedSerializer
-from apps.appointments.models import Appointment
-
-
-def validate_appointment_type(value):
-    """Validate appoint type field"""
-    appointment_type_choices = [c[0] for c in Appointment.APPOINTMENT_TYPE_CHOICES]
-    choices = list(set(value.split(',')))
-    for c in choices:
-        if c not in appointment_type_choices:
-            raise serializers.ValidationError(detail=f'"{c}" no es una elección válida.', code='invalid_choice')
-    return ','.join(choices)
+from apps.appointments.utils import validate_appointment_type, save_appointment_multimedia
 
 
 class CustomMultipleChoiceField(fields.CharField):
@@ -23,26 +14,44 @@ class CustomMultipleChoiceField(fields.CharField):
         return value.split(',')
 
 
+class AppointmentMultimediaSerializer(serializers.ModelSerializer):
+    """Appointment Multimedia Serializer"""
+
+    class Meta:
+        model = AppointmentMultimedia
+        fields = ('file',)
+
+
 class AppointmentSerializer(serializers.ModelSerializer):
     """
     Appointment serializer
     Used by user ADMIN
     """
 
+    multimedia = AppointmentMultimediaSerializer(many=True, required=False)
     type = CustomMultipleChoiceField()
 
     class Meta:
         model = Appointment
-        exclude = ('user',)
+        fields = (
+            'id', 'doctor', 'type', 'children', 'aggressor', 'description', 'audio', 'start_date', 'end_date',
+            'multimedia',
+        )
+        read_only_fields = ('id',)
 
     def validate_type(self, value):
         return validate_appointment_type(value)
 
     def create(self, validated_data):
         """Assign the user who has the active session"""
+        multimedia = None
+        if 'multimedia' in validated_data:
+            multimedia = validated_data['multimedia']
+            validated_data.pop('multimedia')
+
         appointment = Appointment(**validated_data, user=self.context['user'])
         appointment.save()
-        return appointment
+        return save_appointment_multimedia(multimedia, appointment)
 
 
 class AppointmentUserSerializer(serializers.ModelSerializer):
@@ -51,6 +60,7 @@ class AppointmentUserSerializer(serializers.ModelSerializer):
     Used by user with role USER
     """
 
+    multimedia = AppointmentMultimediaSerializer(many=True, required=False)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     type = CustomMultipleChoiceField()
 
@@ -62,6 +72,17 @@ class AppointmentUserSerializer(serializers.ModelSerializer):
     def validate_type(self, value):
         return validate_appointment_type(value)
 
+    def create(self, validated_data):
+        """Assign the user who has the active session"""
+        multimedia = None
+        if 'multimedia' in validated_data:
+            multimedia = validated_data['multimedia']
+            validated_data.pop('multimedia')
+
+        appointment = Appointment(**validated_data)
+        appointment.save()
+        return save_appointment_multimedia(multimedia, appointment)
+
 
 class AppointmentListSerializer(serializers.ModelSerializer):
     """Appointment list serializer"""
@@ -69,6 +90,7 @@ class AppointmentListSerializer(serializers.ModelSerializer):
     user = UserListRelatedSerializer(read_only=True)
     doctor = UserListRelatedSerializer(read_only=True)
     type = CustomMultipleChoiceField(read_only=True)
+    multimedia = AppointmentMultimediaSerializer(read_only=True, many=True)
 
     class Meta:
         model = Appointment

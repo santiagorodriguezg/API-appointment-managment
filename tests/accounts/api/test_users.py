@@ -191,13 +191,13 @@ class UsersAPITestCase(APITestCase):
 
     def test_my_profile(self) -> None:
         """Obtain the profile of the logged in user"""
-        response = self.client.get(f'{self.url}me/')
+        response = self.client.get(f'{self.url}profile/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('first_name'), self.user.first_name, )
+        self.assertEqual(response.data.get('first_name'), self.user.first_name)
 
     def test_update_profile(self) -> None:
         """Verify that the user can update his profile"""
-        response = self.client.put(f'{self.url}me/', USER_FACTORY_DICT)
+        response = self.client.put(f'{self.url}profile/', USER_FACTORY_DICT)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data.get('first_name'), USER_FACTORY_DICT.get('first_name'))
 

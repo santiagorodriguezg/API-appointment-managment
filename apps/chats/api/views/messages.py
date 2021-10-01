@@ -4,10 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from apps.chats.models import Message
 from apps.accounts.api.permissions import check_permissions
 from apps.chats.api.serializers.messages import MessageListSerializer
 from apps.chats.api.views.rooms import RoomListViewSet
-from apps.chats.models import Message
 
 
 class MessageListViewSet(ListModelMixin, GenericViewSet):

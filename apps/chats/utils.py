@@ -1,8 +1,8 @@
 """Chats utilities"""
 
 import pytz
-from channels.db import database_sync_to_async
 from django.utils import timezone
+from channels.db import database_sync_to_async
 
 from apps.accounts.models import User
 from apps.chats.models import Room, Message

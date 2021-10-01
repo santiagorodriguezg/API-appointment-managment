@@ -1,5 +1,6 @@
 """Appointment views"""
 
+from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
 from rest_framework.filters import OrderingFilter
@@ -7,14 +8,14 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
+from apps.accounts.models import User
+from apps.appointments.models import Appointment
 from apps.accounts.api.permissions import check_permissions
 from apps.accounts.api.views.users import UserModelViewSet
-from apps.accounts.models import User
 from apps.appointments.api.filters.appointments import AppointmentFilter
 from apps.appointments.api.serializers.appointments import (
     AppointmentSerializer, AppointmentUserSerializer, AppointmentListSerializer
 )
-from apps.appointments.models import Appointment
 from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk
 
 
@@ -32,6 +33,11 @@ class AppointmentListAPIView(ListAPIView):
     search_fields = ['~user__city', '~user__neighborhood', '~user__address']
     ordering = ('-created_at',)
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.prefetch_related(Prefetch('multimedia'))
+        return queryset
+
 
 class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin, viewsets.GenericViewSet):
@@ -41,6 +47,16 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
     filter_backends = (DjangoFilterBackend, UnaccentedSearchFilter, OrderingFilter)
     filterset_class = AppointmentFilter
     ordering = ('-created_at',)
+
+    def get_user(self, request, username):
+        """Get user from UserModelViewSet class"""
+        user_model_view_set = UserModelViewSet(
+            request=request,
+            action=self.action,
+            format_kwarg=self.format_kwarg,
+            kwargs={'username': username}
+        )
+        return user_model_view_set.get_object()
 
     def get_serializer_class(self):
         """Assign serializer based on action."""
@@ -53,9 +69,11 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
     def get_queryset(self, user=None, pk=None):
         """Get the list of items for this view."""
         detail = 'Cita no encontrada.'
-        queryset = Appointment.objects.order_by('id').filter(user=user['id'])
-        if user['role'] == User.Type.DOCTOR:
-            queryset = Appointment.objects.order_by('id').filter(doctor=user['id'])
+        queryset = Appointment.objects.order_by('id').filter(user=user).prefetch_related(Prefetch('multimedia'))
+
+        if user.role == User.Type.DOCTOR:
+            queryset = Appointment.objects.order_by('id').filter(doctor=user)
+
         return get_queryset_with_pk(detail, queryset, pk)
 
     def create(self, request, username=None, *args, **kwargs):
@@ -63,7 +81,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         check_permissions(request.user, username, 'appointments.add_appointment')
         serializer = AppointmentUserSerializer(data=request.data, context={'request': request})
         if request.user.role == User.Type.ADMIN:
-            user = User.objects.get(username=username)
+            user = self.get_user(request, username)
             serializer = self.get_serializer(data=request.data, context={'user': user})
         if serializer.is_valid():
             serializer.save()
@@ -73,8 +91,7 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
     def list(self, request, username=None, *args, **kwargs):
         """User appointments"""
         check_permissions(request.user, username, 'appointments.view_appointment')
-        user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        user = self.get_user(request, username)
         queryset = self.filter_queryset(self.get_queryset(user))
         page = self.paginate_queryset(queryset)
         return self.get_paginated_response(self.get_serializer(page, many=True).data)
@@ -82,16 +99,14 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
     def retrieve(self, request, username=None, pk=None, *args, **kwargs):
         """User appointments given Id"""
         check_permissions(request.user, username, 'appointments.view_appointment')
-        user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        user = self.get_user(request, username)
         queryset = self.get_queryset(user, pk)
         return Response(self.get_serializer(queryset).data, status=status.HTTP_200_OK)
 
     def update(self, request, username=None, pk=None, *args, **kwargs):
         """Users with ADMIN and USER roles can update appointments."""
         check_permissions(request.user, username, 'appointments.change_appointment')
-        user_model_view_set = UserModelViewSet(request=request, format_kwarg=self.format_kwarg)
-        user = user_model_view_set.retrieve(request, username, *args, **kwargs).data
+        user = self.get_user(request, username)
         queryset = self.get_queryset(user, pk)
 
         partial = request.method == 'PATCH'
