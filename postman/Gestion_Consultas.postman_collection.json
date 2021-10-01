@@ -151,7 +151,7 @@
 					"response": []
 				},
 				{
-					"name": "Me",
+					"name": "Profile",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -166,14 +166,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/me/",
+							"raw": "{{host}}/{{api_version}}/users/profile/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"me",
+								"profile",
 								""
 							]
 						}
@@ -449,17 +449,23 @@
 								{
 									"key": "username",
 									"value": "luis",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "ana",
 									"type": "text",
 									"disabled": true
 								},
 								{
 									"key": "username",
-									"value": "ana",
-									"type": "text"
+									"value": "carlos",
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "username",
-									"value": "carlos",
+									"value": "sofia",
 									"type": "text",
 									"disabled": true
 								}
@@ -733,18 +739,44 @@
 									"key": "type",
 									"value": "LEG",
 									"type": "text"
+								},
+								{
+									"key": "audio",
+									"type": "file",
+									"src": "Audios/audio1.mp3"
+								},
+								{
+									"key": "multimedia[0]file",
+									"type": "file",
+									"src": "img_test/student-g778de6184_1280.jpg"
+								},
+								{
+									"key": "multimedia[0]file_type",
+									"value": "IMG",
+									"type": "text"
+								},
+								{
+									"key": "multimedia[1]file",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "multimedia[0]id",
+									"value": "50asa",
+									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/carlos/appointments/",
+							"raw": "{{host}}/{{api_version}}/users/sofia/appointments/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"carlos",
+								"sofia",
 								"appointments",
 								""
 							]
@@ -830,14 +862,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/ana/appointments/",
+							"raw": "{{host}}/{{api_version}}/users/sofia/appointments/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"ana",
+								"sofia",
 								"appointments",
 								""
 							],

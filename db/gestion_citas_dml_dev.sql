@@ -44,15 +44,19 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
         'carlos@gmail.com', '3123456789', '', 'Sogamoso', null, null, true, false, '2021-03-25 22:27:34.940033',
         '2021-04-06 16:19:24.743649'),
        (3, 'argon2$argon2id$v=19$m=102400,t=2,p=8$bXNlR3AxanV4Y1hvYlFGZ3I0MVpISA$UtXFvptFX3bpziHXniXKhg',
-        '2021-04-13 15:24:36.629052', false, 'USR', 'Ana', 'Hernandez', 'CC', '7456123', 'ana', 'ana@gmail.com',
+        '2021-04-13 15:24:36.629052', false, 'USR', 'Ana', 'Hernández', 'CC', '7456123', 'ana', 'ana@gmail.com',
         '3124567898', '', 'Duitama', null, null, true, false, '2021-03-25 22:27:34.940033',
-        '2021-04-06 16:19:56.661574');
+        '2021-04-06 16:19:56.661574'),
+       (4, 'argon2$argon2id$v=19$m=102400,t=2,p=8$WVdqZEp2MHF5Z3dESmtzZ0R2dDlDdA$F84JW0+IH4+6Zlj9frhG6A',
+        '2021-10-01 15:38:29.650566 +00:00', false, 'USR', 'Sofia', 'García', 'CC', '2586824', 'sofia', null, null, '',
+        null, null, null, true, false, '2021-10-01 15:38:29.652567 +00:00', '2021-10-01 15:38:29.652567 +00:00');
 
 
 -- user_groups table
 INSERT INTO user_groups(id, user_id, group_id)
 VALUES (1, 2, 2),
-       (2, 3, 1);
+       (2, 3, 1),
+       (3, 4, 1);
 
 
 -- appointment table
@@ -60,22 +64,22 @@ INSERT INTO public.appointment (id, type, children, aggressor, description, audi
                                 updated_at, doctor_id, user_id)
 VALUES (1, 'PSY,LEG', '[
   {
-    "name": "Maria Hernandez",
+    "name": "Maria Hernández",
     "age": 14
   },
   {
-    "name": "Ana Hernandez",
+    "name": "Paula Hernández",
     "age": 8
   }
 ]', '{
   "name": "Juan Moreno",
-  "identification_number": 1007143234,
+  "identification_number": 1834802567,
   "phone": 3143498163,
   "address": "Tunja",
   "more_info": "Lugar de trabajo: Claro"
 }', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415', '2021-04-12 22:56:04.356851', null, 3),
        (2, 'LEG', null, null, 'Violencia intrafamiliar', '', null, null, '2021-09-10 21:16:37.951541 +00:00',
-        '2021-09-10 21:16:37.951541 +00:00', 2, 3);
+        '2021-09-10 21:16:37.951541 +00:00', 2, 4);
 
 
 -- room table
@@ -92,8 +96,8 @@ VALUES (1, 'roomtest1', '2021-04-17 19:16:04.510000', 1, 3),
 
 SELECT setval('auth_group_id_seq', 2);
 SELECT setval('auth_group_permissions_id_seq', 17);
-SELECT setval('user_id_seq', 3);
-SELECT setval('user_groups_id_seq', 2);
+SELECT setval('user_id_seq', 4);
+SELECT setval('user_groups_id_seq', 3);
 SELECT setval('appointment_id_seq', 2);
 SELECT setval('room_id_seq', 2);
 -- SELECT setval('message_id_seq', 3);

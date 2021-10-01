@@ -17,9 +17,14 @@ class CustomMultipleChoiceField(fields.CharField):
 class AppointmentMultimediaSerializer(serializers.ModelSerializer):
     """Appointment Multimedia Serializer"""
 
+    file_name = serializers.SerializerMethodField()
+
     class Meta:
         model = AppointmentMultimedia
-        fields = ('file',)
+        exclude = ('appointment',)
+
+    def get_file_name(self, obj):
+        return obj.file.name.split('/')[-1]
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -37,7 +42,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
             'id', 'doctor', 'type', 'children', 'aggressor', 'description', 'audio', 'start_date', 'end_date',
             'multimedia',
         )
-        read_only_fields = ('id',)
 
     def validate_type(self, value):
         return validate_appointment_type(value)

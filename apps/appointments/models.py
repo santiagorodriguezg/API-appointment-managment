@@ -22,7 +22,7 @@ class Appointment(models.Model):
     children = models.JSONField(verbose_name=_('datos de los hijos'), null=True, blank=True)
     aggressor = models.JSONField(verbose_name=_('datos del agresor'), null=True, blank=True)
     description = models.TextField(_('descripción'), null=True, blank=True)
-    audio = models.FileField(_('audio'), upload_to='appointments/audio', null=True, blank=True, validators=[
+    audio = models.FileField(_('audio'), upload_to='appointments/audio', validators=[
         FileExtensionValidator(allowed_extensions=['mp3', 'mp4', 'ogg', 'm4a'])
     ])
     start_date = models.DateTimeField(_('fecha de inicio'), null=True, blank=True)
@@ -49,12 +49,18 @@ class Appointment(models.Model):
 class AppointmentMultimedia(models.Model):
     """Appointment Multimedia model"""
 
+    class FileType(models.TextChoices):
+        PDF = 'PDF', _('Archivo PDF')
+        IMAGE = 'IMG', _('Imagen')
+        VIDEO = 'VIDEO', _('Video')
+
     appointment = models.ForeignKey(
         Appointment, verbose_name=_('cita'), related_name='multimedia', on_delete=models.CASCADE
     )
-    file = models.FileField(_('archivo'), upload_to='appointments/files', null=True, blank=True, validators=[
+    file = models.FileField(_('archivo'), upload_to='appointments/files', validators=[
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp', 'pdf'])
     ])
+    file_type = models.CharField(_('tipo de archivo'), max_length=8, choices=FileType.choices)
 
     class Meta:
         db_table = 'appointment_multimedia'

@@ -35,12 +35,16 @@ class AppointmentListAPIView(ListAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.prefetch_related(Prefetch('multimedia'))
-        return queryset
+        return queryset.prefetch_related(Prefetch('multimedia'))
 
 
-class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
-                         mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class AppointmentViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
     """Appointment model view set"""
 
     permission_classes = [IsAuthenticated]
@@ -52,7 +56,6 @@ class AppointmentViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, mixins.
         """Get user from UserModelViewSet class"""
         user_model_view_set = UserModelViewSet(
             request=request,
-            action=self.action,
             format_kwarg=self.format_kwarg,
             kwargs={'username': username}
         )
