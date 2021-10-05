@@ -1,10 +1,10 @@
 # Base
-Django==3.2.7
+Django==3.2.8
 psycopg2==2.9.1
 Pillow==8.3.2
 
 # Environment
-python-decouple==3.4
+python-decouple==3.5
 
 # File cleanup
 django-cleanup==5.2.0
@@ -14,10 +14,10 @@ django-multiselectfield==0.1.12
 
 # Django REST Framework
 djangorestframework==3.12.4
-django-filter==2.4.0
+django-filter==21.1
 
 # Cors headers
-django-cors-headers==3.8.0
+django-cors-headers==3.10.0
 
 # Passwords security
 argon2-cffi==21.1.0
@@ -28,7 +28,7 @@ djangorestframework-simplejwt==4.8.0
 
 # Django channels
 channels==3.0.4
-channels-redis==3.3.0
+channels-redis==3.3.1
 channels_redis[cryptography]
 
 # Django Searchable Encrypted Fields

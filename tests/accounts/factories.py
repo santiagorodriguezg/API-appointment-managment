@@ -1,6 +1,5 @@
 """Accounts factories"""
 
-from django.conf import settings
 import factory
 
 from apps.accounts.models import User

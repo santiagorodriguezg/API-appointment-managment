@@ -7,7 +7,7 @@ la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-fron
 
 **Python 3.9**
 
-**PostgreSQL 12, 13**
+**PostgreSQL 13, 14**
 
 ## Instalación en local
 
