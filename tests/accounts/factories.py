@@ -1,5 +1,6 @@
 """Accounts factories"""
 
+from django.conf import settings
 import factory
 
 from apps.accounts.models import User
@@ -23,6 +24,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     city = factory.Faker('city')
     neighborhood = factory.Faker('street_name')
     address = factory.Faker('street_address')
+    # picture = factory.Sequence(lambda n: f"{settings.MEDIA_ROOT}/users/pictures/fake_{n}.jpg")
     password = TEST_PASSWORD
 
     @classmethod

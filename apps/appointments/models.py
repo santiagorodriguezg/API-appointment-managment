@@ -66,3 +66,6 @@ class AppointmentMultimedia(models.Model):
         db_table = 'appointment_multimedia'
         verbose_name = _('archivo de la cita')
         verbose_name_plural = _('archivos de las citas')
+
+    def __str__(self):
+        return self.file.name

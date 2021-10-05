@@ -1,12 +1,18 @@
 """Appointments tests"""
 
+import json
+
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from apps.appointments.models import Appointment
 from tests.accounts.factories import UserFactory, UserAdminFactory, UserDoctorFactory
-from tests.appointments.factories import AppointmentFactory, APPOINTMENT_FACTORY_DICT
-from tests.utils import API_ENDPOINT_V1, AccessTokenTest
+from tests.appointments.factories import (
+    AppointmentFactory, AppointmentMultimediaIMGFactory, AppointmentMultimediaPDFactory
+)
+from tests.utils import (
+    API_ENDPOINT_V1, AccessTokenTest, delete_test_audio_files, delete_all_test_files
+)
 
 
 class AppointmentsAdminAPITestCase(APITestCase):
@@ -44,16 +50,37 @@ class AppointmentsAdminAPITestCase(APITestCase):
         """Verify that an ADMIN user can create appointments"""
         doctors = UserDoctorFactory.create_batch(2)
         users = UserFactory.create_batch(2)
-        APPOINTMENT_FACTORY_DICT.pop('user')
-        APPOINTMENT_FACTORY_DICT['doctor'] = doctors[0].id
+        appointment = AppointmentFactory.build(doctor=doctors[0])
+        appointment_img_file = AppointmentMultimediaIMGFactory.build()
+        appointment_pdf_file = AppointmentMultimediaPDFactory.build()
 
         url = f'/{API_ENDPOINT_V1}/users/{users[1].username}/appointments/'
-        response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
+        data = {
+            'type': appointment.type,
+            'audio': appointment.audio,
+            'doctor': appointment.doctor.id,
+            'children': json.dumps(appointment.children),
+            'aggressor': json.dumps(appointment.aggressor),
+            'description': appointment.description,
+            'start_date': appointment.start_date,
+            'end_date': appointment.end_date,
+            'multimedia[0]file': appointment_img_file.file,
+            'multimedia[0]file_type': appointment_img_file.file_type,
+            'multimedia[1]file': appointment_pdf_file.file,
+            'multimedia[1]file_type': appointment_pdf_file.file_type,
+        }
+
+        response = self.client.post(url, data, format='multipart')
+        multimedia = response.data.get('multimedia')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Appointment.objects.count(), 1)
-        self.assertEqual(response.data.get('doctor'), APPOINTMENT_FACTORY_DICT.get('doctor'))
+        self.assertEqual(response.data.get('doctor'), data.get('doctor'))
         self.assertIsNone(response.data.get('user'))
+        self.assertEqual(multimedia[0]['file_name'], appointment_img_file.file.name)
+
+        # Delete test files
+        delete_all_test_files()
 
     def test_list_appointments_by_user_admin(self) -> None:
         """An ADMIN user can list all appointments with all fields"""
@@ -103,17 +130,30 @@ class AppointmentsAdminAPITestCase(APITestCase):
         AppointmentFactory(user=users[0])
         appointment = AppointmentFactory(user=users[0], doctor=doctors[0])
 
-        APPOINTMENT_FACTORY_DICT['user'] = users[1].id
-        APPOINTMENT_FACTORY_DICT['doctor'] = doctors[1].id
+        new_appointment = AppointmentFactory.build(doctor=doctors[1])
+        data = {
+            'type': new_appointment.type,
+            'audio': new_appointment.audio,
+            'doctor': new_appointment.doctor.id,
+            'children': json.dumps(new_appointment.children),
+            'aggressor': json.dumps(new_appointment.aggressor),
+            'description': new_appointment.description,
+            'start_date': new_appointment.start_date,
+            'end_date': new_appointment.end_date,
+        }
 
         url = f'/{API_ENDPOINT_V1}/users/{users[0].username}/appointments/{appointment.id}/'
-        response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.put(url, data, format='multipart')
 
         queryset = Appointment.objects.get(pk=appointment.id, user=users[0])
 
         self.assertEqual(appointment.user_id, queryset.user_id)
         self.assertEqual(response.data.get('id'), appointment.id)
-        self.assertEqual(response.data.get('doctor'), doctors[1].id)
+        self.assertEqual(response.data.get('doctor'), new_appointment.doctor.id)
+        self.assertEqual(response.data.get('type')[0], new_appointment.type)
+
+        # Delete test files
+        delete_test_audio_files()
 
 
 class AppointmentsDoctorAPITestCase(APITestCase):
@@ -134,18 +174,22 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         """Verify that an DOCTOR user can not create appointments"""
         doctor = UserDoctorFactory()
         users = UserFactory.create_batch(2)
-        APPOINTMENT_FACTORY_DICT['user'] = users[1].id
-        APPOINTMENT_FACTORY_DICT['doctor'] = doctor.id
+        appointment = AppointmentFactory.build(doctor=doctor, user=users[1])
+        data = {
+            'type': appointment.type,
+            'audio': appointment.audio,
+            'description': appointment.description,
+        }
 
-        # Crear cita asociada al perfil de un usuario
-        response = self.client.post(self.url, APPOINTMENT_FACTORY_DICT, format='json')
+        # Crear cita asociada al perfil del doctor
+        response = self.client.post(self.url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Appointment.objects.count(), 0)
 
-        # Crear cita asociada al perfil del doctor
+        # Crear cita asociada al perfil de un usuario
         url = f'/{API_ENDPOINT_V1}/users/{users[1].username}/appointments/'
-        response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.post(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Appointment.objects.count(), 0)
@@ -202,19 +246,28 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         AppointmentFactory(user=users[0])
         appointment = AppointmentFactory(user=users[0], doctor=self.user)
 
-        APPOINTMENT_FACTORY_DICT['user'] = users[1].id
+        new_appointment = AppointmentFactory.build(user=users[1])
+        data = {
+            'user': new_appointment.user.id,
+            'type': new_appointment.type,
+            'audio': new_appointment.audio,
+            'description': new_appointment.description,
+        }
 
         url = f'{self.url}{appointment.id}/'
-        response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Appointment.objects.filter(doctor=self.user).count(), 1)
 
         # Actualizar cita asociada al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{users[0].username}/appointments/{appointment.id}/'
-        response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Delete test files
+        delete_test_audio_files()
 
 
 class AppointmentsPatientAPITestCase(APITestCase):
@@ -235,11 +288,28 @@ class AppointmentsPatientAPITestCase(APITestCase):
         """Verify that an patient user can create appointments"""
         doctor = UserDoctorFactory()
         user = UserFactory()
-        APPOINTMENT_FACTORY_DICT.pop('user')
-        APPOINTMENT_FACTORY_DICT['doctor'] = doctor.id
+        appointment = AppointmentFactory.build(doctor=doctor)
+        appointment_img_file = AppointmentMultimediaIMGFactory.build()
+        appointment_pdf_file = AppointmentMultimediaPDFactory.build()
+
+        data = {
+            'type': appointment.type,
+            'audio': appointment.audio,
+            'doctor': appointment.doctor.id,
+            'children': json.dumps(appointment.children),
+            'aggressor': json.dumps(appointment.aggressor),
+            'description': appointment.description,
+            'start_date': appointment.start_date,
+            'end_date': appointment.end_date,
+            'multimedia[0]file': appointment_img_file.file,
+            'multimedia[0]file_type': appointment_img_file.file_type,
+            'multimedia[1]file': appointment_pdf_file.file,
+            'multimedia[1]file_type': appointment_pdf_file.file_type,
+        }
 
         # Crear cita asociada al perfil del usuario
-        response = self.client.post(self.url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.post(self.url, data, format='multipart')
+        multimedia = response.data.get('multimedia')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Appointment.objects.count(), 1)
@@ -247,13 +317,17 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertIsNone(response.data.get('end_date'))
         self.assertIsNone(response.data.get('user'))
         self.assertIsNone(response.data.get('doctor'))
+        self.assertEqual(multimedia[0]['file_name'], appointment_img_file.file.name)
 
         # Crear cita asociada al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/'
-        response = self.client.post(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.post(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Appointment.objects.count(), 1)
+
+        # Delete test files
+        delete_all_test_files()
 
     def test_list_appointments_by_user_patient(self) -> None:
         """Verify that a patient can only list his appointments"""
@@ -312,22 +386,37 @@ class AppointmentsPatientAPITestCase(APITestCase):
         user_appt = AppointmentFactory(user=user, doctor=doctor)
         appointment = AppointmentFactory(user=self.user, start_date=None, end_date=None)
 
-        APPOINTMENT_FACTORY_DICT['doctor'] = doctor.id
+        new_appointment = AppointmentFactory.build(doctor=doctor)
+        data = {
+            'type': new_appointment.type,
+            'audio': new_appointment.audio,
+            'doctor': new_appointment.doctor.id,
+            'children': json.dumps(new_appointment.children),
+            'aggressor': json.dumps(new_appointment.aggressor),
+            'description': new_appointment.description,
+            'start_date': new_appointment.start_date,
+            'end_date': new_appointment.end_date,
+        }
 
         url = f'{self.url}{appointment.id}/'
-        response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Appointment.objects.filter(user=self.user).count(), 1)
+        self.assertEqual(response.data.get('type')[0], new_appointment.type)
         self.assertIsNone(response.data.get('start_date'))
         self.assertIsNone(response.data.get('end_date'))
         self.assertIsNone(response.data.get('doctor'))
+        self.assertListEqual(response.data.get('multimedia'), [])
 
         # Actualizar cita asociada al perfil de otro usuario
-        APPOINTMENT_FACTORY_DICT['user'] = self.user.id
-        APPOINTMENT_FACTORY_DICT['doctor'] = None
+        data['user'] = self.user.id
+        data['doctor'] = ''
 
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{user_appt.id}/'
-        response = self.client.put(url, APPOINTMENT_FACTORY_DICT, format='json')
+        response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Delete test files
+        delete_all_test_files()
