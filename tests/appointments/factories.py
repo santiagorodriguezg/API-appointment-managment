@@ -29,7 +29,6 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
     ])
     aggressor = factory.Dict({
         'name': factory.Faker('name'),
-        'age': FuzzyInteger(1, 18),
         'identification_number': factory.Faker('bothify', text='########'),
         'phone': factory.Faker('bothify', text='3#########'),
         'address': factory.Faker('address'),

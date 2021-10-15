@@ -15,20 +15,28 @@ INSERT INTO public.auth_group_permissions (id, group_id, permission_id)
 VALUES (1, 1, 38),
        (2, 1, 39),
        (3, 1, 41),
-       (4, 1, 46),
-       (5, 1, 49),
+       (4, 1, 50),
+       (5, 1, 53),
        (6, 1, 54),
        (7, 1, 55),
        (8, 1, 56),
        (9, 1, 57),
-       (10, 2, 32),
-       (11, 2, 41),
-       (12, 2, 46),
-       (13, 2, 49),
-       (14, 2, 54),
-       (15, 2, 55),
-       (16, 2, 56),
-       (17, 2, 57);
+       (10, 1, 58),
+       (11, 1, 59),
+       (12, 1, 60),
+       (13, 1, 61),
+       (14, 2, 32),
+       (15, 2, 41),
+       (16, 2, 50),
+       (17, 2, 53),
+       (18, 2, 54),
+       (19, 2, 55),
+       (20, 2, 56),
+       (21, 2, 57),
+       (22, 2, 58),
+       (23, 2, 59),
+       (24, 2, 60),
+       (25, 2, 61);
 
 
 -- user table
@@ -95,7 +103,7 @@ VALUES (1, 'roomtest1', '2021-04-17 19:16:04.510000', 1, 3),
 --        (3, 'TXT', 'Cuando es la cita?', '', '2021-04-17 19:18:03.754000', '2021-04-17 19:18:03.754000', 1, 3);
 
 SELECT setval('auth_group_id_seq', 2);
-SELECT setval('auth_group_permissions_id_seq', 17);
+SELECT setval('auth_group_permissions_id_seq', 25);
 SELECT setval('user_id_seq', 4);
 SELECT setval('user_groups_id_seq', 3);
 SELECT setval('appointment_id_seq', 2);

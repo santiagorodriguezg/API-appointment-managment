@@ -18,7 +18,8 @@ def validate_appointment_type(value):
 def save_appointment_multimedia(multimedia, appointment):
     """Save the files of the appointment in the database"""
     if multimedia:
+        objs = []
         for media in multimedia:
-            AppointmentMultimedia.objects.create(**media, appointment=appointment)
-
+            objs.append(AppointmentMultimedia(**media, appointment=appointment))
+        AppointmentMultimedia.objects.bulk_create(objs)
     return appointment

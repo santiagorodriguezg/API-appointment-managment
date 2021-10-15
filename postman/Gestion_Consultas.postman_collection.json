@@ -737,34 +737,31 @@
 							"formdata": [
 								{
 									"key": "type",
-									"value": "LEG",
+									"value": "LEG,PSY",
 									"type": "text"
 								},
 								{
 									"key": "audio",
 									"type": "file",
-									"src": "Audios/audio1.mp3"
+									"src": []
 								},
 								{
 									"key": "multimedia[0]file",
 									"type": "file",
-									"src": "img_test/student-g778de6184_1280.jpg"
+									"src": [],
+									"disabled": true
 								},
 								{
 									"key": "multimedia[0]file_type",
 									"value": "IMG",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								},
 								{
 									"key": "multimedia[1]file",
 									"value": "",
 									"type": "text",
 									"disabled": true
-								},
-								{
-									"key": "multimedia[0]id",
-									"value": "50asa",
-									"type": "text"
 								}
 							]
 						},
@@ -1026,16 +1023,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/juan/rooms/1/messages",
+							"raw": "{{host}}/{{api_version}}/users/ana/rooms/roomtest1/messages",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"juan",
+								"ana",
 								"rooms",
-								"1",
+								"roomtest1",
 								"messages"
 							]
 						}

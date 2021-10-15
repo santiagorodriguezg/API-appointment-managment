@@ -65,7 +65,7 @@ class MessageConsumerTransactionTestCase(TransactionTestCase):
             'command': 'create_message',
             'data': {
                 'room_name': self.room_name,
-                'user_receiver': self.user_receiver.id,
+                'user_receiver': self.user_receiver.username,
                 'content': self.message
             }
         })

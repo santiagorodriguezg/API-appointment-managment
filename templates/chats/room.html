@@ -24,10 +24,10 @@
     const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
     const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI5NDk2OTY0LCJqdGkiOiI1ZGRhNTUxYjI4ZGM0YmIxYWJhNmMwZTY0M2ZkYzRiNSIsInVzZXJfdXNlcm5hbWUiOiJsdWlzIn0.Vzi_hCRoiGhDtq8LTj9ARH4FpglhdnbpoWK0Wyul14c"
-    const ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
 
     const chatSocket = new ReconnectingWebSocket(
-        `${ws_scheme}://${window.location.host}/ws/v1/chat/${roomName}/?token=${token}`
+        `${wsScheme}://${window.location.host}/ws/v1/chat/${roomName}/?token=${token}`
     );
 
     chatSocket.onopen = function (e) {
@@ -65,7 +65,7 @@
             "command": "create_message",
             "data": {
                 "room_name": roomName,
-                "user_receiver": 2,
+                "user_receiver": 'ana',
                 "content": message
             }
         }));

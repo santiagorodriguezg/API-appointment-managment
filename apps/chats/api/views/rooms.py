@@ -2,6 +2,7 @@
 
 from django.db.models import Q
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -10,7 +11,6 @@ from apps.accounts.api.permissions import check_permissions
 from apps.accounts.api.views.users import UserModelViewSet
 from apps.chats.api.serializers.rooms import RoomSerializer
 from apps.chats.models import Room
-from gestion_consultas.utils import get_queryset_with_pk
 
 
 class RoomListViewSet(ReadOnlyModelViewSet):
@@ -20,6 +20,7 @@ class RoomListViewSet(ReadOnlyModelViewSet):
 
     serializer_class = RoomSerializer
     permission_classes = (IsAuthenticated,)
+    lookup_field = 'name'
     ordering = ('id',)
 
     def get_user(self, request, username, *args, **kwargs):
@@ -33,9 +34,14 @@ class RoomListViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self, user=None, pk=None):
         """Get the list of items for this view."""
-        detail = 'Chat no encontrado.'
-        queryset = Room.objects.order_by('id').filter(Q(user_owner=user['id']) | Q(user_receiver=user['id']))
-        return get_queryset_with_pk(detail, queryset, pk)
+        return Room.objects.order_by('id').filter(Q(user_owner=user['id']) | Q(user_receiver=user['id']))
+
+    def get_object(self, user=None, room_name=None):
+        queryset = self.filter_queryset(self.get_queryset(user=user))
+        queryset = queryset.filter(name=room_name).first()
+        if queryset is not None:
+            return queryset
+        raise NotFound(detail='Chat no encontrado.')
 
     def list(self, request, username=None, *args, **kwargs):
         """User list chat rooms"""
@@ -58,11 +64,11 @@ class RoomListViewSet(ReadOnlyModelViewSet):
         }
         return self.get_paginated_response(data)
 
-    def retrieve(self, request, username=None, pk=None, *args, **kwargs):
+    def retrieve(self, request, username=None, name=None, *args, **kwargs):
         """User chat room given Id"""
         check_permissions(request.user, username, 'chats.view_room')
         user = self.get_user(request, username, *args, **kwargs)
-        queryset = self.get_queryset(user, pk)
+        queryset = self.get_object(user, name)
 
         room = self.get_serializer(queryset).data
         if room['user_owner']['username'] == user['username']:

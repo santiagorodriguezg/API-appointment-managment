@@ -11,7 +11,7 @@ from apps.chats.models import Room, Message
 @database_sync_to_async
 def create_chat_message(data, user):
     """Create a new message in DB"""
-    user_receiver = User.objects.get(pk=data['user_receiver'])
+    user_receiver = User.objects.get(username=data['user_receiver'])
     room = Room.objects.filter(name=data['room_name']).first()
     if room is None:
         room = Room.objects.create(

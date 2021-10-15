@@ -19,15 +19,15 @@ class MessageListViewSet(ListModelMixin, GenericViewSet):
     permission_classes = (IsAuthenticated,)
     ordering = ('created_at',)
 
-    def get_queryset(self, pk=None):
+    def get_queryset(self, room_name=None):
         """Get the list of items for this view."""
-        return Message.objects.filter(room_id=pk).order_by('created_at')
+        return Message.objects.filter(room__name=room_name).order_by('created_at')
 
-    def list(self, request, username=None, pk=None, *args, **kwargs):
+    def list(self, request, username=None, name=None, *args, **kwargs):
         """List room messages"""
         check_permissions(request.user, username, 'chats.view_message')
         room_list_view_set = RoomListViewSet(request=request, format_kwarg=self.format_kwarg)
-        data = room_list_view_set.retrieve(request, username, pk, *args, **kwargs).data
-        queryset = self.get_queryset(pk)
+        data = room_list_view_set.retrieve(request, username, name, *args, **kwargs).data
+        queryset = self.get_queryset(name)
         data['room']['messages'] = self.get_serializer(queryset, many=True).data
         return Response(data, status=status.HTTP_200_OK)

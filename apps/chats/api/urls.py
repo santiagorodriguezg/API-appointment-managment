@@ -16,7 +16,7 @@ router.register(
 )
 
 router.register(
-    f'{user_url}/rooms/(?P<pk>[^/.]+)/messages',
+    f'{user_url}/rooms/(?P<name>[^/.]+)/messages',
     MessageListViewSet,
     basename='users-messages'
 )
