@@ -21,7 +21,6 @@ class RoomListViewSet(ReadOnlyModelViewSet):
     serializer_class = RoomSerializer
     permission_classes = (IsAuthenticated,)
     lookup_field = 'name'
-    ordering = ('id',)
 
     def get_user(self, request, username, *args, **kwargs):
         """Get user from UserModelViewSet class"""
@@ -34,7 +33,7 @@ class RoomListViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self, user=None, pk=None):
         """Get the list of items for this view."""
-        return Room.objects.order_by('id').filter(Q(user_owner=user['id']) | Q(user_receiver=user['id']))
+        return Room.objects.order_by('-created_at').filter(Q(user_owner=user['id']) | Q(user_receiver=user['id']))
 
     def get_object(self, user=None, room_name=None):
         queryset = self.filter_queryset(self.get_queryset(user=user))

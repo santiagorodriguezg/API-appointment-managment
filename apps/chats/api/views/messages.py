@@ -17,7 +17,6 @@ class MessageListViewSet(ListModelMixin, GenericViewSet):
 
     serializer_class = MessageListSerializer
     permission_classes = (IsAuthenticated,)
-    ordering = ('created_at',)
 
     def get_queryset(self, room_name=None):
         """Get the list of items for this view."""

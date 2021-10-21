@@ -1,7 +1,7 @@
 # Base
 Django==3.2.8
 psycopg2==2.9.1
-Pillow==8.3.2
+Pillow==8.4.0
 
 # Environment
 python-decouple==3.5
@@ -23,8 +23,8 @@ django-cors-headers==3.10.0
 argon2-cffi==21.1.0
 
 # JWT
-pyjwt==2.1.0
-djangorestframework-simplejwt==4.8.0
+PyJWT==2.3.0
+djangorestframework-simplejwt==5.0.0
 
 # Django channels
 channels==3.0.4

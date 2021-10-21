@@ -34,6 +34,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=15),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=5),
     'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
     'USER_ID_FIELD': 'username',
     'USER_ID_CLAIM': 'user_username',
 }
@@ -41,7 +42,7 @@ SIMPLE_JWT = {
 # A list of hex-encoded 32 byte keys
 # You only need one unless / until rotating keys
 # https://gitlab.com/guywillett/django-searchable-encrypted-fields/-/tree/master#rotating-encryption-keys
-FIELD_ENCRYPTION_KEYS = config('FIELD_ENCRYPTION_KEYS', cast=Csv()) # NOQA
+FIELD_ENCRYPTION_KEYS = config('FIELD_ENCRYPTION_KEYS', cast=Csv())  # NOQA
 
 # Django channels
 # https://pypi.org/project/channels-redis/
@@ -49,8 +50,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [f"redis://:{config('REDIS_PASSWORD')}@127.0.0.1:6379/0"], # NOQA
-            "symmetric_encryption_keys": config('REDIS_SYMMETRIC_ENCRYPTION_KEYS', cast=Csv()), # NOQA
+            "hosts": [f"redis://:{config('REDIS_PASSWORD')}@127.0.0.1:6379/0"],  # NOQA
+            "symmetric_encryption_keys": config('REDIS_SYMMETRIC_ENCRYPTION_KEYS', cast=Csv()),  # NOQA
         },
     },
 }

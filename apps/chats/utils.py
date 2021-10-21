@@ -24,7 +24,7 @@ def create_chat_message(data, user):
 @database_sync_to_async
 def get_messages(room_name):
     """Get chat room messages"""
-    return list(Message.objects.select_related('user').filter(room__name=room_name))
+    return list(Message.objects.select_related('user').order_by('created_at').filter(room__name=room_name))
 
 
 def messages_to_json(messages):

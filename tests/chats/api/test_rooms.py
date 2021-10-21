@@ -39,7 +39,9 @@ class RoomAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
 
-        queryset = Room.objects.select_related('user_receiver').filter(user_owner=self.user_owner)
+        queryset = (
+            Room.objects.select_related('user_receiver').filter(user_owner=self.user_owner).order_by('-created_at')
+        )
         for i, room in enumerate(queryset):
             self.assertEqual(rooms[i]['id'], room.id)
             self.assertEqual(rooms[i]['name'], room.name)
