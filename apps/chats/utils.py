@@ -1,7 +1,5 @@
 """Chats utilities"""
 
-import pytz
-from django.utils import timezone
 from channels.db import database_sync_to_async
 
 from apps.accounts.models import User
@@ -20,26 +18,13 @@ def create_chat_message(data, user):
             user_receiver=user_receiver
         )
 
-    message = Message.objects.create(room=room, user=user, content=data['content'])
-    return message
+    return Message.objects.create(room=room, user=user, content=data['content'])
 
 
 @database_sync_to_async
 def get_messages(room_name):
     """Get chat room messages"""
     return list(Message.objects.select_related('user').filter(room__name=room_name))
-
-
-def convert_to_localtime(utctime):
-    """
-    Converts UTC date to local date.
-    :param utctime: UTC date
-    :return: Date converted into 12-hour format
-    """
-    fmt = '%d/%m/%Y %I:%M %p'
-    utc = utctime.replace(tzinfo=pytz.UTC)
-    local_tz = utc.astimezone(timezone.get_current_timezone())
-    return local_tz.strftime(fmt)
 
 
 def messages_to_json(messages):
@@ -66,6 +51,6 @@ def message_to_json(message):
         'user': message.user.username,
         'type': message.type,
         'content': message.content,
-        'created_at': convert_to_localtime(message.created_at),
-        'updated_at': convert_to_localtime(message.updated_at),
+        'created_at': str(message.created_at),
+        'updated_at': str(message.updated_at),
     }
