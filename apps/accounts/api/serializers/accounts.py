@@ -4,8 +4,6 @@ import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
@@ -14,9 +12,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import User
 from apps.accounts.utils import (
-    clean_password2, delete_user_sessions, get_user_from_uidb64, password_reset_check_token, validate_username,
+    clean_password2, delete_user_sessions, get_user_from_uidb64, check_password_reset_token, validate_username,
     generate_password_reset_link
 )
+from gestion_consultas.utils import send_email
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -118,22 +117,14 @@ class PasswordResetEmailSerializer(serializers.Serializer):
         if self.instance.email is None:
             self.context['send_email'] = False
         else:
-            send = self.send_password_reset_email()
+            template_context = {
+                'user': self.instance,
+                'password_reset_url': generate_password_reset_link(self.instance)
+            }
+            send = send_email(self.instance.email, 'accounts/email/password_reset_key', template_context)
             self.context['send_email'] = send == 1
 
         return self.instance
-
-    def send_password_reset_email(self):
-        """Send reset password link to given user."""
-        url = generate_password_reset_link(self.instance)
-        template_prefix = 'accounts/email/password_reset_key'
-        context = {'user': self.instance, 'password_reset_url': url}
-        subject = render_to_string(f'{template_prefix}_subject.txt', context)
-        subject = " ".join(subject.splitlines()).strip()  # Remove superfluous line breaks
-        content = render_to_string(f'{template_prefix}_message.html', context)
-        msg = EmailMultiAlternatives(subject, content, settings.DEFAULT_FROM_EMAIL, [self.instance.email])
-        msg.attach_alternative(content, "text/html")
-        return msg.send()
 
 
 class PasswordResetCompleteSerializer(serializers.Serializer):
@@ -150,7 +141,7 @@ class PasswordResetCompleteSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = get_user_from_uidb64(data.get('uid'))
-        password_reset_check_token(user, data.get('token'))
+        check_password_reset_token(user, data.get('token'))
         self.instance = user
         return clean_password2(self.instance, data)
 

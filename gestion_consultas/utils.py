@@ -1,7 +1,10 @@
 """Project utilities"""
 
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import Value
 from django.db.models.functions import Concat
+from django.template.loader import render_to_string
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
 
@@ -53,3 +56,13 @@ def filter_by_full_name(queryset, first_name_field, last_name_field, value):
     """
     return (queryset.annotate(full_name=Concat(first_name_field, Value(' '), last_name_field)).
             filter(full_name__unaccent__icontains=value))
+
+
+def send_email(recipient_email, template_prefix, template_context):
+    """Send reset password link to given user."""
+    subject = render_to_string(f'{template_prefix}_subject.txt', template_context)
+    subject = " ".join(subject.splitlines()).strip()  # Remove superfluous line breaks
+    content = render_to_string(f'{template_prefix}.html', template_context)
+    msg = EmailMultiAlternatives(subject, content, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+    msg.attach_alternative(content, "text/html")
+    return msg.send()

@@ -7,7 +7,7 @@ from apps.accounts.api.serializers.accounts import (
     SignupSerializer, LoginSerializer, LogoutSerializer, PasswordResetEmailSerializer, PasswordResetCompleteSerializer
 )
 from apps.accounts.api.serializers.users import UserListSerializer
-from apps.accounts.utils import get_user_from_uidb64, password_reset_check_token
+from apps.accounts.utils import get_user_from_uidb64, check_password_reset_token
 
 
 class SignupAPIView(generics.GenericAPIView):
@@ -79,7 +79,7 @@ class PasswordResetVerifyTokenAPIView(generics.GenericAPIView):
 
     def post(self, request, uidb64, token, *args, **kwargs):
         user = get_user_from_uidb64(uidb64)
-        password_reset_check_token(user, token)
+        check_password_reset_token(user, token)
         data = {
             'success': True,
             'message': 'El token es valido.'

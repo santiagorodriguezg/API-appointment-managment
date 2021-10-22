@@ -72,7 +72,8 @@ def generate_password_reset_link(user):
     return f'{settings.CLIENT_DOMAIN}/accounts/password/reset/{uidb64}/{token}'
 
 
-def password_reset_check_token(user, token):
+def check_password_reset_token(user, token):
+    """Verify that the password reset token is valid"""
     if not PasswordResetTokenGenerator().check_token(user, token):
         raise AuthenticationFailed(
             detail='El enlace de restablecimiento de la contraseña es inválido, por favor solicite uno nuevo.'

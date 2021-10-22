@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ current_site.name }}</title>
+    <title>Casa de la Mujer UPTC - Tunja</title>
     <style>
         #logo img {
             display: block;
@@ -33,7 +33,7 @@
             padding: .5em;
         }
 
-        .btn_validate {
+        .btn_link {
             text-decoration: none !important;
             border-radius: 30px;
             padding: .7em 2em;
@@ -62,16 +62,8 @@
              alt="Casa de la Mujer UPTC - Tunja">
     </div>
     <div class="content">
-        <p>Hola <strong>{{ user.first_name }}</strong>,</p>
-        <p>
-            Ha solicitado un enlace para restablecer su contraseña. Haga clic en el botón a continuación para cambiarla.
-        </p>
-        <div style="text-align: center; margin: 45px 0 60px;">
-            <a href="{{ password_reset_url }}" class="btn_validate" title="Clic para cambiar la contraseña">
-                Cambiar contraseña
-            </a>
-        </div>
-        <p>Puede ignorar este correo si no ha solicitado un restablecimiento de la contraseña.</p>
+        <p>Hola <strong>{{ user.first_name }}</strong>, {{ current_site.name }}</p>
+        {% block content %}{% endblock %}
         <p>Atentamente,</p>
         <p>Casa de la Mujer UPTC - Tunja</p>
     </div>
