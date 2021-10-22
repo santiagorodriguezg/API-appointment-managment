@@ -4,12 +4,7 @@ from rest_framework import serializers
 
 from apps.chats.models import Room, Message
 from apps.accounts.api.serializers.users import UserListRelatedSerializer
-
-
-class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        fields = ('type', 'content', 'created_at', 'updated_at')
+from apps.chats.api.serializers.messages import LastMessageSerializer
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -25,4 +20,4 @@ class RoomSerializer(serializers.ModelSerializer):
 
     def get_last_message(self, obj):
         msg = Message.objects.filter(room=obj).order_by('created_at').last()
-        return MessageSerializer(msg).data
+        return LastMessageSerializer(msg).data

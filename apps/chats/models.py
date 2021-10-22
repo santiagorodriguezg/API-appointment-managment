@@ -43,7 +43,7 @@ class Message(models.Model):
         TEXT = 'TXT', _('Texto')
         VIDEO = 'VD', _('Video')
 
-    room = models.ForeignKey(Room, verbose_name=_('chat'), on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, verbose_name=_('chat'), related_name='messages', on_delete=models.CASCADE)
     user = models.ForeignKey('accounts.User', verbose_name=_('usuario'), on_delete=models.CASCADE)
     type = models.CharField(_('tipo de mensaje'), max_length=4, choices=Type.choices, default=Type.TEXT)
     _content_data = fields.EncryptedTextField(default='')

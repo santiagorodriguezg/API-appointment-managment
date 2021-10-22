@@ -13,4 +13,12 @@ class MessageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = ('id', 'user', 'type', 'content', 'created_at', 'updated_at')
+
+
+class LastMessageSerializer(serializers.ModelSerializer):
+    """Serializes the last message sent in the chat room"""
+
+    class Meta:
+        model = Message
+        fields = ('type', 'content', 'created_at', 'updated_at')
