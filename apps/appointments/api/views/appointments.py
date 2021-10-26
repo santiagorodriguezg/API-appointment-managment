@@ -1,10 +1,8 @@
 """Appointment views"""
 
-from django.db.models import Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status, mixins
 from rest_framework.filters import OrderingFilter
-from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
@@ -19,9 +17,9 @@ from apps.appointments.api.serializers.appointments import (
 from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk
 
 
-class AppointmentListAPIView(ListAPIView):
+class AppointmentListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """
-    Appointment List API View
+    Appointment List ViewSet
     List all appointments of all users by ADMIN users only.
     """
 
@@ -35,7 +33,7 @@ class AppointmentListAPIView(ListAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.prefetch_related(Prefetch('multimedia'))
+        return queryset.prefetch_related('doctors', 'multimedia')
 
 
 class AppointmentViewSet(
@@ -72,10 +70,10 @@ class AppointmentViewSet(
     def get_queryset(self, user=None, pk=None):
         """Get the list of items for this view."""
         detail = 'Cita no encontrada.'
-        queryset = Appointment.objects.order_by('id').filter(user=user).prefetch_related(Prefetch('multimedia'))
+        queryset = Appointment.objects.order_by('id').filter(user=user).prefetch_related('doctors', 'multimedia')
 
         if user.role == User.Type.DOCTOR:
-            queryset = Appointment.objects.order_by('id').filter(doctor=user)
+            queryset = Appointment.objects.filter(doctors=user).order_by('id')
 
         return get_queryset_with_pk(detail, queryset, pk)
 

@@ -20,7 +20,7 @@ def create_chat_message(data, user):
             user_receiver=user_receiver
         )
 
-        if user_receiver.email is not None:
+        if user_receiver.email:
             context = {
                 'user': user_receiver,
                 'user_owner': user,

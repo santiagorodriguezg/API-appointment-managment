@@ -22,7 +22,7 @@ class AppointmentFilter(FilterSet):
     class Meta:
         model = Appointment
         fields = [
-            'id', 'start_date', 'end_date', 'created_at', 'updated_at', 'doctor__username'
+            'id', 'start_date', 'end_date', 'created_at', 'updated_at', 'doctors__username'
         ]
 
     order_by = OrderingFilter(

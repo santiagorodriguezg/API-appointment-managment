@@ -4,7 +4,7 @@
 SET client_encoding TO 'UTF8';
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
--- aut_group table
+-- auth_group table
 INSERT INTO public.auth_group(id, name)
 VALUES (1, 'Users'),
        (2, 'Doctors');
@@ -69,7 +69,7 @@ VALUES (1, 2, 2),
 
 -- appointment table
 INSERT INTO public.appointment (id, type, children, aggressor, description, audio, start_date, end_date, created_at,
-                                updated_at, doctor_id, user_id)
+                                updated_at, user_id)
 VALUES (1, 'PSY,LEG', '[
   {
     "name": "Maria Hernández",
@@ -85,9 +85,14 @@ VALUES (1, 'PSY,LEG', '[
   "phone": 3143498163,
   "address": "Tunja",
   "more_info": "Lugar de trabajo: Claro"
-}', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415', '2021-04-12 22:56:04.356851', null, 3),
+}', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415', '2021-04-12 22:56:04.356851', 3),
        (2, 'LEG', null, null, 'Violencia intrafamiliar', '', null, null, '2021-09-10 21:16:37.951541 +00:00',
-        '2021-09-10 21:16:37.951541 +00:00', 2, 4);
+        '2021-09-10 21:16:37.951541 +00:00', 4);
+
+
+-- appointment_doctor table
+INSERT INTO public.appointment_doctors(id, appointment_id, user_id)
+VALUES (1, 2, 2);
 
 
 -- room table
@@ -107,5 +112,6 @@ SELECT setval('auth_group_permissions_id_seq', 25);
 SELECT setval('user_id_seq', 4);
 SELECT setval('user_groups_id_seq', 3);
 SELECT setval('appointment_id_seq', 2);
+SELECT setval('appointment_doctors_id_seq', 1);
 SELECT setval('room_id_seq', 2);
 -- SELECT setval('message_id_seq', 3);

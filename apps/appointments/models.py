@@ -14,10 +14,7 @@ class Appointment(models.Model):
     ]
 
     user = models.ForeignKey('accounts.User', verbose_name=_('user'), related_name='patient', on_delete=models.CASCADE)
-    doctor = models.ForeignKey(
-        'accounts.User', verbose_name=_('doctor'), related_name='doctor', on_delete=models.CASCADE, null=True,
-        blank=True
-    )
+    doctors = models.ManyToManyField('accounts.User', verbose_name=_('doctores'), related_name='doctors', blank=True)
     type = models.CharField(verbose_name=_('tipo de cita'), max_length=7)
     children = models.JSONField(verbose_name=_('datos de los hijos'), null=True, blank=True)
     aggressor = models.JSONField(verbose_name=_('datos del agresor'), null=True, blank=True)

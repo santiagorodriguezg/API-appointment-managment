@@ -40,6 +40,15 @@ class AppointmentFactory(factory.django.DjangoModelFactory):
     end_date = factory.LazyAttribute(lambda o: o.start_date + timedelta(days=2))
     user = factory.SubFactory(UserFactory)
 
+    @factory.post_generation
+    def doctors(self, create, extracted, **kwargs):
+        if not create or not extracted:
+            # Simple build, or nothing to add, do nothing.
+            return
+
+        # Add the iterable of doctors using bulk addition
+        self.doctors.add(*extracted)
+
 
 class AppointmentMultimediaIMGFactory(factory.django.DjangoModelFactory):
     """

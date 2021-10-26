@@ -10,9 +10,7 @@ from tests.accounts.factories import UserFactory, UserAdminFactory, UserDoctorFa
 from tests.appointments.factories import (
     AppointmentFactory, AppointmentMultimediaIMGFactory, AppointmentMultimediaPDFactory
 )
-from tests.utils import (
-    API_ENDPOINT_V1, AccessTokenTest, delete_test_audio_files, delete_all_test_files
-)
+from tests.utils import API_ENDPOINT_V1, AccessTokenTest, delete_all_test_files
 
 
 class AppointmentsAdminAPITestCase(APITestCase):
@@ -27,13 +25,18 @@ class AppointmentsAdminAPITestCase(APITestCase):
         self.token = AccessTokenTest().for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
 
+    def tearDown(self) -> None:
+        # Delete test files
+        delete_all_test_files()
+
     def test_appointments_list(self) -> None:
         """
         Appointment List API View test case
         An ADMIN user can list appointments with all fields
         """
-        doctor = UserDoctorFactory()
-        AppointmentFactory.create_batch(2, doctor=doctor)
+        doctors = UserDoctorFactory.create_batch(2)
+        AppointmentFactory.create(doctors=(doctors[0],))
+        AppointmentFactory.create(doctors=(doctors[1],))
 
         response = self.client.get(f'/{API_ENDPOINT_V1}/appointments/')
 
@@ -41,16 +44,19 @@ class AppointmentsAdminAPITestCase(APITestCase):
         self.assertEqual(response.data.get('count'), 2)
 
         appt = response.data.get('results')
-        queryset = Appointment.objects.select_related('user', 'doctor').order_by('-created_at')
+        queryset = Appointment.objects.select_related('user').prefetch_related('doctors').order_by('-created_at')
+
         for i, a in enumerate(queryset):
             self.assertEqual(appt[i]['user']['username'], a.user.username)
-            self.assertEqual(appt[i]['doctor']['username'], a.doctor.username)
+
+            for j, o in enumerate(a.doctors.all()):
+                self.assertEqual(appt[i]['doctors'][j]['username'], o.username)
 
     def test_create_appointment_by_user_admin(self) -> None:
         """Verify that an ADMIN user can create appointments"""
-        doctors = UserDoctorFactory.create_batch(2)
+        doctors = UserDoctorFactory.create_batch(3)
         users = UserFactory.create_batch(2)
-        appointment = AppointmentFactory.build(doctor=doctors[0])
+        appointment = AppointmentFactory.build()
         appointment_img_file = AppointmentMultimediaIMGFactory.build()
         appointment_pdf_file = AppointmentMultimediaPDFactory.build()
 
@@ -58,7 +64,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         data = {
             'type': appointment.type,
             'audio': appointment.audio,
-            'doctor': appointment.doctor.id,
+            'doctors_username': f'{doctors[0].username},{doctors[1].username}',
             'children': json.dumps(appointment.children),
             'aggressor': json.dumps(appointment.aggressor),
             'description': appointment.description,
@@ -75,12 +81,10 @@ class AppointmentsAdminAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Appointment.objects.count(), 1)
-        self.assertEqual(response.data.get('doctor'), data.get('doctor'))
         self.assertIsNone(response.data.get('user'))
+        self.assertEqual(response.data['doctors'][0]['username'], doctors[0].username)
         self.assertEqual(multimedia[0]['file_name'], appointment_img_file.file.name)
-
-        # Delete test files
-        delete_all_test_files()
+        self.assertEqual(multimedia[1]['file_name'], appointment_pdf_file.file.name)
 
     def test_list_appointments_by_user_admin(self) -> None:
         """An ADMIN user can list all appointments with all fields"""
@@ -88,7 +92,7 @@ class AppointmentsAdminAPITestCase(APITestCase):
         user = UserFactory()
         AppointmentFactory()
         AppointmentFactory(user=user)
-        AppointmentFactory(user=user, doctor=doctor)
+        AppointmentFactory(user=user, doctors=(doctor,))
 
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/'
         response = self.client.get(url)
@@ -97,20 +101,25 @@ class AppointmentsAdminAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
 
-        queryset = Appointment.objects.select_related('user', 'doctor').filter(user=user).order_by('-created_at')
+        queryset = (Appointment.objects.select_related('user').prefetch_related('doctors')
+                    .filter(user=user).order_by('-created_at'))
+
         for i, a in enumerate(queryset):
             self.assertEqual(appointments[i]['user']['username'], a.user.username)
-            if a.doctor is None:
-                self.assertIsNone(appointments[i].get('doctor'))
+
+            if not a.doctors.exists():
+                self.assertListEqual(appointments[i]['doctors'], [])
                 continue
-            self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
+
+            for j, o in enumerate(a.doctors.all()):
+                self.assertEqual(appointments[i]['doctors'][j]['username'], o.username)
 
     def test_retrieve_appointment_by_user_admin(self) -> None:
         """Retrieve appointment from the user given Id"""
         doctor = UserDoctorFactory()
         user = UserFactory()
         AppointmentFactory(user=user)
-        appointment = AppointmentFactory(user=user, doctor=doctor)
+        appointment = AppointmentFactory(user=user, doctors=(doctor,))
 
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{appointment.id}/'
         response = self.client.get(url)
@@ -121,20 +130,20 @@ class AppointmentsAdminAPITestCase(APITestCase):
 
         self.assertEqual(appointment_res['id'], appointment.id)
         self.assertEqual(appointment_res['user']['username'], user.username)
-        self.assertEqual(appointment_res['doctor']['username'], doctor.username)
+        self.assertEqual(appointment_res['doctors'][0]['username'], doctor.username)
 
     def test_update_appointment_by_user_admin(self) -> None:
         """Update appointment for given id"""
         doctors = UserDoctorFactory.create_batch(2)
         users = UserFactory.create_batch(2)
         AppointmentFactory(user=users[0])
-        appointment = AppointmentFactory(user=users[0], doctor=doctors[0])
+        appointment = AppointmentFactory(user=users[0], doctors=(doctors[0],))
 
-        new_appointment = AppointmentFactory.build(doctor=doctors[1])
+        new_appointment = AppointmentFactory.build()
         data = {
             'type': new_appointment.type,
             'audio': new_appointment.audio,
-            'doctor': new_appointment.doctor.id,
+            'doctors_username': f'{doctors[1].username}',
             'children': json.dumps(new_appointment.children),
             'aggressor': json.dumps(new_appointment.aggressor),
             'description': new_appointment.description,
@@ -148,12 +157,9 @@ class AppointmentsAdminAPITestCase(APITestCase):
         queryset = Appointment.objects.get(pk=appointment.id, user=users[0])
 
         self.assertEqual(appointment.user_id, queryset.user_id)
-        self.assertEqual(response.data.get('id'), appointment.id)
-        self.assertEqual(response.data.get('doctor'), new_appointment.doctor.id)
-        self.assertEqual(response.data.get('type')[0], new_appointment.type)
-
-        # Delete test files
-        delete_test_audio_files()
+        self.assertEqual(response.data['id'], appointment.id)
+        self.assertEqual(response.data['doctors'][0]['username'], doctors[1].username)
+        self.assertEqual(response.data['type'][0], new_appointment.type)
 
 
 class AppointmentsDoctorAPITestCase(APITestCase):
@@ -170,11 +176,15 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_ENDPOINT_V1}/users/{self.user.username}/appointments/'
 
+    def tearDown(self) -> None:
+        # Delete test files
+        delete_all_test_files()
+
     def test_create_appointment_by_user_doctor(self) -> None:
         """Verify that an DOCTOR user can not create appointments"""
-        doctor = UserDoctorFactory()
+        UserDoctorFactory()
         users = UserFactory.create_batch(2)
-        appointment = AppointmentFactory.build(doctor=doctor, user=users[1])
+        appointment = AppointmentFactory.build()
         data = {
             'type': appointment.type,
             'audio': appointment.audio,
@@ -198,7 +208,7 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         """Verify that a doctor can only list his appointments"""
         user = UserFactory()
         AppointmentFactory.create_batch(2)
-        AppointmentFactory.create_batch(2, doctor=self.user)
+        AppointmentFactory.create_batch(2, doctors=(self.user,))
 
         # Listar citas asociadas al perfil del doctor
         response = self.client.get(self.url)
@@ -207,10 +217,13 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
 
-        queryset = Appointment.objects.select_related('user', 'doctor').filter(doctor=self.user).order_by('-created_at')
+        queryset = (Appointment.objects.select_related('user').prefetch_related('doctors')
+                    .filter(doctors=self.user).order_by('-created_at'))
         for i, a in enumerate(queryset):
             self.assertEqual(appointments[i]['user']['username'], a.user.username)
-            self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
+
+            for j, o in enumerate(a.doctors.all()):
+                self.assertEqual(appointments[i]['doctors'][j]['username'], o.username)
 
         # Listar citas asociadas al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/'
@@ -222,17 +235,17 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         """Retrieve appointment from the user given Id"""
         user = UserFactory()
         AppointmentFactory.create_batch(2)
-        appointment = AppointmentFactory(user=user, doctor=self.user)
+        appointment = AppointmentFactory(user=user, doctors=(self.user,))
 
         url = f'{self.url}{appointment.id}/'
         response = self.client.get(url)
         appointment_res = response.data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Appointment.objects.filter(doctor=self.user).count(), 1)
+        self.assertEqual(Appointment.objects.filter(doctors=self.user).count(), 1)
         self.assertEqual(appointment_res['id'], appointment.id)
         self.assertEqual(appointment_res['user']['username'], user.username)
-        self.assertEqual(appointment_res['doctor']['username'], self.user.username)
+        self.assertEqual(appointment_res['doctors'][0]['username'], self.user.username)
 
         # Obtener cita asociadas al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{appointment.id}/'
@@ -242,13 +255,12 @@ class AppointmentsDoctorAPITestCase(APITestCase):
 
     def test_update_appointment_by_user_doctor(self) -> None:
         """Update appointment for given id"""
-        users = UserFactory.create_batch(2)
-        AppointmentFactory(user=users[0])
-        appointment = AppointmentFactory(user=users[0], doctor=self.user)
+        user = UserFactory()
+        AppointmentFactory(user=user)
+        appointment = AppointmentFactory(user=user, doctors=(self.user,))
 
-        new_appointment = AppointmentFactory.build(user=users[1])
+        new_appointment = AppointmentFactory.build()
         data = {
-            'user': new_appointment.user.id,
             'type': new_appointment.type,
             'audio': new_appointment.audio,
             'description': new_appointment.description,
@@ -258,16 +270,13 @@ class AppointmentsDoctorAPITestCase(APITestCase):
         response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(Appointment.objects.filter(doctor=self.user).count(), 1)
+        self.assertEqual(Appointment.objects.filter(doctors=self.user).count(), 1)
 
         # Actualizar cita asociada al perfil de otro usuario
-        url = f'/{API_ENDPOINT_V1}/users/{users[0].username}/appointments/{appointment.id}/'
+        url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{appointment.id}/'
         response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        # Delete test files
-        delete_test_audio_files()
 
 
 class AppointmentsPatientAPITestCase(APITestCase):
@@ -284,18 +293,22 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(self.token)}')
         self.url = f'/{API_ENDPOINT_V1}/users/{self.user.username}/appointments/'
 
+    def tearDown(self) -> None:
+        # Delete test files
+        delete_all_test_files()
+
     def test_create_appointment_by_user_patient(self) -> None:
         """Verify that an patient user can create appointments"""
         doctor = UserDoctorFactory()
         user = UserFactory()
-        appointment = AppointmentFactory.build(doctor=doctor)
+        appointment = AppointmentFactory.build()
         appointment_img_file = AppointmentMultimediaIMGFactory.build()
         appointment_pdf_file = AppointmentMultimediaPDFactory.build()
 
         data = {
             'type': appointment.type,
             'audio': appointment.audio,
-            'doctor': appointment.doctor.id,
+            'doctors': f'{doctor.username}',
             'children': json.dumps(appointment.children),
             'aggressor': json.dumps(appointment.aggressor),
             'description': appointment.description,
@@ -313,11 +326,10 @@ class AppointmentsPatientAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Appointment.objects.count(), 1)
-        self.assertIsNone(response.data.get('start_date'))
-        self.assertIsNone(response.data.get('end_date'))
         self.assertIsNone(response.data.get('user'))
         self.assertIsNone(response.data.get('doctor'))
         self.assertEqual(multimedia[0]['file_name'], appointment_img_file.file.name)
+        self.assertEqual(multimedia[1]['file_name'], appointment_pdf_file.file.name)
 
         # Crear cita asociada al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/'
@@ -326,14 +338,11 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Appointment.objects.count(), 1)
 
-        # Delete test files
-        delete_all_test_files()
-
     def test_list_appointments_by_user_patient(self) -> None:
         """Verify that a patient can only list his appointments"""
         doctor = UserDoctorFactory()
         AppointmentFactory(user=self.user)
-        AppointmentFactory(user=self.user, doctor=doctor)
+        AppointmentFactory(user=self.user, doctors=(doctor,))
         AppointmentFactory.create_batch(2)
 
         response = self.client.get(self.url)
@@ -342,13 +351,17 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), 2)
 
-        queryset = Appointment.objects.select_related('user', 'doctor').filter(user=self.user).order_by('-created_at')
+        queryset = (Appointment.objects.select_related('user').prefetch_related('doctors')
+                    .filter(user=self.user).order_by('-created_at'))
         for i, a in enumerate(queryset):
             self.assertEqual(appointments[i]['user']['username'], a.user.username)
-            if a.doctor is None:
-                self.assertIsNone(appointments[i].get('doctor'))
+
+            if not a.doctors.exists():
+                self.assertEqual(appointments[i]['doctors'], [])
                 continue
-            self.assertEqual(appointments[i]['doctor']['username'], a.doctor.username)
+
+            for j, o in enumerate(a.doctors.all()):
+                self.assertEqual(appointments[i]['doctors'][j]['username'], o.username)
 
         # Listar citas asociadas al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{doctor.username}/appointments/'
@@ -361,7 +374,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
         doctor = UserDoctorFactory()
         user = UserFactory()
         user_appt = AppointmentFactory(user=user)
-        appointment = AppointmentFactory(user=self.user, doctor=doctor)
+        appointment = AppointmentFactory(user=self.user, doctors=(doctor,))
 
         url = f'{self.url}{appointment.id}/'
         response = self.client.get(url)
@@ -371,7 +384,7 @@ class AppointmentsPatientAPITestCase(APITestCase):
         self.assertEqual(Appointment.objects.filter(user=self.user).count(), 1)
         self.assertEqual(appointment_res['id'], appointment.id)
         self.assertEqual(appointment_res['user']['username'], self.user.username)
-        self.assertEqual(appointment_res['doctor']['username'], doctor.username)
+        self.assertEqual(appointment_res['doctors'][0]['username'], doctor.username)
 
         # Obtener citas asociadas al perfil de otro usuario
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{user_appt.id}/'
@@ -383,19 +396,17 @@ class AppointmentsPatientAPITestCase(APITestCase):
         """Update appointment for given id"""
         doctor = UserDoctorFactory()
         user = UserFactory()
-        user_appt = AppointmentFactory(user=user, doctor=doctor)
+        user_appt = AppointmentFactory(user=user, doctors=(doctor,))
         appointment = AppointmentFactory(user=self.user, start_date=None, end_date=None)
 
-        new_appointment = AppointmentFactory.build(doctor=doctor)
+        new_appointment = AppointmentFactory.build()
         data = {
             'type': new_appointment.type,
             'audio': new_appointment.audio,
-            'doctor': new_appointment.doctor.id,
+            'doctors_username': f'{doctor.username}',
             'children': json.dumps(new_appointment.children),
             'aggressor': json.dumps(new_appointment.aggressor),
             'description': new_appointment.description,
-            'start_date': new_appointment.start_date,
-            'end_date': new_appointment.end_date,
         }
 
         url = f'{self.url}{appointment.id}/'
@@ -403,20 +414,15 @@ class AppointmentsPatientAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Appointment.objects.filter(user=self.user).count(), 1)
-        self.assertEqual(response.data.get('type')[0], new_appointment.type)
-        self.assertIsNone(response.data.get('start_date'))
-        self.assertIsNone(response.data.get('end_date'))
-        self.assertIsNone(response.data.get('doctor'))
-        self.assertListEqual(response.data.get('multimedia'), [])
+        self.assertEqual(response.data['type'][0], new_appointment.type)
+        self.assertListEqual(response.data['doctors'], [])
+        self.assertListEqual(response.data['multimedia'], [])
 
         # Actualizar cita asociada al perfil de otro usuario
         data['user'] = self.user.id
-        data['doctor'] = ''
+        data['doctors_username'] = ''
 
         url = f'/{API_ENDPOINT_V1}/users/{user.username}/appointments/{user_appt.id}/'
         response = self.client.put(url, data, format='multipart')
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        # Delete test files
-        delete_all_test_files()
