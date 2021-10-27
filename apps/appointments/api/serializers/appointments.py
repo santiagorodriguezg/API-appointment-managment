@@ -1,10 +1,12 @@
 """Appointment serializers"""
 
+from django.conf import settings
 from rest_framework import serializers
 
 from apps.appointments.models import Appointment, AppointmentMultimedia
 from apps.accounts.api.serializers.users import UserListRelatedSerializer
 from apps.appointments.utils import StringMultipleChoiceField, DoctorsUsernameField, save_appointment_multimedia
+from gestion_consultas.utils import send_email
 
 
 class AppointmentMultimediaSerializer(serializers.ModelSerializer):
@@ -58,6 +60,14 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
         if doctors:
             instance.doctors.set(doctors)
+            for doctor in doctors:
+                context = {
+                    'user': doctor,
+                    'user_admin': self.context['request'].user,
+                    'appointment': instance,
+                    'appointments_historic_url': f'{settings.CLIENT_DOMAIN}/appointments/historic'
+                }
+                send_email(doctor.email, 'accounts/email/doctor_assignment_notification', context)
 
         return instance
 

@@ -36,7 +36,7 @@ class DoctorsUsernameField(serializers.CharField):
 
     def to_internal_value(self, data):
         data = data.split(',')
-        queryset = User.objects.filter(username__in=data)
+        queryset = User.objects.filter(username__in=data, role=User.Type.DOCTOR)
         if not queryset.exists():
             self.fail('invalid_doctor_username')
         return queryset

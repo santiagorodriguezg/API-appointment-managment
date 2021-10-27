@@ -1,0 +1,15 @@
+{% extends "accounts/email/base.html" %}
+
+{% block content %}
+    <p>
+        <strong>{{ user_admin.get_full_name }}</strong> te ha asignado a una cita.
+    </p>
+    <p>
+        En la página de Histórico de citas puedes filtrar la cita con el código <strong>{{ appointment.id }}</strong>.
+    </p>
+    <div style="text-align: center; margin: 45px 0 60px;">
+        <a href="{{ appointments_historic_url }}" class="btn_link" title="Clic para ver el histórico de citas">
+            Ver Histórico de citas
+        </a>
+    </div>
+{% endblock %}

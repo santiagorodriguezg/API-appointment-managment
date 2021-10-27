@@ -115,7 +115,7 @@ class AppointmentViewSet(
             queryset, data=request.data, partial=partial, context={'request': request}
         )
         if request.user.role == User.Type.ADMIN:
-            serializer = self.get_serializer(queryset, data=request.data, partial=partial)
+            serializer = self.get_serializer(queryset, data=request.data, partial=partial, context={'request': request})
 
         if serializer.is_valid():
             serializer.save()
