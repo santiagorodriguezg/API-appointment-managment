@@ -33,3 +33,10 @@ channels_redis[cryptography]
 
 # Django Searchable Encrypted Fields
 django-searchable-encrypted-fields==0.1.9
+
+# Redis cache
+django-redis==5.0.0
+
+# Celery
+redis==3.5.3
+celery==5.1.2

@@ -7,6 +7,20 @@ from .base import *  # NOQA
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = Path(BASE_DIR, '../static')  # NOQA
 
+# Databases
+DATABASES['default']['CONN_MAX_AGE'] = config('DB_CONN_MAX_AGE', default=60, cast=int)  # NOQA
+
+# Cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f"redis://:{config('REDIS_PASSWORD')}@127.0.0.1:6379/0",  # NOQA
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
 # Security
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SECURE = True

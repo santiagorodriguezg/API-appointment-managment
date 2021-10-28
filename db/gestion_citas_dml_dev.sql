@@ -48,19 +48,19 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
         'luis@outlook.com', '3144823086', '', 'Tunja', null, null, true, true,
         '2021-03-25 23:24:20.752790 +00:00', '2021-04-06 16:18:09.497649 +00:00'),
 
-       (2, 'argon2$argon2id$v=19$m=102400,t=2,p=8$Z0xRSXlQZlZBMU9KcjdUc0hEa1hQVA$NQruGAhdQgdqZOyDhfM3jQ',
-        '2021-10-27 14:34:30.851082 +00:00', false, 'DOC', 'Carlos', 'Perez', 'CC', '54632189', 'carlos',
-        'luis@gmail.com', '3123456789', '', 'Sogamoso', null, null,
-        true, false, '2021-03-25 22:27:34.940033 +00:00', '2021-10-26 16:22:10.625795 +00:00'),
-
-       (3, 'argon2$argon2id$v=19$m=102400,t=2,p=8$bXNlR3AxanV4Y1hvYlFGZ3I0MVpISA$UtXFvptFX3bpziHXniXKhg',
+       (2, 'argon2$argon2id$v=19$m=102400,t=2,p=8$bXNlR3AxanV4Y1hvYlFGZ3I0MVpISA$UtXFvptFX3bpziHXniXKhg',
         '2021-10-26 00:34:01.602680 +00:00', false, 'USR', 'Ana', 'Hernández', 'CC', '7456123', 'ana', 'ana@gmail.com',
         '3124567898', '', 'Duitama', null, null, true, false, '2021-03-25 22:27:34.940033 +00:00',
         '2021-04-06 16:19:56.661574 +00:00'),
 
-       (4, 'argon2$argon2id$v=19$m=102400,t=2,p=8$WVdqZEp2MHF5Z3dESmtzZ0R2dDlDdA$F84JW0+IH4+6Zlj9frhG6A',
+       (3, 'argon2$argon2id$v=19$m=102400,t=2,p=8$WVdqZEp2MHF5Z3dESmtzZ0R2dDlDdA$F84JW0+IH4+6Zlj9frhG6A',
         '2021-10-01 15:38:29.650566 +00:00', false, 'USR', 'Sofia', 'García', 'CC', '2586824', 'sofia', null, null, '',
         null, null, null, true, false, '2021-10-01 15:38:29.652567 +00:00', '2021-10-01 15:38:29.652567 +00:00'),
+
+       (4, 'argon2$argon2id$v=19$m=102400,t=2,p=8$Z0xRSXlQZlZBMU9KcjdUc0hEa1hQVA$NQruGAhdQgdqZOyDhfM3jQ',
+        '2021-10-27 14:34:30.851082 +00:00', false, 'DOC', 'Carlos', 'Perez', 'CC', '54632189', 'carlos',
+        'luis@gmail.com', '3123456789', '', 'Sogamoso', null, null,
+        true, false, '2021-03-25 22:27:34.940033 +00:00', '2021-10-26 16:22:10.625795 +00:00'),
 
        (5, 'argon2$argon2id$v=19$m=102400,t=2,p=8$SkNnQmFOSzVwN3ZoaW1uQ2JxSG1JNg$LeGodylg9Z9Z2C8ozkiq2g', null, false,
         'DOC', 'Andrea', 'Acero Caro', 'CC', '120348183', 'andrea', 'andrea@gmail.com', '3132238204', '', null, null,
@@ -77,9 +77,12 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
 
 -- user_groups table
 INSERT INTO user_groups(id, user_id, group_id)
-VALUES (1, 2, 2),
+VALUES (1, 2, 1),
        (2, 3, 1),
-       (3, 4, 1);
+       (3, 4, 2),
+       (4, 5, 2),
+       (5, 6, 2),
+       (6, 7, 2);
 
 
 -- appointment table

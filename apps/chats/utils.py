@@ -1,11 +1,10 @@
 """Chats utilities"""
 
-from django.conf import settings
 from channels.db import database_sync_to_async
 
 from apps.accounts.models import User
 from apps.chats.models import Room, Message
-from gestion_consultas.utils import send_email
+from apps.chats.tasks import send_chat_message_notification
 
 
 @database_sync_to_async
@@ -21,12 +20,7 @@ def create_chat_message(data, user):
         )
 
         if user_receiver.email:
-            context = {
-                'user': user_receiver,
-                'user_owner': user,
-                'chat_url': f'{settings.CLIENT_DOMAIN}/chat/{room.name}'
-            }
-            send_email(user_receiver.email, 'accounts/email/chat_message_notification', context)
+            send_chat_message_notification.delay(user_receiver.id, user.id, room.name)
 
     return Message.objects.create(room=room, user=user, content=data['content'])
 
