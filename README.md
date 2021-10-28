@@ -5,9 +5,23 @@ la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-fron
 
 ## Requerimientos
 
-**Python 3.9**
+**[Python](https://www.python.org/) 3.9**
 
-**PostgreSQL 13, 14**
+**[PostgreSQL](https://www.postgresql.org/) 13, 14**
+
+**[Redis](https://redis.io/)**
+
+## Instalar Redis en Windows
+
+1. Descargar la última versión del archivo ejecutable del siguiente
+   repositorio: [tporadowski/redis](https://github.com/tporadowski/redis/releases).
+2. Descomprimir el archivo en el disco local `C:\`.
+3. Abrir una consola CMD en la ruta de la carpeta descomprimida y ejecutar el siguiente comando:
+    ```bash
+    redis-server --requirepass REDIS_PASSWORD
+   ```
+   **Nota:** Reemplazar `REDIS_PASSWORD` por una contraseña segura. Esta contraseña se usará en la configuración de las
+   variables de entorno del archivo `.env`. Ver el archivo `.env.example` y la sección [configuración](#configuración).
 
 ## Instalación en local
 
@@ -42,21 +56,23 @@ la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-fron
    pip install -r requirements/local.txt
    ```
 
-7. Configurar variables de entorno en el archivo `.env`. Ver el archivo `.env.example` y la
+7. Ejecutar redis. Ver la sección [Instalar Redis en Windows](#instalar-redis-en-windows).
+
+8. Configurar variables de entorno en el archivo `.env`. Ver el archivo `.env.example` y la
    sección [configuración](#configuración).
 
 
-8. Ejecutar migraciones:
+9. Ejecutar migraciones:
 
    ```bash
    python manage.py migrate
    ```
 
-9. Ejecutar la aplicación en el modo de desarrollo:
+10. Ejecutar la aplicación en el modo de desarrollo:
 
-   ```bash
-   python manage.py runserver
-   ```
+    ```bash
+    python manage.py runserver
+    ```
 
 ## Configuración
 
