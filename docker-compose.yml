@@ -41,6 +41,18 @@ services:
       - postgres_server
       - redis
 
+  celery_worker:
+    build: .
+    command: celery -A gestion_consultas worker -l INFO
+    depends_on:
+      - redis
+
+  celery_beat:
+    build: .
+    command: celery -A gestion_consultas beat -l INFO
+    depends_on:
+      - redis
+
   nginx:
     build: ./nginx
     ports:

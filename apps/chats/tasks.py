@@ -8,7 +8,7 @@ from apps.chats.models import Room
 from gestion_consultas.utils import send_email
 
 
-@shared_task(autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
+@shared_task(autoretry_for=(Exception,), retry_kwargs={'max_retries': 2})
 def send_chat_message_notification(user_receiver_pk, user_owner_pk, room_name):
     """
     Sends an e-mail to the user receiving the chat.

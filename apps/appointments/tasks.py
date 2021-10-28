@@ -8,7 +8,7 @@ from apps.appointments.models import Appointment
 from gestion_consultas.utils import send_email
 
 
-@shared_task(autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})
+@shared_task(autoretry_for=(Exception,), retry_kwargs={'max_retries': 2})
 def send_doctor_assignment_notification(doctors_pks, user_admin_pk, appointment_pk):
     """Sends an email to users with a doctor role that has been assigned to an appointment"""
     doctors = User.objects.filter(pk__in=doctors_pks)
