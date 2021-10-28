@@ -103,14 +103,14 @@ VALUES (1, 'PSY,LEG', '[
   "phone": 3143498163,
   "address": "Tunja",
   "more_info": "Lugar de trabajo: Claro"
-}', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415', '2021-04-12 22:56:04.356851', 3),
+}', 'No tengo datos', '', null, null, '2021-04-12 13:41:53.275415', '2021-04-12 22:56:04.356851', 2),
        (2, 'LEG', null, null, 'Violencia intrafamiliar', '', null, null, '2021-09-10 21:16:37.951541 +00:00',
-        '2021-09-10 21:16:37.951541 +00:00', 4);
+        '2021-09-10 21:16:37.951541 +00:00', 3);
 
 
 -- appointment_doctor table
 INSERT INTO public.appointment_doctors(id, appointment_id, user_id)
-VALUES (1, 2, 2);
+VALUES (1, 1, 4);
 
 
 -- room table

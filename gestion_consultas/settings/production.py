@@ -14,7 +14,7 @@ DATABASES['default']['CONN_MAX_AGE'] = config('DB_CONN_MAX_AGE', default=60, cas
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f"redis://:{config('REDIS_PASSWORD')}@127.0.0.1:6379/0",  # NOQA
+        'LOCATION': config('REDIS_URL'),  # NOQA
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -64,7 +64,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [f"redis://:{config('REDIS_PASSWORD')}@127.0.0.1:6379/0"],  # NOQA
+            "hosts": [config('REDIS_URL')],  # NOQA
             "symmetric_encryption_keys": config('REDIS_SYMMETRIC_ENCRYPTION_KEYS', cast=Csv()),  # NOQA
         },
     },
