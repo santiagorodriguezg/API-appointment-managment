@@ -1,6 +1,7 @@
 """Chats Celery tasks"""
 
 from django.conf import settings
+from django.core.management import call_command
 from celery import shared_task
 
 from apps.accounts.models import User
@@ -24,3 +25,13 @@ def send_chat_message_notification(user_receiver_pk, user_owner_pk, room_name):
         'chat_url': f'{settings.CLIENT_DOMAIN}/chat/{room.name}'
     }
     send_email(user_receiver.email, 'accounts/email/chat_message_notification', context)
+
+
+@shared_task
+def delete_token_blacklist():
+    """
+    Delete any tokens from the outstanding list and blacklist that have expired.
+    https://django-rest-framework-simplejwt.readthedocs.io/en/latest/blacklist_app.html#blacklist-app
+    """
+    call_command('flushexpiredtokens')
+    print("djangorestframework-simplejwt command flushexpiredtokens completed")

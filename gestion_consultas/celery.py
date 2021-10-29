@@ -1,7 +1,8 @@
 import os
 
-from celery import Celery
 from decouple import config
+from celery import Celery
+from celery.schedules import crontab
 
 settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
 
@@ -23,3 +24,14 @@ app.autodiscover_tasks()
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+
+
+app.conf.beat_schedule = {
+    # Scheduler Name
+    'delete_token_blacklist_daily_at_midnight': {
+        # Task Name
+        'task': 'apps.chats.tasks.delete_token_blacklist',
+        # Schedule
+        'schedule': crontab(minute=0, hour=0),
+    },
+}
