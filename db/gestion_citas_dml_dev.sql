@@ -63,7 +63,7 @@ VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ
         true, false, '2021-03-25 22:27:34.940033 +00:00', '2021-10-26 16:22:10.625795 +00:00'),
 
        (5, 'argon2$argon2id$v=19$m=102400,t=2,p=8$SkNnQmFOSzVwN3ZoaW1uQ2JxSG1JNg$LeGodylg9Z9Z2C8ozkiq2g', null, false,
-        'DOC', 'Andrea', 'Acero Caro', 'CC', '120348183', 'andrea', 'andrea@gmail.com', '3132238204', '', null, null,
+        'DOC', 'Andrea', 'Romero Vega', 'CC', '120348183', 'andrea', 'andrea@gmail.com', '3132238204', '', null, null,
         null, true, false, '2021-10-26 21:03:34.865981 +00:00', '2021-10-26 21:03:34.865981 +00:00'),
 
        (6, 'argon2$argon2id$v=19$m=102400,t=2,p=8$cmlMNEJ6eDhLOGdPZFFzTG1vaDNFUA$Fiedzlui+WDoyAZNStD+jw', null, false,

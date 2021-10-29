@@ -27,6 +27,28 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 
+# https://docs.djangoproject.com/en/3.2/ref/settings/#secure-ssl-redirect
+# SECURE_SSL_REDIRECT=True
+
+# https://docs.djangoproject.com/en/3.2/ref/settings/#secure-hsts-seconds
+# SECURE_HSTS_SECONDS=0
+
+
+# Admin
+
+# A list of all the people who get code error notifications.
+# https://docs.djangoproject.com/en/3.2/ref/settings/#admins
+# ADMINS = [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+
+# A list of all the people who should get broken link notifications.
+# https://docs.djangoproject.com/en/3.2/ref/settings/#managers
+# MANAGERS = ADMINS
+
+# By default, Django will send system email from root@localhost.
+# However, some mail providers reject all email from this address.
+# https://docs.djangoproject.com/en/3.2/ref/settings/#server-email
+# SERVER_EMAIL = webmaster@example.com
+
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [

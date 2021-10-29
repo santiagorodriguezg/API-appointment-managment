@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  postgres_server:
+  postgres:
     image: postgres:14
     restart: always
     environment:
@@ -24,8 +24,9 @@ services:
 
   api:
     build: .
+    image: gestion_consultas_api
     command: bash -c "
-      while !</dev/tcp/postgres_server/5432; do sleep 1; done;
+      while !</dev/tcp/postgres/5432; do sleep 1; done;
       python manage.py migrate --noinput
       && python manage.py collectstatic --noinput
       && python manage.py runserver 0.0.0.0:8000
@@ -38,23 +39,24 @@ services:
       - static:/code/static
       - media:/code/media
     depends_on:
-      - postgres_server
+      - postgres
       - redis
 
   celery_worker:
-    build: .
+    image: gestion_consultas_api
     command: celery -A gestion_consultas worker -l INFO
     volumes:
       - .:/code
 
   celery_beat:
-    build: .
+    image: gestion_consultas_api
     command: celery -A gestion_consultas beat -l INFO
     volumes:
       - .:/code
 
   nginx:
     build: ./nginx
+    image: gestion_consultas_api_nginx
     ports:
       - "8080:80"
     volumes:
