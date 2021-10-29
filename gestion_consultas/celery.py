@@ -30,7 +30,7 @@ app.conf.beat_schedule = {
     # Scheduler Name
     'delete_token_blacklist_daily_at_midnight': {
         # Task Name
-        'task': 'apps.chats.tasks.delete_token_blacklist',
+        'task': 'apps.accounts.tasks.delete_token_blacklist',
         # Schedule
         'schedule': crontab(minute=0, hour=0),
     },

@@ -81,7 +81,7 @@ la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-fron
 
 12. Ejecutar [Celery Beat](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html) (Tareas periódicas):
      ```bash
-    celery -A gestion_consultas worker -l INFO
+    celery -A gestion_consultas beat -l INFO
     ```
 
 ## Configuración
