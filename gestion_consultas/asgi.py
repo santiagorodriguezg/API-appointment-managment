@@ -1,5 +1,5 @@
 """
-ASGI config for gestion_citas project.
+ASGI config for gestion_consultas project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,19 +11,24 @@ import os
 
 from django.urls import re_path
 from django.core.asgi import get_asgi_application
-from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import AllowedHostsOriginValidator
 from decouple import config
-
-from apps.chats.api.consumers import messages
-from gestion_consultas.middleware import JwtAuthMiddleware
 
 settings = 'local' if config('DJANGO_ENV', default='dev') == 'dev' else 'production'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'gestion_consultas.settings.{settings}')
 
+# Initialize Django ASGI application early to ensure the AppRegistry
+# is populated before importing code that may import ORM models.
+django_asgi_app = get_asgi_application()
+
+from channels.auth import AuthMiddlewareStack  # NOQA
+from channels.routing import ProtocolTypeRouter, URLRouter  # NOQA
+from channels.security.websocket import AllowedHostsOriginValidator  # NOQA
+
+from gestion_consultas.middleware import JwtAuthMiddleware  # NOQA
+from apps.chats.api.consumers import messages  # NOQA
+
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_asgi_app,
     'websocket': AllowedHostsOriginValidator(
         JwtAuthMiddleware(
             AuthMiddlewareStack(

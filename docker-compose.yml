@@ -22,7 +22,7 @@ services:
     volumes:
       - redis:/var/lib/redis/data
 
-  api: &api
+  api:
     build: .
     command: bash -c "
       while !</dev/tcp/postgres_server/5432; do sleep 1; done;
@@ -42,12 +42,16 @@ services:
       - redis
 
   celery_worker:
-    <<: *api
+    build: .
     command: celery -A gestion_consultas worker -l INFO
+    volumes:
+      - .:/code
 
   celery_beat:
-    <<: *api
+    build: .
     command: celery -A gestion_consultas beat -l INFO
+    volumes:
+      - .:/code
 
   nginx:
     build: ./nginx

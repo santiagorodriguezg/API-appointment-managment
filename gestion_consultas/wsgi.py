@@ -1,5 +1,5 @@
 """
-WSGI config for gestion_citas project.
+WSGI config for gestion_consultas project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
