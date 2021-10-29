@@ -74,7 +74,7 @@ ROOT_URLCONF = 'gestion_consultas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [Path(BASE_DIR, '../templates')],
+        'DIRS': [BASE_DIR.parent / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -148,7 +148,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 
 # MEDIA
 MEDIA_URL = '/media/'
-MEDIA_ROOT = Path(BASE_DIR, '../media')
+MEDIA_ROOT = BASE_DIR.parent / 'media'
 
 # User model
 AUTH_USER_MODEL = 'accounts.User'
@@ -157,9 +157,9 @@ AUTH_USER_MODEL = 'accounts.User'
 ADMIN_URL = config('DJANGO_ADMIN_URL')
 
 # Email settings
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')  # env
+EMAIL_PORT = config('EMAIL_PORT', cast=int)  # env
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)  # env
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # env
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # env
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')  # env

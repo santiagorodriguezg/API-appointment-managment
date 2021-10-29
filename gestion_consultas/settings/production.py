@@ -5,7 +5,7 @@ from datetime import timedelta
 from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
-STATIC_ROOT = Path(BASE_DIR, '../static')  # NOQA
+STATIC_ROOT = BASE_DIR.parent / 'static'  # NOQA
 
 # Databases
 DATABASES['default']['CONN_MAX_AGE'] = config('DB_CONN_MAX_AGE', default=60, cast=int)  # NOQA

@@ -74,6 +74,16 @@ la [interfaz gráfica](https://github.com/luisgomez29/gestion-consultas-api-fron
     python manage.py runserver
     ```
 
+11. Ejecutar [Celery Worker](https://docs.celeryproject.org/en/stable/userguide/workers.html) (Tareas):
+     ```bash
+    celery -A gestion_consultas worker -l INFO -P threads
+    ```
+
+12. Ejecutar [Celery Beat](https://docs.celeryproject.org/en/stable/userguide/periodic-tasks.html) (Tareas periódicas):
+     ```bash
+    celery -A gestion_consultas worker -l INFO
+    ```
+
 ## Configuración
 
 ### Crear usuario administrador desde la consola

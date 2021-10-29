@@ -5,7 +5,7 @@ from datetime import timedelta
 from .base import *  # NOQA
 
 # Static files (CSS, JavaScript, Images)
-STATICFILES_DIRS = (Path(BASE_DIR, '../static'),)  # NOQA
+STATICFILES_DIRS = (BASE_DIR.parent / 'static',)  # NOQA
 
 # Django REST Framework
 REST_FRAMEWORK = {
