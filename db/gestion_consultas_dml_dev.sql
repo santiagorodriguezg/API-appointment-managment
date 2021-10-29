@@ -45,7 +45,7 @@ INSERT INTO public."user" (id, password, last_login, is_superuser, role, first_n
                            is_active, is_staff, created_at, updated_at)
 VALUES (1, 'argon2$argon2id$v=19$m=102400,t=2,p=8$b2JSRExFU3E5YWgyazZTUUh4d0w4YQ$HXkzz+zSJt9WdBEZy75Fcg',
         '2021-10-27 14:52:26.822815 +00:00', true, 'ADMIN', 'Luis', 'Gómez', 'CC', '1234567', 'luis',
-        'luis@outlook.com', '3144823086', '', 'Tunja', null, null, true, true,
+        'luis@outlook.com', '3148923851', '', 'Tunja', null, null, true, true,
         '2021-03-25 23:24:20.752790 +00:00', '2021-04-06 16:18:09.497649 +00:00'),
 
        (2, 'argon2$argon2id$v=19$m=102400,t=2,p=8$bXNlR3AxanV4Y1hvYlFGZ3I0MVpISA$UtXFvptFX3bpziHXniXKhg',

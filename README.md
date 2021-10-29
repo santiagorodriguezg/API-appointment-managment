@@ -185,5 +185,5 @@ pytest
 Para iniciar los contenedores detenidos ejecutar el comando:
 
 ```bash
-docker start $(docker ps -aqf "name=gestion-consultas")
+docker start $(docker ps -aqf "name=gestion_consultas")
 ```
