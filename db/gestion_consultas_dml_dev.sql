@@ -128,7 +128,7 @@ VALUES (1, 'roomtest1', '2021-04-17 19:16:04.510000', 1, 3),
 SELECT setval('auth_group_id_seq', 2);
 SELECT setval('auth_group_permissions_id_seq', 25);
 SELECT setval('user_id_seq', 7);
-SELECT setval('user_groups_id_seq', 3);
+SELECT setval('user_groups_id_seq', 6);
 SELECT setval('appointment_id_seq', 2);
 SELECT setval('appointment_doctors_id_seq', 1);
 SELECT setval('room_id_seq', 2);

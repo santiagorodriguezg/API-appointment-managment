@@ -1,4 +1,4 @@
 {% load i18n %}
 {% autoescape off %}
-{% blocktrans %}Has sido asignado a una cita{% endblocktrans %}
+{% blocktrans %}Te ha sido asignada una cita{% endblocktrans %}
 {% endautoescape %}
