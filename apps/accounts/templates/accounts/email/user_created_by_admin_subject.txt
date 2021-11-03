@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}Te han registrado en la Casa de la Mujer UPTC - Tunja{% endblocktrans %}
+{% endautoescape %}

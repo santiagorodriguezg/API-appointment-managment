@@ -3,6 +3,7 @@
 from rest_framework import serializers
 
 from apps.accounts.models import User
+from apps.accounts.tasks import send_email_to_user_created_by_admin
 from apps.accounts.utils import clean_password2, validate_username, generate_password_reset_link
 
 
@@ -85,6 +86,9 @@ class UserCreateSerializer(UserBaseModelSerializer):
             user.is_superuser = True
             user.is_staff = True
         user.save()
+        # Send email
+        if user.email:
+            send_email_to_user_created_by_admin.delay(user.id, validated_data['password'])
         return user
 
 

@@ -1,0 +1,16 @@
+{% extends "accounts/email/base.html" %}
+
+{% block content %}
+    <p>Te han registrado en la plataforma Casa de la Mujer UPTC - Tunja.</p>
+    <p>A continuación los datos de acceso:</p>
+    <ul>
+        <li><strong>Usuario:</strong> {{ user.username }}</li>
+        <li><strong>Contraseña:</strong> {{ password }}</li>
+    </ul>
+    <p><strong>Nota:</strong> Al iniciar sesión cambia la contraseña.</p>
+    <div style="text-align: center; margin: 45px 0 60px;">
+        <a href="{{ login_url }}" class="btn_link" title="Clic para iniciar sesión">
+            Iniciar sesión
+        </a>
+    </div>
+{% endblock %}
