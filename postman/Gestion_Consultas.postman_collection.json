@@ -92,7 +92,7 @@
 								},
 								{
 									"key": "role",
-									"value": "ADMIN",
+									"value": "DOC",
 									"disabled": true
 								},
 								{
@@ -410,6 +410,61 @@
 						"description": "Genera el enlace de restablecimiento de la contraseña para un usuario"
 					},
 					"response": []
+				},
+				{
+					"name": "Doctors list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/{{api_version}}/users/doctors/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{api_version}}",
+								"users",
+								"doctors",
+								""
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "3",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -647,7 +702,8 @@
 								{
 									"key": "refresh",
 									"value": "{{token_refresh}}",
-									"type": "text"
+									"type": "text",
+									"disabled": true
 								}
 							]
 						},
@@ -753,27 +809,39 @@
 								},
 								{
 									"key": "multimedia[0]file_type",
-									"value": "IMG",
+									"value": "PDF",
 									"type": "text",
 									"disabled": true
 								},
 								{
 									"key": "multimedia[1]file",
-									"value": "",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								},
+								{
+									"key": "multimedia[1]file_type",
+									"value": "IMG",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "doctors_username",
+									"value": "luis,carlos",
 									"type": "text",
 									"disabled": true
 								}
 							]
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/sofia/appointments/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"sofia",
+								"ana",
 								"appointments",
 								""
 							]
@@ -813,8 +881,8 @@
 									"disabled": true
 								},
 								{
-									"key": "doctor__username",
-									"value": "luis",
+									"key": "doctors__username",
+									"value": "carlos",
 									"disabled": true
 								},
 								{
@@ -859,14 +927,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/sofia/appointments/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"sofia",
+								"ana",
 								"appointments",
 								""
 							],
@@ -921,7 +989,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/ana/appointments/2/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/4/",
 							"host": [
 								"{{host}}"
 							],
@@ -930,7 +998,7 @@
 								"users",
 								"ana",
 								"appointments",
-								"2",
+								"4",
 								""
 							]
 						}
@@ -940,10 +1008,40 @@
 				{
 					"name": "User Appointment Partial Update (ADMIN, USER)",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PATCH",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "doctors_username",
+									"value": "andrea,camilo",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "LEG,PSY",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/ana/appointments/2/",
+							"raw": "{{host}}/{{api_version}}/users/ana/appointments/1/",
 							"host": [
 								"{{host}}"
 							],
@@ -952,7 +1050,7 @@
 								"users",
 								"ana",
 								"appointments",
-								"2",
+								"1",
 								""
 							]
 						}
@@ -980,14 +1078,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/{{api_version}}/users/ana/rooms/",
+							"raw": "{{host}}/{{api_version}}/users/luis/rooms/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"{{api_version}}",
 								"users",
-								"ana",
+								"luis",
 								"rooms",
 								""
 							],

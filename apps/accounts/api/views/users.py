@@ -13,7 +13,7 @@ from apps.accounts.api.permissions import IsAdminOrDoctorUser
 from apps.accounts.api.filters.users import UserFilter
 from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
-    UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer
+    UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer, UserListRelatedSerializer
 )
 from gestion_consultas.utils import UnaccentedSearchFilter
 
@@ -108,6 +108,14 @@ class UserModelViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=False)
+    def doctors(self, request):
+        """Lists the doctor type users. The endpoint is public."""
+        queryset = User.objects.filter(role=User.Type.DOCTOR)
+        page = self.paginate_queryset(queryset)
+        serializer = UserListRelatedSerializer(page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(methods=['get', 'put', 'patch'], detail=False)
     def profile(self, request):
