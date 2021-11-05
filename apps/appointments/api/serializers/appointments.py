@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from apps.appointments.models import Appointment, AppointmentMultimedia
 from apps.accounts.api.serializers.users import UserListRelatedSerializer
-from apps.appointments.tasks import send_doctor_assignment_notification
+from apps.appointments.tasks import send_doctor_assignment_notification, send_admin_email_new_appointment
 from apps.appointments.utils import StringMultipleChoiceField, DoctorsUsernameField, save_appointment_multimedia
 
 
@@ -87,7 +87,9 @@ class AppointmentUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         multimedia = validated_data.pop('multimedia', None)
         appointment = Appointment.objects.create(**validated_data)
-        return save_appointment_multimedia(multimedia, appointment)
+        save_appointment_multimedia(multimedia, appointment)
+        send_admin_email_new_appointment.delay(validated_data['user'].id, appointment.id)
+        return appointment
 
     def update(self, instance, validated_data):
         """Update the user's appointment. Media files are not updated."""

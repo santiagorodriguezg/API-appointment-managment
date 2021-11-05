@@ -163,7 +163,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(
         _('activo'),
         default=True,
-        help_text=_('Indica que la cuenta del usuario está activa.')
+        help_text=_('Indica si la cuenta del usuario está activa.')
     )
     is_staff = models.BooleanField(
         _('login en admin'),

@@ -112,7 +112,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def doctors(self, request):
         """Lists the doctor type users. The endpoint is public."""
-        queryset = User.objects.filter(role=User.Type.DOCTOR)
+        queryset = User.objects.filter(role=User.Type.DOCTOR, is_active=True)
         page = self.paginate_queryset(queryset)
         serializer = UserListRelatedSerializer(page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
