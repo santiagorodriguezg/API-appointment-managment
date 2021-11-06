@@ -66,7 +66,10 @@ class LoginSerializer(serializers.Serializer):
 
         user = authenticate(username=data['username'], password=data['password'])
         if not user:
-            raise AuthenticationFailed(detail='Usuario o contraseña incorrectos')
+            raise AuthenticationFailed(detail='Usuario o contraseña incorrectos.')
+
+        if not user.is_active:
+            raise AuthenticationFailed(detail='Su cuenta ha sido desactivada.')
 
         # if not user.is_verified:
         #     raise serializers.ValidationError('Account is not active yet :(')
