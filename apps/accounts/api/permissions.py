@@ -13,10 +13,7 @@ class IsAdminOrDoctorUser(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        if user.is_authenticated:
-            if user.is_staff or user.role == User.Type.DOCTOR:
-                return True
-        return False
+        return True if user.is_authenticated and (user.is_staff or user.role == User.Type.DOCTOR) else False
 
 
 def is_account_owner(request_user, username):

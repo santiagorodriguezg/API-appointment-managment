@@ -61,10 +61,8 @@ class AppointmentViewSet(
 
     def get_serializer_class(self):
         """Assign serializer based on action."""
-        if self.action in ['create', 'update', 'partial_update']:
-            serializer = AppointmentSerializer
-        else:
-            serializer = AppointmentListSerializer
+        actions = ['create', 'update', 'partial_update']
+        serializer = AppointmentSerializer if self.action in actions else AppointmentListSerializer
         return serializer
 
     def get_queryset(self, user=None, pk=None):

@@ -37,10 +37,7 @@ def messages_to_json(messages):
     :param messages: Message object list
     :return: All messages in JSON format
     """
-    result = []
-    for message in messages:
-        result.append(message_to_json(message))
-    return result
+    return [message_to_json(message) for message in messages]
 
 
 def message_to_json(message):

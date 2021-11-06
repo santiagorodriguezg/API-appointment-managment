@@ -63,9 +63,9 @@ class UserModelViewSet(viewsets.ModelViewSet):
         if self.request.user.role == User.Type.ADMIN:
             obj = queryset.filter(username=username).first()
 
-        if obj is not None:
-            return obj
-        raise NotFound(detail='Usuario no encontrado.')
+        if obj is None:
+            raise NotFound(detail='Usuario no encontrado.')
+        return obj
 
     def retrieve(self, request, username=None, *args, **kwargs):
         """User by username"""
@@ -122,10 +122,7 @@ class UserModelViewSet(viewsets.ModelViewSet):
         """Get and update the logged-in user's profile"""
         if request.method == 'GET':
             user = self.get_object()
-            if request.user.role == User.Type.ADMIN:
-                serializer = self.get_serializer(user)
-            else:
-                serializer = UserListSerializer(user)
+            serializer = self.get_serializer(user) if request.user.role == User.Type.ADMIN else UserListSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             partial = request.method == 'PATCH'

@@ -38,9 +38,9 @@ class RoomListViewSet(ReadOnlyModelViewSet):
     def get_object(self, user=None, room_name=None):
         queryset = self.filter_queryset(self.get_queryset(user=user))
         queryset = queryset.filter(name=room_name).first()
-        if queryset is not None:
-            return queryset
-        raise NotFound(detail='Chat no encontrado.')
+        if queryset is None:
+            raise NotFound(detail='Chat no encontrado.')
+        return queryset
 
     def list(self, request, username=None, *args, **kwargs):
         """User list chat rooms"""

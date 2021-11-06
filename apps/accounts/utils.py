@@ -25,17 +25,16 @@ def delete_user_sessions(user):
         for session in all_sessions:
             session_data = session.get_decoded()
             session_user = session_data.get('_auth_user_id')
-            if session_user:
-                if user.id == int(session_user):
-                    session.delete()
+            if session_user and user.id == int(session_user):
+                session.delete()
 
 
 def validate_username(value):
     """Verify that the user account exists"""
     user = User.objects.filter(username=value, is_active=True).first()
-    if user is not None:
-        return user
-    raise NotFound(detail='El usuario no está asignado a ninguna cuenta.', code='user_not_found')
+    if user is None:
+        raise NotFound(detail='El usuario no está asignado a ninguna cuenta.', code='user_not_found')
+    return user
 
 
 def clean_password2(instance, data):

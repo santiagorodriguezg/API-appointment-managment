@@ -69,7 +69,7 @@ class LoginSerializer(serializers.Serializer):
             raise AuthenticationFailed(detail='Usuario o contraseña incorrectos.')
 
         if not user.is_active:
-            raise AuthenticationFailed(detail='Su cuenta ha sido desactivada.')
+            raise AuthenticationFailed(detail='Esta cuenta está inactiva.')
 
         # if not user.is_verified:
         #     raise serializers.ValidationError('Account is not active yet :(')
@@ -117,7 +117,7 @@ class PasswordResetEmailSerializer(serializers.Serializer):
     def save(self, **kwargs):
         """Send password reset email"""
 
-        if self.instance.email is None:
+        if not self.instance.email:
             self.context['send_email'] = False
         else:
             template_context = {
