@@ -14,7 +14,7 @@ from apps.appointments.api.filters.appointments import AppointmentFilter
 from apps.appointments.api.serializers.appointments import (
     AppointmentSerializer, AppointmentUserSerializer, AppointmentListSerializer
 )
-from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk
+from gestion_consultas.utils import UnaccentedSearchFilter, get_queryset_with_pk, ResponseWithErrors
 
 
 class AppointmentListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -79,13 +79,16 @@ class AppointmentViewSet(
         """Users with ADMIN and USER roles can create appointments."""
         check_permissions(request.user, username, 'appointments.add_appointment')
         serializer = AppointmentUserSerializer(data=request.data, context={'request': request})
+
         if request.user.role == User.Type.ADMIN:
             user = self.get_user(request, username)
             serializer = self.get_serializer(data=request.data, context={'user': user})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return ResponseWithErrors(serializer.errors)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, username=None, *args, **kwargs):
         """User appointments"""
@@ -115,7 +118,8 @@ class AppointmentViewSet(
         if request.user.role == User.Type.ADMIN:
             serializer = self.get_serializer(queryset, data=request.data, partial=partial, context={'request': request})
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

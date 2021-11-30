@@ -8,6 +8,7 @@ from apps.accounts.api.serializers.accounts import (
 )
 from apps.accounts.api.serializers.users import UserListSerializer
 from apps.accounts.utils import get_user_from_uidb64, check_password_reset_token
+from gestion_consultas.utils import ResponseWithErrors
 
 
 class SignupAPIView(generics.GenericAPIView):
@@ -17,15 +18,17 @@ class SignupAPIView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            data = {
-                'access': serializer.context['access'],
-                'refresh': serializer.context['refresh'],
-                'user': UserListSerializer(user).data,
-            }
-            return Response(data, status=status.HTTP_201_CREATED)
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return ResponseWithErrors(serializer.errors)
+
+        user = serializer.save()
+        data = {
+            'access': serializer.context['access'],
+            'refresh': serializer.context['refresh'],
+            'user': UserListSerializer(user).data,
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class LoginAPIView(generics.GenericAPIView):
@@ -46,6 +49,7 @@ class LoginAPIView(generics.GenericAPIView):
 
 class LogoutAPIView(generics.GenericAPIView):
     """User logout view"""
+
     serializer_class = LogoutSerializer
 
     def post(self, request):

@@ -15,7 +15,7 @@ from apps.accounts.api.serializers.users import (
     UserListSerializer, UserListAdminSerializer, UserCreateSerializer, UserPasswordChangeSerializer,
     UserProfileUpdateSerializer, UserUpdateSerializer, UserPasswordResetSerializer, UserListRelatedSerializer
 )
-from gestion_consultas.utils import UnaccentedSearchFilter
+from gestion_consultas.utils import UnaccentedSearchFilter, ResponseWithErrors
 
 
 class UserModelViewSet(viewsets.ModelViewSet):
@@ -91,10 +91,11 @@ class UserModelViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
 
         serializer = UserCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(UserListAdminSerializer(user).data, status=status.HTTP_201_CREATED)
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return ResponseWithErrors(serializer.errors)
+
+        user = serializer.save()
+        return Response(UserListAdminSerializer(user).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, username=None, *args, **kwargs):
         """Update users for given Id"""
@@ -104,10 +105,12 @@ class UserModelViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         partial = request.method == 'PATCH'
         serializer = UserUpdateSerializer(user, data=request.data, partial=partial, context={'request': request})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return ResponseWithErrors(serializer.errors)
+
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=False)
     def doctors(self, request):
@@ -129,22 +132,25 @@ class UserModelViewSet(viewsets.ModelViewSet):
             serializer = UserProfileUpdateSerializer(
                 request.user, data=request.data, partial=partial, context={'request': request}
             )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            if not serializer.is_valid():
+                return ResponseWithErrors(serializer.errors)
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['patch'], detail=False, url_path='password/change')
     def change_password(self, request):
         """User change password"""
         serializer = UserPasswordChangeSerializer(request.user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {'success': True, 'message': 'Su contraseña fue actualizada correctamente.'},
-                status=status.HTTP_201_CREATED
-            )
-        return Response({'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not serializer.is_valid():
+            return ResponseWithErrors(serializer.errors)
+
+        serializer.save()
+        return Response(
+            {'success': True, 'message': 'Su contraseña fue actualizada correctamente.'},
+            status=status.HTTP_201_CREATED
+        )
 
     @action(methods=['get'], detail=True, url_path='password/reset')
     def password_reset(self, request, username=None):

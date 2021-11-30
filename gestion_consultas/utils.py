@@ -5,6 +5,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.db.models import Value
 from django.db.models.functions import Concat
 from django.template.loader import render_to_string
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter
 
@@ -20,6 +22,16 @@ class UnaccentedSearchFilter(SearchFilter):
         '@': 'search',
         '$': 'iregex',
     }
+
+
+class ResponseWithErrors(Response):
+    """
+    ResponseWithErrors is used to return serializer errors.
+    By default it has the status HTTP 400 Bad Request.
+    """
+
+    def __init__(self, errors):
+        super().__init__(data={'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def get_queryset_with_pk(detail, queryset, pk):
